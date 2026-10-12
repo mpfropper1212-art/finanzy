@@ -326,7 +326,15 @@ export function createAccountsEditor({ accountHost, transferHost, store, request
       const balance = el('input', { type: 'number', step: '10', value: node.balance });
       const del = el('button', { class: 'icon-btn', type: 'button', title: 'Konto löschen' }, '×');
 
-      name.addEventListener('input', () => { node.name = name.value; valueChange(); });
+      name.addEventListener('input', () => {
+        node.name = name.value;
+        // Die Auswahlfelder der Umbuchungen zeigen denselben Namen - direkt
+        // nachziehen, statt die Zeilen unter dem Cursor neu zu bauen.
+        for (const opt of transferHost.querySelectorAll(`option[value="${node.id}"]`)) {
+          opt.textContent = name.value;
+        }
+        valueChange();
+      });
       type.addEventListener('change', () => { node.type = type.value; valueChange(); });
       balance.addEventListener('input', () => { node.balance = Number(balance.value) || 0; valueChange(); });
       del.addEventListener('click', () => {
