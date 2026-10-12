@@ -192,6 +192,29 @@ button, input, select { font: inherit; color: inherit; }
 .menu-pop button:hover { background: var(--surface-2); }
 .menu-pop hr { border: 0; border-top: 1px solid var(--border); margin: 5px 2px; }
 
+.forgot { margin: 12px 0 0; text-align: center; font-size: 13px; }
+
+/* ---------- Übernahme aus der lokalen Version ---------- */
+.migrate {
+  margin: 16px 16px 0;
+  padding: 13px 15px;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 10px;
+}
+.migrate-text { display: grid; gap: 3px; font-size: 13px; color: var(--warn-text); }
+.migrate-form { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+.migrate-form select, .migrate-form input {
+  padding: 6px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 7px;
+  background: var(--surface);
+}
+.migrate-form input { min-width: 180px; }
+.migrate .msg { margin: 0; }
+
 /* ---------- Panels ---------- */
 .panel {
   flex: 1;

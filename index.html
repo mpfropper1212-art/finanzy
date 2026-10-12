@@ -12,18 +12,18 @@
 <section id="login-view" class="login-view">
   <div class="login-card">
     <h1 class="login-title">Finanz&#8209;Sankey</h1>
-    <p class="login-sub">Geldfluss und Kontomodell &#8211; lokal und verschlüsselt.</p>
+    <p class="login-sub">Geldfluss und Kontomodell &#8211; auf allen deinen Geräten.</p>
 
     <div class="seg" role="tablist">
       <button type="button" class="seg-btn is-active" data-mode="login" role="tab">Anmelden</button>
-      <button type="button" class="seg-btn" data-mode="register" role="tab">Neues Profil</button>
+      <button type="button" class="seg-btn" data-mode="register" role="tab">Konto anlegen</button>
     </div>
 
-    <form id="login-form" autocomplete="off">
+    <form id="login-form" autocomplete="on">
       <label class="field">
-        <span>Benutzer-ID</span>
-        <input id="f-user" name="user" type="text" autocomplete="username" required
-               spellcheck="false" autocapitalize="none" placeholder="z. B. matteo">
+        <span>E-Mail</span>
+        <input id="f-user" name="email" type="email" autocomplete="username" required
+               spellcheck="false" autocapitalize="none" placeholder="du@beispiel.de">
       </label>
 
       <label class="field">
@@ -43,26 +43,22 @@
       <button id="login-submit" class="btn btn-primary btn-block" type="submit">Anmelden</button>
     </form>
 
-    <div id="profile-list-wrap" class="profiles" hidden>
-      <span class="profiles-label">Profile in diesem Browser:</span>
-      <div id="profile-list" class="profile-chips"></div>
-    </div>
+    <p class="forgot">
+      <button type="button" id="btn-forgot" class="link-btn">Passwort vergessen?</button>
+    </p>
 
     <details class="disclosure">
       <summary>Wie die Daten gespeichert werden</summary>
       <p>
-        Deine Daten liegen ausschließlich in <strong>diesem Browser</strong> (localStorage) und werden
-        dort mit deinem Passwort verschlüsselt (PBKDF2&#8209;SHA&#8209;256, 250.000 Runden &rarr;
-        AES&#8209;GCM&#8209;256). Es gibt keinen Server, der etwas von dir speichert.
+        Deine Daten liegen in deinem Konto auf einem Server in Frankfurt und sind mit deiner
+        E-Mail-Adresse und deinem Passwort geschützt. Dadurch siehst du auf jedem Gerät dieselben
+        Zahlen &#8211; Seite aufrufen, anmelden, fertig.
       </p>
       <p>
-        Das heißt aber auch: <strong>ein vergessenes Passwort kann niemand zurücksetzen</strong>, die
-        Daten sind dann verloren. Und wer Zugriff auf deine entsperrte Sitzung hat, sieht die Daten &#8211;
-        es ist ein Schutz der gespeicherten Datei, kein vollwertiges Benutzerkonto. Für andere Geräte
-        nutze „Tresor exportieren“ und importiere die Datei dort.
-      </p>
-      <p>
-        Daten von einem anderen Gerät? <button type="button" id="btn-import-login" class="link-btn">Tresor&#8209;Datei importieren</button>
+        Jeder Zugriff ist auf die eigene Zeile beschränkt: Andere Nutzer können deine Daten nicht
+        lesen, auch nicht, wenn sie es versuchen. Unverschlüsselt abgelegt sind sie trotzdem, der
+        Betreiber der Datenbank könnte also hineinsehen. Dafür funktioniert
+        <strong>Passwort vergessen</strong> wie gewohnt.
       </p>
     </details>
   </div>
@@ -86,9 +82,8 @@
           <button type="button" data-act="export-svg">Diagramm als SVG</button>
           <button type="button" data-act="export-png">Diagramm als PNG</button>
           <hr>
-          <button type="button" data-act="export-vault">Tresor exportieren (verschlüsselt)</button>
-          <button type="button" data-act="import-vault">Tresor importieren</button>
-          <button type="button" data-act="export-json">Rohdaten als JSON</button>
+          <button type="button" data-act="export-json">Sicherung herunterladen (JSON)</button>
+          <button type="button" data-act="import-json">Sicherung einspielen</button>
           <hr>
           <button type="button" data-act="reset">Daten zurücksetzen</button>
         </div>
@@ -96,6 +91,21 @@
       <button class="btn btn-ghost" id="btn-logout">Abmelden</button>
     </div>
   </header>
+
+  <!-- Einmaliges Angebot, Daten aus der alten lokalen Version zu übernehmen -->
+  <div id="migrate-bar" class="migrate" hidden>
+    <div class="migrate-text">
+      <strong>In diesem Browser liegen noch Daten aus der lokalen Version.</strong>
+      <span>Zum Übernehmen das damalige Passwort eingeben – danach stehen sie in deinem Konto auf allen Geräten.</span>
+    </div>
+    <form id="migrate-form" class="migrate-form" autocomplete="off">
+      <select id="migrate-profile" aria-label="Altes Profil"></select>
+      <input id="migrate-pass" type="password" placeholder="Altes Passwort" autocomplete="off">
+      <button class="btn btn-primary btn-sm" type="submit">Übernehmen</button>
+      <button class="btn btn-ghost btn-sm" type="button" id="migrate-dismiss">Verwerfen</button>
+    </form>
+    <p id="migrate-msg" class="msg" role="alert" hidden></p>
+  </div>
 
   <!-- ---- Geldfluss ---- -->
   <main id="panel-flow" class="panel">

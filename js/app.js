@@ -1,6 +1,7 @@
 // Bootstrap: Login, Tabs, Datenmenü, Chart-Aktualisierung.
 
 import * as vault from './vault.js';
+import * as cloud from './cloud.js';
 import { Store, createDefaultData, migrate } from './store.js';
 import { computeLayout, renderSankey } from './sankey.js';
 import { createFlowEditor } from './sankey-editor.js';
@@ -45,97 +46,82 @@ function setMode(next) {
   $('#f-pass2-wrap').hidden = next !== 'register';
   fPass2.required = next === 'register';
   fPass.autocomplete = next === 'register' ? 'new-password' : 'current-password';
-  submitBtn.textContent = next === 'register' ? 'Profil anlegen' : 'Anmelden';
-}
-
-function renderProfiles() {
-  const list = vault.listProfiles();
-  const wrap = $('#profile-list-wrap');
-  wrap.hidden = list.length === 0;
-  const host = $('#profile-list');
-  clear(host);
-  for (const id of list) {
-    const chip = el('button', { type: 'button' }, id);
-    chip.addEventListener('click', () => {
-      setMode('login');
-      fUser.value = id;
-      fPass.focus();
-    });
-    host.appendChild(chip);
-  }
+  submitBtn.textContent = next === 'register' ? 'Konto anlegen' : 'Anmelden';
 }
 
 for (const btn of document.querySelectorAll('.seg-btn')) {
   btn.addEventListener('click', () => setMode(btn.dataset.mode));
 }
 
+async function startSession() {
+  let data = await cloud.loadData();
+
+  // Ein liegengebliebener lokaler Stand ist neuer als das, was der Server hat,
+  // wenn beim letzten Mal das Hochladen scheiterte.
+  const backup = cloud.readBackup();
+  if (backup && !data) data = backup;
+
+  if (!data) {
+    data = createDefaultData();
+    await cloud.saveData(data);
+  }
+  enterApp(migrate(data));
+}
+
 loginForm.addEventListener('submit', async ev => {
   ev.preventDefault();
   hideMsg();
 
-  const userId = vault.normalizeUserId(fUser.value);
+  const email = fUser.value.trim();
   const password = fPass.value;
-  if (!userId) return showMsg('Bitte eine Benutzer-ID eingeben.');
+  if (!email) return showMsg('Bitte eine E-Mail-Adresse eingeben.');
   if (!password) return showMsg('Bitte ein Passwort eingeben.');
-
   if (mode === 'register') {
-    if (password.length < 6) {
-      return showMsg('Das Passwort sollte mindestens 6 Zeichen haben – es verschlüsselt deine Daten.');
-    }
+    if (password.length < 6) return showMsg('Das Passwort muss mindestens 6 Zeichen haben.');
     if (password !== fPass2.value) return showMsg('Die beiden Passwörter sind nicht gleich.');
-    if (vault.profileExists(userId)) {
-      return showMsg('Dieses Profil gibt es in diesem Browser schon. Wechsle zu „Anmelden“.');
-    }
   }
 
   submitBtn.disabled = true;
   const label = submitBtn.textContent;
-  submitBtn.textContent = mode === 'register' ? 'Lege an …' : 'Entsperre …';
+  submitBtn.textContent = mode === 'register' ? 'Lege an …' : 'Melde an …';
 
   try {
-    if (mode === 'register') {
-      const data = createDefaultData();
-      const session = await vault.createProfile(userId, password, data);
-      enterApp(session, data);
-    } else {
-      const { session, data } = await vault.unlock(userId, password);
-      enterApp(session, migrate(data));
-    }
+    if (mode === 'register') await cloud.signUp(email, password);
+    else await cloud.signIn(email, password);
+    await startSession();
   } catch (err) {
-    showMsg(err instanceof vault.WrongPasswordError
-      ? 'Passwort falsch.'
-      : err.message || 'Das hat nicht funktioniert.');
+    showMsg(err.message || 'Das hat nicht funktioniert.');
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = label;
   }
 });
 
-$('#btn-import-login').addEventListener('click', () => pickFile(async file => {
+$('#btn-forgot').addEventListener('click', async () => {
+  const email = fUser.value.trim();
+  if (!email) {
+    fUser.focus();
+    return showMsg('Bitte zuerst deine E-Mail-Adresse eintragen.');
+  }
   try {
-    const rec = await dl.readJsonFile(file);
-    const id = vault.importRecord(rec);
-    renderProfiles();
-    setMode('login');
-    fUser.value = id;
-    fPass.value = '';
-    fPass.focus();
-    showMsg(`Tresor „${id}" importiert. Jetzt mit dem zugehörigen Passwort anmelden.`, 'is-info');
+    await cloud.requestPasswordReset(email);
+    showMsg(`Wenn es ein Konto zu ${email} gibt, ist eine E-Mail zum Zurücksetzen unterwegs.`, 'is-info');
   } catch (err) {
     showMsg(err.message);
   }
-}));
+});
 
 /* ----------------------------- App ----------------------------- */
 
-function enterApp(session, data) {
-  store.attach(session, data);
+function enterApp(data) {
+  store.attach(data);
   store.onStatus(onSaveStatus);
 
   $('#login-view').hidden = true;
   $('#app-view').hidden = false;
   fPass.value = '';
   fPass2.value = '';
+  renderMigrateBar();
 
   flowEditor = createFlowEditor({
     incomeHost: $('#income-rows'),
@@ -172,21 +158,88 @@ function enterApp(session, data) {
 
 function leaveApp() {
   store.detach();
+  cloud.signOut();
   flowEditor = accountsEditor = accountsView = null;
   $('#app-view').hidden = true;
   $('#login-view').hidden = false;
   $('#accounts-host').replaceChildren();
   $('#sankey-host').replaceChildren();
-  renderProfiles();
   setMode('login');
-  fPass.focus();
+  fUser.focus();
 }
 
 function onSaveStatus(state, err) {
   const node = $('#save-state');
-  if (state === 'dirty') node.textContent = 'Speichere …';
-  else if (state === 'saved') node.textContent = 'Gespeichert';
-  else node.textContent = err?.message ? 'Fehler beim Speichern' : '';
+  if (state === 'dirty') {
+    node.textContent = 'Speichere …';
+    node.title = '';
+  } else if (state === 'saved') {
+    node.textContent = 'Gespeichert';
+    node.title = '';
+  } else {
+    node.textContent = err instanceof cloud.OfflineError ? 'Offline' : 'Nicht gespeichert';
+    node.title = err?.message ?? '';
+    if (err instanceof cloud.AuthError) {
+      window.alert(`${err.message}\n\nDein letzter Stand bleibt in diesem Browser erhalten und wird nach dem Anmelden hochgeladen.`);
+      leaveApp();
+    }
+  }
+}
+
+/* ------------- Übernahme aus der lokalen Version ------------- */
+
+function renderMigrateBar() {
+  const bar = $('#migrate-bar');
+  const profiles = vault.listProfiles();
+  if (!profiles.length) {
+    bar.hidden = true;
+    return;
+  }
+  const select = $('#migrate-profile');
+  clear(select);
+  for (const id of profiles) select.appendChild(el('option', { value: id }, id));
+  bar.hidden = false;
+}
+
+$('#migrate-form').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const msg = $('#migrate-msg');
+  const userId = $('#migrate-profile').value;
+  const password = $('#migrate-pass').value;
+  msg.hidden = true;
+
+  try {
+    const { data } = await vault.unlock(userId, password);
+    if (!window.confirm('Die übernommenen Daten ersetzen den aktuellen Stand in deinem Konto. Fortfahren?')) return;
+    store.data = migrate(data);
+    store.commit({ silent: true });
+    await store.flushNow();
+    vault.removeProfile(userId);
+    $('#migrate-pass').value = '';
+    rebuildAll();
+    renderMigrateBar();
+  } catch (err) {
+    msg.textContent = err instanceof vault.WrongPasswordError
+      ? 'Passwort falsch.'
+      : err.message || 'Das hat nicht funktioniert.';
+    msg.className = 'msg is-error';
+    msg.hidden = false;
+  }
+});
+
+$('#migrate-dismiss').addEventListener('click', () => {
+  if (!window.confirm('Die lokalen Daten dieses Browsers werden gelöscht. Fortfahren?')) return;
+  for (const id of vault.listProfiles()) vault.removeProfile(id);
+  renderMigrateBar();
+});
+
+function rebuildAll() {
+  $('#sankey-title').value = store.data.sankey.title;
+  $('#sankey-height').value = store.data.sankey.height;
+  flowEditor.renderAll();
+  accountsEditor.renderAll();
+  refreshFlowChart();
+  refreshAccounts();
 }
 
 function setTab(tab) {
@@ -336,35 +389,25 @@ menuPop.addEventListener('click', async ev => {
       const node = activeSvg();
       if (!node) return;
       await dl.downloadPng(node, dl.slugFilename(activeName(), 'png'));
-    } else if (act === 'export-vault') {
-      await store.flushNow();
-      dl.downloadJson(vault.exportRecord(store.session.userId),
-        dl.slugFilename(`tresor-${store.session.userId}`, 'json'));
     } else if (act === 'export-json') {
-      dl.downloadJson(store.data, dl.slugFilename(`${activeName()}-rohdaten`, 'json'));
-    } else if (act === 'import-vault') {
+      dl.downloadJson(store.data, dl.slugFilename('finanzy-sicherung', 'json'));
+    } else if (act === 'import-json') {
       pickFile(async file => {
-        const rec = await dl.readJsonFile(file);
-        const id = vault.normalizeUserId(rec?.userId);
-        if (id !== store.session.userId) {
-          window.alert(`Diese Datei gehört zum Profil „${id}". Melde dich ab und importiere sie auf dem Login-Bildschirm.`);
+        const raw = await dl.readJsonFile(file);
+        if (!raw?.sankey || !raw?.accounts) {
+          window.alert('Das ist keine Sicherungsdatei dieser App.');
           return;
         }
-        if (!window.confirm('Die aktuellen Daten dieses Profils werden durch die Datei ersetzt. Fortfahren?')) return;
-        vault.importRecord(rec, { overwrite: true });
-        window.alert('Tresor ersetzt. Bitte neu anmelden.');
-        leaveApp();
+        if (!window.confirm('Die Sicherung ersetzt deinen aktuellen Stand. Fortfahren?')) return;
+        store.data = migrate(raw);
+        store.commit({ silent: true });
+        rebuildAll();
       });
     } else if (act === 'reset') {
-      if (!window.confirm('Alle Posten, Konten und Umbuchungen dieses Profils auf die Startwerte zurücksetzen?')) return;
+      if (!window.confirm('Alle Posten, Konten und Umbuchungen auf die Startwerte zurücksetzen?')) return;
       store.data = createDefaultData();
       store.commit({ silent: true });
-      $('#sankey-title').value = store.data.sankey.title;
-      $('#sankey-height').value = store.data.sankey.height;
-      flowEditor.renderAll();
-      accountsEditor.renderAll();
-      refreshFlowChart();
-      refreshAccounts();
+      rebuildAll();
     }
   } catch (err) {
     window.alert(err.message || 'Das hat nicht funktioniert.');
@@ -417,11 +460,21 @@ document.addEventListener('visibilitychange', () => {
 });
 window.addEventListener('beforeunload', () => { store.flushNow(); });
 
-if (!window.crypto?.subtle) {
-  showMsg('Dieser Browser bietet keine WebCrypto-API – die App braucht https oder localhost.');
+setMode('login');
+
+// Eine gespeicherte Sitzung überspringt den Login-Bildschirm.
+if (cloud.restoreSession()) {
   submitBtn.disabled = true;
+  showMsg('Lade deine Daten …', 'is-info');
+  startSession()
+    .then(hideMsg)
+    .catch(err => {
+      showMsg(err instanceof cloud.OfflineError
+        ? 'Keine Verbindung zum Server. Bitte später erneut versuchen.'
+        : err.message);
+      fUser.value = cloud.currentUser()?.email ?? '';
+    })
+    .finally(() => { submitBtn.disabled = false; });
 } else {
-  renderProfiles();
-  setMode('login');
   fUser.focus();
 }

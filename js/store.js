@@ -1,6 +1,6 @@
 // Zustand der App: halten, verteilen, verschlüsselt zurückschreiben.
 
-import * as vault from './vault.js';
+import * as cloud from './cloud.js';
 
 export const DATA_VERSION = 2;
 const SAVE_DEBOUNCE_MS = 400;
@@ -132,21 +132,18 @@ export function migrate(raw) {
 export class Store {
   constructor() {
     this.data = null;
-    this.session = null;
     this._listeners = new Set();
     this._statusCb = () => {};
     this._timer = null;
     this._pending = false;
   }
 
-  attach(session, data) {
-    this.session = session;
+  attach(data) {
     this.data = data;
   }
 
   detach() {
     this.flushNow();
-    this.session = null;
     this.data = null;
     this._listeners.clear();
   }
@@ -170,10 +167,15 @@ export class Store {
   async flushNow() {
     clearTimeout(this._timer);
     this._timer = null;
-    if (!this._pending || !this.session) return;
+    if (!this._pending || !this.data) return;
+
+    // Erst lokal sichern, dann hochladen: schlägt der Upload fehl, ist der
+    // Stand trotzdem nicht verloren.
+    cloud.writeBackup(this.data);
     this._pending = false;
     try {
-      await vault.save(this.session, this.data);
+      await cloud.saveData(this.data);
+      cloud.clearBackup();
       this._statusCb('saved');
     } catch (err) {
       this._pending = true;
