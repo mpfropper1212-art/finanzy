@@ -115,15 +115,16 @@
 
     <aside class="editor">
       <div class="editor-head">
-        <h2>Flüsse</h2>
-        <button class="btn btn-primary btn-sm" id="btn-add-flow">+ Fluss</button>
+        <h2>Einnahmen</h2>
+        <button class="btn btn-primary btn-sm" id="btn-add-income">+ Einnahme</button>
       </div>
-      <p class="editor-hint">
-        Namen frei eintippen &#8211; neue Posten entstehen automatisch. Beispiel:
-        <em>Netto &rarr; Wohnen &rarr; Miete</em>.
-      </p>
-      <datalist id="node-names"></datalist>
-      <div id="flow-rows" class="rows"></div>
+      <div id="income-rows" class="rows"></div>
+
+      <div class="editor-head editor-head-sep">
+        <h2>Ausgaben</h2>
+        <button class="btn btn-primary btn-sm" id="btn-add-expense">+ Ausgabe</button>
+      </div>
+      <div id="expense-rows" class="rows"></div>
 
       <div class="editor-head editor-head-sep">
         <h2>Farben</h2>

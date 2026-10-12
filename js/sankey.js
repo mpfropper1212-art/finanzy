@@ -6,6 +6,7 @@ const NODE_W = 15;
 const NODE_GAP = 16;
 const PAD = { top: 26, right: 150, bottom: 26, left: 18 };
 const MIN_COL_SPACE = 162;
+const HUB_COLOR = '#64748b';
 const LABEL_PAD = 9;
 
 export function computeLayout(sankey, { width, height }) {
@@ -241,6 +242,13 @@ function assignColors({ order, active, byId, inL, outL, value }) {
     const node = byId.get(id);
     if (isValidHex(node.color)) {
       colors.set(id, node.color);
+      shade.set(id, 0);
+      continue;
+    }
+    // Der Knoten, an dem sich alles aufteilt, ist eine Summe und keine
+    // Kategorie - eine Signalfarbe würde ihn falsch gewichten.
+    if (id === hub) {
+      colors.set(id, HUB_COLOR);
       shade.set(id, 0);
       continue;
     }

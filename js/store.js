@@ -2,8 +2,12 @@
 
 import * as vault from './vault.js';
 
-export const DATA_VERSION = 1;
+export const DATA_VERSION = 2;
 const SAVE_DEBOUNCE_MS = 400;
+
+// Der Knoten, in den alle Einnahmen laufen und aus dem alle Ausgaben kommen.
+// Der Editor ist um ihn herum gebaut, deshalb hat er eine feste id.
+export const HUB_ID = 'einnahmen';
 
 export function uid(prefix) {
   return prefix + Math.random().toString(36).slice(2, 9);
@@ -20,8 +24,7 @@ export function createDefaultData() {
       currency: 'EUR',
       height: 620,
       nodes: [
-        n('gehalt', 'Gehalt'), n('nebenjob', 'Nebeneinkünfte'), n('brutto', 'Brutto'),
-        n('lohnsteuer', 'Lohnsteuer'), n('sozial', 'Sozialabgaben'), n('netto', 'Netto'),
+        n('gehalt', 'Gehalt'), n('nebenjob', 'Nebeneinkünfte'), n(HUB_ID, 'Einnahmen'),
         n('wohnen', 'Wohnen'), n('miete', 'Miete'), n('strom', 'Strom'),
         n('internet', 'Internet'), n('nebenkosten', 'Nebenkosten'),
         n('lebensmittel', 'Lebensmittel'), n('mobilitaet', 'Mobilität'),
@@ -30,23 +33,22 @@ export function createDefaultData() {
         n('sparen', 'Sparen'), n('notgroschen', 'Notgroschen'), n('etf', 'ETF-Depot'),
       ],
       flows: [
-        f('gehalt', 'brutto', 3200), f('nebenjob', 'brutto', 300),
-        f('brutto', 'lohnsteuer', 520), f('brutto', 'sozial', 680), f('brutto', 'netto', 2300),
-        f('netto', 'wohnen', 950), f('netto', 'lebensmittel', 420), f('netto', 'mobilitaet', 220),
-        f('netto', 'freizeit', 260), f('netto', 'versicherung', 110), f('netto', 'sparen', 340),
+        f('gehalt', HUB_ID, 2300), f('nebenjob', HUB_ID, 300),
+        f(HUB_ID, 'wohnen', 950), f(HUB_ID, 'lebensmittel', 420), f(HUB_ID, 'mobilitaet', 220),
+        f(HUB_ID, 'freizeit', 260), f(HUB_ID, 'versicherung', 110), f(HUB_ID, 'sparen', 640),
         f('wohnen', 'miete', 780), f('wohnen', 'strom', 70),
         f('wohnen', 'internet', 40), f('wohnen', 'nebenkosten', 60),
         f('mobilitaet', 'oepnv', 60), f('mobilitaet', 'auto', 160),
-        f('sparen', 'notgroschen', 100), f('sparen', 'etf', 240),
+        f('sparen', 'notgroschen', 150), f('sparen', 'etf', 490),
       ],
     },
     accounts: {
       nodes: [
-        { id: 'giro', name: 'Girokonto', type: 'giro', balance: 2400, x: 60, y: 60 },
-        { id: 'tagesgeld', name: 'Tagesgeld', type: 'tagesgeld', balance: 8500, x: 400, y: 30 },
-        { id: 'depot', name: 'ETF-Depot', type: 'depot', balance: 12400, x: 400, y: 150 },
-        { id: 'kreditkarte', name: 'Kreditkarte', type: 'kredit', balance: -320, x: 400, y: 270 },
-        { id: 'bargeld', name: 'Bargeld', type: 'bar', balance: 150, x: 60, y: 270 },
+        { id: 'giro', name: 'Girokonto', type: 'giro', bank: 'DKB', info: 'Gehalt & Lastschriften', balance: 2400, x: 60, y: 60 },
+        { id: 'tagesgeld', name: 'Tagesgeld', type: 'tagesgeld', bank: 'ING', info: 'Notgroschen, 3 Monatsausgaben', balance: 8500, x: 470, y: 30 },
+        { id: 'depot', name: 'ETF-Depot', type: 'depot', bank: 'Trade Republic', info: 'MSCI World, Sparplan am 1.', balance: 12400, x: 470, y: 170 },
+        { id: 'kreditkarte', name: 'Kreditkarte', type: 'kredit', bank: 'DKB', info: '', balance: -320, x: 470, y: 310 },
+        { id: 'bargeld', name: 'Bargeld', type: 'bar', bank: '', info: '', balance: 150, x: 60, y: 310 },
       ],
       transfers: [
         { id: uid('t'), from: 'giro', to: 'tagesgeld', amount: 100, label: 'Notgroschen', interval: 'monatlich' },
@@ -63,14 +65,21 @@ export function migrate(raw) {
   const base = createDefaultData();
   if (!raw || typeof raw !== 'object') return base;
 
-  const s = raw.sankey && typeof raw.sankey === 'object' ? raw.sankey : {};
   const a = raw.accounts && typeof raw.accounts === 'object' ? raw.accounts : {};
+
+  // Vor Version 2 lief der Geldfluss über Brutto/Netto statt über einen
+  // Einnahmen-Knoten. Der Editor setzt diese Form voraus, also wird der
+  // Geldfluss-Teil auf die Startvorlage gesetzt; die Konten bleiben erhalten.
+  const s = Number(raw.version) === DATA_VERSION && raw.sankey && typeof raw.sankey === 'object'
+    ? raw.sankey
+    : base.sankey;
 
   const nodes = Array.isArray(s.nodes) ? s.nodes.filter(x => x && x.id).map(x => ({
     id: String(x.id),
     name: String(x.name ?? x.id),
     color: typeof x.color === 'string' ? x.color : null,
   })) : [];
+  if (!nodes.some(x => x.id === HUB_ID)) nodes.push({ id: HUB_ID, name: 'Einnahmen', color: null });
 
   const known = new Set(nodes.map(x => x.id));
   const flows = Array.isArray(s.flows) ? s.flows.filter(x => x && known.has(x.from) && known.has(x.to)).map(x => ({
@@ -85,6 +94,8 @@ export function migrate(raw) {
     id: String(x.id),
     name: String(x.name ?? x.id),
     type: ['giro', 'tagesgeld', 'depot', 'bar', 'kredit'].includes(x.type) ? x.type : 'giro',
+    bank: String(x.bank ?? ''),
+    info: String(x.info ?? ''),
     balance: Number(x.balance) || 0,
     x: Number.isFinite(Number(x.x)) ? Number(x.x) : 60 + (i % 3) * 320,
     y: Number.isFinite(Number(x.y)) ? Number(x.y) : 60 + Math.floor(i / 3) * 140,

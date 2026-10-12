@@ -1,42 +1,26 @@
-// Editor für die Flüsse: Von/Nach als freie Namen, Beträge, Farben.
+// Editor für den Geldfluss: Einnahmen oben, Ausgaben darunter, Unterposten
+// eingerückt. Alles hängt am Einnahmen-Knoten, deshalb braucht es kein Von/Nach.
 
-import { uid } from './store.js';
-import { el, clear, isValidHex } from './util.js';
+import { uid, HUB_ID } from './store.js';
+import { el, clear, isValidHex, money } from './util.js';
 
-const UMLAUTS = { ä: 'ae', ö: 'oe', ü: 'ue', ß: 'ss' };
-
-function slug(name) {
-  const base = name.toLowerCase().replace(/[äöüß]/g, c => UMLAUTS[c])
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-  return base || 'posten';
+function nodeById(data, id) {
+  return data.sankey.nodes.find(n => n.id === id);
 }
 
-function uniqueId(data, base) {
-  const taken = new Set(data.sankey.nodes.map(n => n.id));
-  if (!taken.has(base)) return base;
-  let i = 2;
-  while (taken.has(`${base}-${i}`)) i++;
-  return `${base}-${i}`;
+function ensureHub(data) {
+  if (!nodeById(data, HUB_ID)) {
+    data.sankey.nodes.push({ id: HUB_ID, name: 'Einnahmen', color: null });
+  }
 }
 
-function nodeName(data, id) {
-  return data.sankey.nodes.find(n => n.id === id)?.name ?? '';
-}
+const incomeFlows = data => data.sankey.flows.filter(f => f.to === HUB_ID);
+const expenseFlows = data => data.sankey.flows.filter(f => f.from === HUB_ID);
+const childFlows = (data, id) => data.sankey.flows.filter(f => f.from === id);
 
-// Leerer Name -> keine Zuordnung; unbekannter Name -> neuer Posten.
-function resolveNode(data, rawName) {
-  const name = String(rawName || '').trim();
-  if (!name) return '';
-  const hit = data.sankey.nodes.find(n => n.name.toLowerCase() === name.toLowerCase());
-  if (hit) return hit.id;
-  const node = { id: uniqueId(data, slug(name)), name, color: null };
-  data.sankey.nodes.push(node);
-  return node.id;
-}
-
-// Posten, die in keinem Fluss mehr vorkommen, verschwinden.
+// Der Einnahmen-Knoten bleibt immer stehen, auch wenn gerade nichts an ihm hängt.
 function pruneNodes(data) {
-  const referenced = new Set();
+  const referenced = new Set([HUB_ID]);
   for (const f of data.sankey.flows) {
     if (f.from) referenced.add(f.from);
     if (f.to) referenced.add(f.to);
@@ -44,98 +28,144 @@ function pruneNodes(data) {
   data.sankey.nodes = data.sankey.nodes.filter(n => referenced.has(n.id));
 }
 
-export function createFlowEditor({ rowHost, colorHost, listHost, store, requestChart }) {
+// Eine Ausgabe mitsamt ihrer Unterposten entfernen.
+function removeBranch(data, nodeId) {
+  const doomed = new Set([nodeId]);
+  for (;;) {
+    const before = doomed.size;
+    for (const f of data.sankey.flows) {
+      if (doomed.has(f.from)) doomed.add(f.to);
+    }
+    if (doomed.size === before) break;
+  }
+  data.sankey.flows = data.sankey.flows.filter(f => !doomed.has(f.to));
+  pruneNodes(data);
+}
+
+export function createFlowEditor({ incomeHost, expenseHost, colorHost, store, requestChart }) {
   const data = () => store.data;
 
-  // Ein geänderter Name kann Posten anlegen oder überflüssig machen. Die Zeilen
-  // selbst dürfen dabei nicht neu gebaut werden, sonst verliert das Feld, in dem
-  // gerade getippt wird, den Fokus.
-  function nameChange() {
-    pruneNodes(data());
+  function valueChange() {
     store.commit({ silent: true });
-    renderNameList();
-    renderColors();
+    refreshTotals();
     requestChart();
   }
 
-  function rowsChanged() {
+  // Summen und Aufteilungs-Hinweise hängen an Beträgen, die im Feld geändert
+  // werden - sie werden im Text nachgezogen, statt die Zeilen neu zu bauen.
+  function refreshTotals() {
+    const sum = flows => flows.reduce((s, f) => s + Number(f.amount), 0);
+    incomeHost.querySelector('[data-sum]')?.replaceChildren(`Summe ${money(sum(incomeFlows(data())))}`);
+    expenseHost.querySelector('[data-sum]')?.replaceChildren(`Summe ${money(sum(expenseFlows(data())))}`);
+
+    for (const flow of expenseFlows(data())) {
+      const hint = expenseHost.querySelector(`[data-hint-for="${flow.to}"]`);
+      if (!hint) continue;
+      const subs = childFlows(data(), flow.to);
+      const diff = Number(flow.amount) - sum(subs);
+      const text = !subs.length || Math.abs(diff) <= 0.005 ? ''
+        : diff > 0
+          ? `${money(diff)} noch nicht aufgeteilt`
+          : `${money(-diff)} mehr aufgeteilt als die Kategorie hergibt`;
+      hint.textContent = text;
+      hint.hidden = !text;
+    }
+  }
+
+  function structureChange(focusId) {
     pruneNodes(data());
     store.commit({ silent: true });
     renderAll();
     requestChart();
-  }
-
-  function valueChange() {
-    store.commit({ silent: true });
-    requestChart();
-  }
-
-  function renderNameList() {
-    clear(listHost);
-    for (const n of data().sankey.nodes) {
-      listHost.appendChild(el('option', { value: n.name }));
+    if (focusId) {
+      const input = document.querySelector(`[data-name-for="${focusId}"]`);
+      input?.scrollIntoView({ block: 'nearest' });
+      input?.focus();
+      input?.select();
     }
   }
 
-  function renderRows() {
-    clear(rowHost);
-    const flows = data().sankey.flows;
+  // Name und Betrag sind in jeder Zeile gleich aufgebaut - nur die Einrückung
+  // und der Platzhalter unterscheiden Einnahme, Ausgabe und Unterposten.
+  function entryRow(flow, { placeholder, sub = false }) {
+    // Bei Einnahmen zeigt der Fluss auf den Einnahmen-Knoten, sonst von ihm weg.
+    const node = nodeById(data(), flow.to === HUB_ID ? flow.from : flow.to);
+    const row = el('div', { class: 'row row-entry' + (sub ? ' row-sub' : '') });
+
+    const name = el('input', {
+      type: 'text', value: node.name, placeholder,
+      'data-name-for': node.id,
+    });
+    const amount = el('input', {
+      type: 'number', min: '0', step: '10', value: flow.amount || '', placeholder: '0',
+    });
+    const del = el('button', { class: 'icon-btn', type: 'button', title: 'Entfernen' }, '×');
+
+    name.addEventListener('input', () => {
+      node.name = name.value;
+      syncColorName(node.id, name.value);
+      valueChange();
+    });
+    amount.addEventListener('input', () => {
+      amount.classList.toggle('is-invalid', amount.value !== '' && !(Number(amount.value) >= 0));
+      flow.amount = Math.max(0, Number(amount.value) || 0);
+      valueChange();
+    });
+    del.addEventListener('click', () => {
+      removeBranch(data(), node.id);
+      structureChange();
+    });
+
+    row.append(name, amount, del);
+    return row;
+  }
+
+  function syncColorName(id, value) {
+    const label = colorHost.querySelector(`[data-color-name="${id}"]`);
+    if (label) label.textContent = value;
+  }
+
+  function renderIncome() {
+    clear(incomeHost);
+    const flows = incomeFlows(data());
     if (!flows.length) {
-      rowHost.appendChild(el('p', { class: 'empty' }, 'Noch keine Flüsse.'));
+      incomeHost.appendChild(el('p', { class: 'empty' }, 'Noch keine Einnahmen.'));
+      return;
+    }
+    for (const flow of flows) {
+      incomeHost.appendChild(entryRow(flow, { placeholder: 'z. B. Gehalt' }));
+    }
+    incomeHost.appendChild(el('p', { class: 'sum', 'data-sum': '' }));
+  }
+
+  function renderExpenses() {
+    clear(expenseHost);
+    const flows = expenseFlows(data());
+    if (!flows.length) {
+      expenseHost.appendChild(el('p', { class: 'empty' }, 'Noch keine Ausgaben.'));
       return;
     }
 
-    const head = el('div', { class: 'row' });
-    head.append(
-      el('span', { class: 'stat-label' }, 'Von'),
-      el('span', { class: 'stat-label' }, 'Nach'),
-      el('span', { class: 'stat-label' }, 'Betrag'),
-      el('span'),
-    );
-    rowHost.appendChild(head);
-
     for (const flow of flows) {
-      const row = el('div', { class: 'row' });
+      const group = el('div', { class: 'cat' });
+      group.appendChild(entryRow(flow, { placeholder: 'z. B. Wohnen' }));
 
-      const from = el('input', {
-        type: 'text', list: 'node-names', placeholder: 'Quelle',
-        value: nodeName(data(), flow.from), spellcheck: 'false',
-        'data-flow-from': flow.id,
-      });
-      const to = el('input', {
-        type: 'text', list: 'node-names', placeholder: 'Ziel',
-        value: nodeName(data(), flow.to), spellcheck: 'false',
-      });
-      const amount = el('input', {
-        type: 'number', min: '0', step: '10', placeholder: '0',
-        value: flow.amount || '',
-      });
-      const del = el('button', { class: 'icon-btn', type: 'button', title: 'Fluss löschen' }, '×');
+      const subs = childFlows(data(), flow.to);
+      for (const sub of subs) {
+        group.appendChild(entryRow(sub, { placeholder: 'z. B. Miete', sub: true }));
+      }
 
-      from.addEventListener('change', () => {
-        flow.from = resolveNode(data(), from.value);
-        from.value = nodeName(data(), flow.from);
-        nameChange();
-      });
-      to.addEventListener('change', () => {
-        flow.to = resolveNode(data(), to.value);
-        to.value = nodeName(data(), flow.to);
-        nameChange();
-      });
-      amount.addEventListener('input', () => {
-        const v = Number(amount.value);
-        amount.classList.toggle('is-invalid', amount.value !== '' && !(v >= 0));
-        flow.amount = v >= 0 ? v : 0;
-        valueChange();
-      });
-      del.addEventListener('click', () => {
-        data().sankey.flows = data().sankey.flows.filter(f => f.id !== flow.id);
-        rowsChanged();
-      });
+      const add = el('button', { class: 'sub-add', type: 'button' }, '+ Unterposten');
+      add.addEventListener('click', () => addEntry(flow.to, 'Neuer Unterposten'));
+      group.appendChild(add);
 
-      row.append(from, to, amount, del);
-      rowHost.appendChild(row);
+      // Unterposten, die zusammen nicht die Kategorie ergeben, fallen sonst erst
+      // unten am Diagramm auf. Den Text setzt refreshTotals.
+      group.appendChild(el('p', { class: 'cat-hint', 'data-hint-for': flow.to, hidden: true }));
+      expenseHost.appendChild(group);
     }
+
+    expenseHost.appendChild(el('p', { class: 'sum', 'data-sum': '' }));
   }
 
   function renderColors() {
@@ -152,7 +182,7 @@ export function createFlowEditor({ rowHost, colorHost, listHost, store, requestC
         value: isValidHex(node.color) ? node.color : currentColor(node.id),
         title: `Farbe für ${node.name}`,
       });
-      const name = el('span', { class: 'name' }, node.name);
+      const name = el('span', { class: 'name', 'data-color-name': node.id }, node.name);
       const reset = el('button', { class: 'link-btn reset', type: 'button' }, 'auto');
 
       picker.addEventListener('input', () => {
@@ -164,6 +194,7 @@ export function createFlowEditor({ rowHost, colorHost, listHost, store, requestC
         store.commit({ silent: true });
         requestChart();
         picker.value = currentColor(node.id);
+        reset.remove();
       });
 
       row.append(picker, name, isValidHex(node.color) ? reset : el('span'));
@@ -177,21 +208,30 @@ export function createFlowEditor({ rowHost, colorHost, listHost, store, requestC
   }
 
   function renderAll() {
-    renderNameList();
-    renderRows();
+    ensureHub(data());
+    renderIncome();
+    renderExpenses();
     renderColors();
+    refreshTotals();
   }
 
-  function addFlow() {
-    const flow = { id: uid('f'), from: '', to: '', amount: 0, note: '' };
-    data().sankey.flows.push(flow);
-    store.commit({ silent: true });
-    renderAll();
-    requestChart();
-    const input = rowHost.querySelector(`[data-flow-from="${flow.id}"]`);
-    input?.scrollIntoView({ block: 'nearest' });
-    input?.focus();
+  function addEntry(parentId, name) {
+    const node = { id: uid('n'), name, color: null };
+    data().sankey.nodes.push(node);
+    data().sankey.flows.push({ id: uid('f'), from: parentId, to: node.id, amount: 0, note: '' });
+    structureChange(node.id);
   }
 
-  return { renderAll, addFlow };
+  function addIncome() {
+    const node = { id: uid('n'), name: 'Neue Einnahme', color: null };
+    data().sankey.nodes.push(node);
+    data().sankey.flows.push({ id: uid('f'), from: node.id, to: HUB_ID, amount: 0, note: '' });
+    structureChange(node.id);
+  }
+
+  return {
+    renderAll,
+    addIncome,
+    addExpense: () => addEntry(HUB_ID, 'Neue Ausgabe'),
+  };
 }

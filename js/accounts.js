@@ -3,9 +3,13 @@
 import { uid } from './store.js';
 import { money, moneyShort, svg, el, clear, fitText } from './util.js';
 
-const W = 176;
-const H = 68;
+const W = 214;
+const H_BASE = 72;
+const H_INFO = 92;
 const MARGIN = 28;
+
+// Nur Konten mit Notiz brauchen die zusätzliche Zeile.
+const heightOf = node => (String(node.info || '').trim() ? H_INFO : H_BASE);
 
 export const ACCOUNT_TYPES = {
   giro: { label: 'Girokonto', color: '#2f6feb' },
@@ -29,11 +33,12 @@ export function monthlyTransferSum(accounts) {
 }
 
 function anchorPoint(node, towardsCx, towardsCy) {
-  const cx = node.x + W / 2, cy = node.y + H / 2;
+  const h = heightOf(node);
+  const cx = node.x + W / 2, cy = node.y + h / 2;
   const dx = towardsCx - cx, dy = towardsCy - cy;
   if (!dx && !dy) return { x: cx, y: cy };
   const tx = dx ? (W / 2) / Math.abs(dx) : Infinity;
-  const ty = dy ? (H / 2) / Math.abs(dy) : Infinity;
+  const ty = dy ? (h / 2) / Math.abs(dy) : Infinity;
   const t = Math.min(tx, ty);
   return { x: cx + dx * t, y: cy + dy * t };
 }
@@ -151,8 +156,8 @@ export function createAccountsView({ host, store, requestEditor }) {
     const nodes = data().nodes;
     const cols = Math.max(1, Math.ceil(Math.sqrt(nodes.length)));
     nodes.forEach((n, i) => {
-      n.x = MARGIN + (i % cols) * (W + 110);
-      n.y = MARGIN + Math.floor(i / cols) * (H + 76);
+      n.x = MARGIN + (i % cols) * (W + 118);
+      n.y = MARGIN + Math.floor(i / cols) * (H_INFO + 64);
     });
     store.commit({ silent: true });
     draw();
@@ -166,7 +171,7 @@ export function createAccountsView({ host, store, requestEditor }) {
     const nodes = data().nodes;
     const byId = new Map(nodes.map(n => [n.id, n]));
     const width = Math.max(host.clientWidth - 2, ...nodes.map(n => n.x + W + MARGIN), 520);
-    const height = Math.max(420, ...nodes.map(n => n.y + H + MARGIN));
+    const height = Math.max(420, ...nodes.map(n => n.y + heightOf(n) + MARGIN));
     root.setAttribute('width', width);
     root.setAttribute('height', height);
     root.setAttribute('viewBox', `0 0 ${width} ${height}`);
@@ -192,8 +197,8 @@ export function createAccountsView({ host, store, requestEditor }) {
     for (const list of groups.values()) {
       list.forEach((t, i) => {
         const a = byId.get(t.from), b = byId.get(t.to);
-        const acx = a.x + W / 2, acy = a.y + H / 2;
-        const bcx = b.x + W / 2, bcy = b.y + H / 2;
+        const acx = a.x + W / 2, acy = a.y + heightOf(a) / 2;
+        const bcx = b.x + W / 2, bcy = b.y + heightOf(b) / 2;
         const offset = (i - (list.length - 1) / 2) * 38;
 
         const mx = (acx + bcx) / 2, my = (acy + bcy) / 2;
@@ -241,26 +246,36 @@ export function createAccountsView({ host, store, requestEditor }) {
       });
       g.setAttribute('data-account', n.id);
 
+      const h = heightOf(n);
+      const bank = String(n.bank || '').trim();
+      const info = String(n.info || '').trim();
+
       g.appendChild(svg('rect', {
-        x: 0, y: 0, width: W, height: H, rx: 11,
+        x: 0, y: 0, width: W, height: h, rx: 11,
         fill: 'var(--surface)',
         stroke: connectFrom === n.id ? meta.color : 'var(--border-strong)',
         'stroke-width': connectFrom === n.id ? 2.5 : 1.2,
       }));
-      g.appendChild(svg('rect', { x: 0, y: 0, width: 5, height: H, rx: 2.5, fill: meta.color }));
+      g.appendChild(svg('rect', { x: 0, y: 0, width: 5, height: h, rx: 2.5, fill: meta.color }));
       g.appendChild(svg('text', {
         x: 16, y: 25, 'font-size': 13.5, 'font-weight': 600, fill: 'currentColor',
       }, fitText(n.name, W - 28, 7)));
       g.appendChild(svg('text', {
-        x: 16, y: 44, 'font-size': 14, fill: 'currentColor',
+        x: 16, y: 45, 'font-size': 14, fill: 'currentColor',
         'font-variant-numeric': 'tabular-nums',
       }, money(n.balance)));
       g.appendChild(svg('text', {
-        x: 16, y: 59, 'font-size': 10.5, fill: 'currentColor', opacity: 0.5,
+        x: 16, y: 61, 'font-size': 10.5, fill: 'currentColor', opacity: 0.55,
         'letter-spacing': '.04em',
-      }, meta.label.toUpperCase()));
+      }, fitText(bank ? `${meta.label.toUpperCase()} · ${bank}` : meta.label.toUpperCase(), W - 28, 5.9)));
+      if (info) {
+        g.appendChild(svg('text', {
+          x: 16, y: 80, 'font-size': 11, fill: 'currentColor', opacity: 0.72,
+        }, fitText(info, W - 28, 5.5)));
+      }
 
-      g.appendChild(svg('title', {}, `${n.name} · ${meta.label} · ${money(n.balance)}`));
+      g.appendChild(svg('title', {},
+        [`${n.name} · ${meta.label}`, bank, money(n.balance), info].filter(Boolean).join('\n')));
       layerNodes.appendChild(g);
     }
   }
@@ -316,7 +331,10 @@ export function createAccountsEditor({ accountHost, transferHost, store, request
 
     for (const node of nodes) {
       const row = el('div', { class: 'row row-account' });
-      const name = el('input', { type: 'text', value: node.name, placeholder: 'Kontoname' });
+      const name = el('input', {
+        type: 'text', value: node.name, placeholder: 'Kontoname',
+        'data-account-name': node.id,
+      });
       const type = el('select');
       for (const [key, meta] of Object.entries(ACCOUNT_TYPES)) {
         const opt = el('option', { value: key }, meta.label);
@@ -345,6 +363,14 @@ export function createAccountsEditor({ accountHost, transferHost, store, request
 
       row.append(name, type, balance, del);
       accountHost.appendChild(row);
+
+      const detail = el('div', { class: 'row row-account-detail' });
+      const bank = el('input', { type: 'text', value: node.bank ?? '', placeholder: 'Bank (optional)' });
+      const info = el('input', { type: 'text', value: node.info ?? '', placeholder: 'Info (optional)' });
+      bank.addEventListener('input', () => { node.bank = bank.value; valueChange(); });
+      info.addEventListener('input', () => { node.info = info.value; valueChange(); });
+      detail.append(bank, info, el('span'));
+      accountHost.appendChild(detail);
     }
   }
 
@@ -413,12 +439,16 @@ export function createAccountsEditor({ accountHost, transferHost, store, request
 
   function addAccount() {
     const n = data().nodes.length;
-    data().nodes.push({
-      id: uid('a'), name: 'Neues Konto', type: 'giro', balance: 0,
-      x: MARGIN + (n % 3) * (W + 110), y: MARGIN + Math.floor(n / 3) * (H + 76),
-    });
+    const node = {
+      id: uid('a'), name: 'Neues Konto', type: 'giro', bank: '', info: '', balance: 0,
+      x: MARGIN + (n % 3) * (W + 118), y: MARGIN + Math.floor(n / 3) * (H_INFO + 64),
+    };
+    data().nodes.push(node);
     structuralChange();
-    accountHost.querySelector('.row-account:nth-of-type(2) input')?.focus();
+    const input = accountHost.querySelector(`[data-account-name="${node.id}"]`);
+    input?.scrollIntoView({ block: 'nearest' });
+    input?.focus();
+    input?.select();
   }
 
   function addTransfer() {

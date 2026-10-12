@@ -2,8 +2,8 @@
 
 Zwei Ansichten für die eigenen Finanzen, als statische Web-App ohne Build-Schritt und ohne Abhängigkeiten:
 
-- **Geldfluss** – ein Sankey-Diagramm im Finanzfluss-Stil: Einnahmen fließen über Steuern und Abgaben zum Netto und von dort in Ausgabenkategorien, Unterkategorien und Sparen.
-- **Konten** – das eigene Kontomodell: Konten als frei verschiebbare Knoten mit Kontostand, verbunden durch Pfeile mit Beträgen.
+- **Geldfluss** – ein Sankey-Diagramm im Finanzfluss-Stil: alle Einnahmequellen laufen in einen Einnahmen-Knoten und von dort in Ausgabenkategorien und deren Unterposten.
+- **Konten** – das eigene Kontomodell: Konten als frei verschiebbare Knoten mit Kontostand, Bank und Notiz, verbunden durch Pfeile mit Beträgen.
 
 Alles wird direkt in der Oberfläche eingetippt und verschlüsselt im Browser gespeichert.
 
@@ -30,13 +30,15 @@ Pages liefert über HTTPS aus – das ist wichtig, weil die Verschlüsselung die
 
 ## Bedienung
 
-**Geldfluss.** Rechts in der Tabelle „Von“, „Nach“ und den Betrag eintragen. Namen werden frei eingetippt – steht dort noch kein Posten mit dem Namen, wird er automatisch angelegt; bestehende Namen schlägt das Feld beim Tippen vor. Ein Posten, der in keinem Fluss mehr vorkommt, verschwindet von selbst.
+**Geldfluss.** Rechts stehen zwei Abschnitte: oben **Einnahmen**, darunter **Ausgaben** – jeweils nur Bezeichnung und Betrag, kein Von/Nach. Jede Ausgabenkategorie lässt sich über „+ Unterposten“ weiter aufschlüsseln, zum Beispiel *Wohnen 950 €* in Miete, Strom, Internet und Nebenkosten. Eine Kategorie zu löschen entfernt ihre Unterposten gleich mit.
 
-Unter dem Diagramm erscheinen Hinweise, wenn bei einem Posten Zu- und Abfluss nicht zusammenpassen, zum Beispiel *„Netto: 2.300 € rein, 2.450 € raus → 150 € mehr verteilt als vorhanden“*. Das ist eine Warnung, keine Sperre – unvollständige Zwischenstände sind erlaubt.
+Stimmen die Unterposten nicht mit ihrer Kategorie überein, steht der Rest direkt darunter (*„120 € noch nicht aufgeteilt“*). Unter dem Diagramm erscheinen dieselben Hinweise für den gesamten Fluss, etwa *„Einnahmen: 2.800 € rein, 2.600 € raus → 200 € nicht zugeordnet“*. Beides sind Warnungen, keine Sperren – unvollständige Zwischenstände sind erlaubt.
 
-Farben vergibt die App automatisch: Posten, die sich weiter aufteilen, bekommen eine eigene Farbe, Unterposten einen helleren Ton ihres Oberpostens. Jede Farbe lässt sich unter „Farben“ überschreiben und mit „auto“ wieder freigeben.
+Farben vergibt die App automatisch: der Einnahmen-Knoten bleibt neutral, jede Ausgabenkategorie bekommt eine eigene Farbe und ihre Unterposten einen helleren Ton davon. Jede Farbe lässt sich unter „Farben“ überschreiben und mit „auto“ wieder freigeben.
 
-**Konten.** Konten lassen sich mit der Maus frei anordnen; die Positionen werden mitgespeichert. Für eine Umbuchung auf **Verbinden** klicken, dann Quell- und Zielkonto anklicken und rechts den Betrag eintragen. Kredite werden mit negativem Stand erfasst und gehen so korrekt ins Nettovermögen ein.
+**Konten.** Konten lassen sich mit der Maus frei anordnen; die Positionen werden mitgespeichert. Neben Name, Art und Kontostand gibt es optional eine **Bank** (erscheint in der Kopfzeile des Knotens, z. B. `GIROKONTO · DKB`) und eine **Info** für eine kurze Notiz wie „Gehalt & Lastschriften“ – Konten ohne Notiz bleiben kompakt. Der vollständige Text steht im Tooltip, falls er auf dem Knoten gekürzt wird.
+
+Für eine Umbuchung auf **Verbinden** klicken, dann Quell- und Zielkonto anklicken und rechts den Betrag eintragen. Kredite werden mit negativem Stand erfasst und gehen so korrekt ins Nettovermögen ein.
 
 **Daten-Menü.** Diagramm als SVG oder PNG exportieren, die Rohdaten als JSON sichern, den verschlüsselten Tresor exportieren und importieren, oder alles auf die Startwerte zurücksetzen.
 
@@ -61,10 +63,12 @@ js/app.js             Bootstrap, Tabs, Datenmenü, Export-Aktionen
 js/vault.js           PBKDF2 + AES-GCM, Profile anlegen/entsperren/speichern
 js/store.js           Zustand, Startdaten, Migration, gebündeltes Speichern
 js/sankey.js          Sankey-Layout und SVG-Rendering
-js/sankey-editor.js   Flusstabelle und Farbzuweisung
+js/sankey-editor.js   Einnahmen/Ausgaben-Editor und Farbzuweisung
 js/accounts.js        Kontengraph (Ziehen, Verbinden) und dessen Editor
 js/export.js          SVG-, PNG- und JSON-Download
 js/util.js            Formatierung, Farbhilfen, DOM-Helfer
 ```
 
 Das Sankey-Layout ist selbst implementiert: Spalten über den längsten Pfad, Kreislauferkennung, Skalierung an der vollsten Spalte und Kreuzungsreduktion über Schwerpunkte der Nachbarspalte.
+
+Intern sind beide Ansichten Graphen aus Knoten und Flüssen. Der Geldfluss-Editor ist nur eine Sicht darauf: Einnahmen sind Flüsse *in* den Knoten `einnahmen`, Ausgaben Flüsse *aus* ihm heraus, Unterposten Flüsse aus einer Kategorie. Deshalb kommt er ohne Von/Nach-Spalten aus.

@@ -138,9 +138,9 @@ function enterApp(session, data) {
   fPass2.value = '';
 
   flowEditor = createFlowEditor({
-    rowHost: $('#flow-rows'),
+    incomeHost: $('#income-rows'),
+    expenseHost: $('#expense-rows'),
     colorHost: $('#color-rows'),
-    listHost: $('#node-names'),
     store,
     requestChart: refreshFlowChart,
   });
@@ -244,7 +244,8 @@ function renderFlowNotes(layout) {
   }
 }
 
-$('#btn-add-flow').addEventListener('click', () => flowEditor?.addFlow());
+$('#btn-add-income').addEventListener('click', () => flowEditor?.addIncome());
+$('#btn-add-expense').addEventListener('click', () => flowEditor?.addExpense());
 
 $('#sankey-title').addEventListener('input', ev => {
   if (!store.data) return;
