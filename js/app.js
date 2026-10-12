@@ -266,6 +266,8 @@ function refreshAccounts() {
   if (!store.data || !accountsView) return;
   accountsView.draw();
   accountsView.renderNotes($('#accounts-notes'));
+  $('#btn-edge-style').textContent =
+    accountsView.edgeStyle() === 'knick' ? 'Pfeile: abgeknickt' : 'Pfeile: gebogen';
   $('#stat-networth').textContent = money(netWorth(store.data.accounts));
   $('#stat-transfers').textContent = money(Math.round(monthlyTransferSum(store.data.accounts) * 100) / 100);
 }
@@ -274,6 +276,10 @@ $('#btn-add-account').addEventListener('click', () => accountsEditor?.addAccount
 $('#btn-add-transfer').addEventListener('click', () => accountsEditor?.addTransfer());
 $('#btn-connect').addEventListener('click', () => {
   accountsView?.toggleConnectMode();
+  refreshAccounts();
+});
+$('#btn-edge-style').addEventListener('click', () => {
+  accountsView?.toggleEdgeStyle();
   refreshAccounts();
 });
 $('#btn-tidy').addEventListener('click', () => {

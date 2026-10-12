@@ -46,29 +46,33 @@ export function createFlowEditor({ incomeHost, expenseHost, colorHost, store, re
   const data = () => store.data;
 
   function valueChange() {
+    syncCategoryTotals();
     store.commit({ silent: true });
     refreshTotals();
     requestChart();
   }
 
-  // Summen und Aufteilungs-Hinweise hängen an Beträgen, die im Feld geändert
-  // werden - sie werden im Text nachgezogen, statt die Zeilen neu zu bauen.
+  // Hat eine Kategorie Unterposten, ist ihr Betrag deren Summe. Sonst müsste
+  // man jede Änderung an einem Unterposten oben von Hand nachtragen.
+  function syncCategoryTotals() {
+    for (const flow of expenseFlows(data())) {
+      const subs = childFlows(data(), flow.to);
+      if (!subs.length) continue;
+      flow.amount = subs.reduce((s, f) => s + Number(f.amount), 0);
+    }
+  }
+
+  // Summen hängen an Beträgen, die im Feld geändert werden - sie werden im Text
+  // nachgezogen, statt die Zeilen unter dem Cursor neu zu bauen.
   function refreshTotals() {
     const sum = flows => flows.reduce((s, f) => s + Number(f.amount), 0);
     incomeHost.querySelector('[data-sum]')?.replaceChildren(`Summe ${money(sum(incomeFlows(data())))}`);
     expenseHost.querySelector('[data-sum]')?.replaceChildren(`Summe ${money(sum(expenseFlows(data())))}`);
 
     for (const flow of expenseFlows(data())) {
-      const hint = expenseHost.querySelector(`[data-hint-for="${flow.to}"]`);
-      if (!hint) continue;
-      const subs = childFlows(data(), flow.to);
-      const diff = Number(flow.amount) - sum(subs);
-      const text = !subs.length || Math.abs(diff) <= 0.005 ? ''
-        : diff > 0
-          ? `${money(diff)} noch nicht aufgeteilt`
-          : `${money(-diff)} mehr aufgeteilt als die Kategorie hergibt`;
-      hint.textContent = text;
-      hint.hidden = !text;
+      if (!childFlows(data(), flow.to).length) continue;
+      const field = expenseHost.querySelector(`[data-amount-for="${flow.to}"]`);
+      if (field) field.value = flow.amount || '';
     }
   }
 
@@ -87,7 +91,7 @@ export function createFlowEditor({ incomeHost, expenseHost, colorHost, store, re
 
   // Name und Betrag sind in jeder Zeile gleich aufgebaut - nur die Einrückung
   // und der Platzhalter unterscheiden Einnahme, Ausgabe und Unterposten.
-  function entryRow(flow, { placeholder, sub = false }) {
+  function entryRow(flow, { placeholder, sub = false, derived = false }) {
     // Bei Einnahmen zeigt der Fluss auf den Einnahmen-Knoten, sonst von ihm weg.
     const node = nodeById(data(), flow.to === HUB_ID ? flow.from : flow.to);
     const row = el('div', { class: 'row row-entry' + (sub ? ' row-sub' : '') });
@@ -98,6 +102,10 @@ export function createFlowEditor({ incomeHost, expenseHost, colorHost, store, re
     });
     const amount = el('input', {
       type: 'number', min: '0', step: '10', value: flow.amount || '', placeholder: '0',
+      'data-amount-for': node.id,
+      readonly: derived,
+      class: derived ? 'is-derived' : null,
+      title: derived ? 'Summe der Unterposten – wird automatisch berechnet' : null,
     });
     const del = el('button', { class: 'icon-btn', type: 'button', title: 'Entfernen' }, '×');
 
@@ -147,10 +155,10 @@ export function createFlowEditor({ incomeHost, expenseHost, colorHost, store, re
     }
 
     for (const flow of flows) {
-      const group = el('div', { class: 'cat' });
-      group.appendChild(entryRow(flow, { placeholder: 'z. B. Wohnen' }));
-
       const subs = childFlows(data(), flow.to);
+      const group = el('div', { class: 'cat' });
+      group.appendChild(entryRow(flow, { placeholder: 'z. B. Wohnen', derived: subs.length > 0 }));
+
       for (const sub of subs) {
         group.appendChild(entryRow(sub, { placeholder: 'z. B. Miete', sub: true }));
       }
@@ -159,9 +167,6 @@ export function createFlowEditor({ incomeHost, expenseHost, colorHost, store, re
       add.addEventListener('click', () => addEntry(flow.to, 'Neuer Unterposten'));
       group.appendChild(add);
 
-      // Unterposten, die zusammen nicht die Kategorie ergeben, fallen sonst erst
-      // unten am Diagramm auf. Den Text setzt refreshTotals.
-      group.appendChild(el('p', { class: 'cat-hint', 'data-hint-for': flow.to, hidden: true }));
       expenseHost.appendChild(group);
     }
 
@@ -209,6 +214,7 @@ export function createFlowEditor({ incomeHost, expenseHost, colorHost, store, re
 
   function renderAll() {
     ensureHub(data());
+    syncCategoryTotals();
     renderIncome();
     renderExpenses();
     renderColors();
@@ -216,9 +222,16 @@ export function createFlowEditor({ incomeHost, expenseHost, colorHost, store, re
   }
 
   function addEntry(parentId, name) {
+    // Beim ersten Unterposten den Kategoriebetrag übernehmen, statt ihn auf 0
+    // fallen zu lassen - ab jetzt ist die Kategorie ja die Summe der Unterposten.
+    const parentFlow = data().sankey.flows.find(f => f.to === parentId);
+    const seed = parentId !== HUB_ID && !childFlows(data(), parentId).length
+      ? Number(parentFlow?.amount) || 0
+      : 0;
+
     const node = { id: uid('n'), name, color: null };
     data().sankey.nodes.push(node);
-    data().sankey.flows.push({ id: uid('f'), from: parentId, to: node.id, amount: 0, note: '' });
+    data().sankey.flows.push({ id: uid('f'), from: parentId, to: node.id, amount: seed, note: '' });
     structureChange(node.id);
   }
 

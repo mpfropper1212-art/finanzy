@@ -32,6 +32,42 @@ export function monthlyTransferSum(accounts) {
   }, 0);
 }
 
+// Rechtwinkliger Verlauf mit abgerundeten Ecken. Je nachdem, ob die Konten
+// eher neben- oder übereinander liegen, wird waagerecht oder senkrecht gestartet.
+function elbowPoints(a, b, offset) {
+  const ha = heightOf(a), hb = heightOf(b);
+  const acx = a.x + W / 2, acy = a.y + ha / 2;
+  const bcx = b.x + W / 2, bcy = b.y + hb / 2;
+
+  if (Math.abs(bcx - acx) >= Math.abs(bcy - acy)) {
+    const right = bcx > acx;
+    const p0 = { x: right ? a.x + W : a.x, y: acy };
+    const p1 = { x: right ? b.x : b.x + W, y: bcy };
+    const mx = (p0.x + p1.x) / 2 + offset;
+    return [p0, { x: mx, y: p0.y }, { x: mx, y: p1.y }, p1];
+  }
+  const below = bcy > acy;
+  const p0 = { x: acx, y: below ? a.y + ha : a.y };
+  const p1 = { x: bcx, y: below ? b.y : b.y + hb };
+  const my = (p0.y + p1.y) / 2 + offset;
+  return [p0, { x: p0.x, y: my }, { x: p1.x, y: my }, p1];
+}
+
+function roundedPath(points, radius = 12) {
+  let d = `M${points[0].x},${points[0].y}`;
+  for (let i = 1; i < points.length - 1; i++) {
+    const p = points[i], prev = points[i - 1], next = points[i + 1];
+    const inLen = Math.hypot(p.x - prev.x, p.y - prev.y) || 1;
+    const outLen = Math.hypot(next.x - p.x, next.y - p.y) || 1;
+    const r = Math.min(radius, inLen / 2, outLen / 2);
+    const from = { x: p.x + (prev.x - p.x) / inLen * r, y: p.y + (prev.y - p.y) / inLen * r };
+    const to = { x: p.x + (next.x - p.x) / outLen * r, y: p.y + (next.y - p.y) / outLen * r };
+    d += ` L${from.x},${from.y} Q${p.x},${p.y} ${to.x},${to.y}`;
+  }
+  const last = points[points.length - 1];
+  return `${d} L${last.x},${last.y}`;
+}
+
 function anchorPoint(node, towardsCx, towardsCy) {
   const h = heightOf(node);
   const cx = node.x + W / 2, cy = node.y + h / 2;
@@ -88,6 +124,9 @@ export function createAccountsView({ host, store, requestEditor }) {
     if (!node) return;
 
     if (connectMode) {
+      // Ohne das setzt der Browser den Fokus zurück auf die Zeichenfläche und
+      // nimmt ihn dem Betragsfeld, das handleConnectClick gerade aktiviert hat.
+      ev.preventDefault();
       handleConnectClick(node);
       return;
     }
@@ -194,23 +233,35 @@ export function createAccountsView({ host, store, requestEditor }) {
       groups.get(key).push(t);
     }
 
+    const elbow = data().edgeStyle === 'knick';
+
     for (const list of groups.values()) {
       list.forEach((t, i) => {
         const a = byId.get(t.from), b = byId.get(t.to);
-        const acx = a.x + W / 2, acy = a.y + heightOf(a) / 2;
-        const bcx = b.x + W / 2, bcy = b.y + heightOf(b) / 2;
         const offset = (i - (list.length - 1) / 2) * 38;
 
-        const mx = (acx + bcx) / 2, my = (acy + bcy) / 2;
-        const len = Math.hypot(bcx - acx, bcy - acy) || 1;
-        const px = -(bcy - acy) / len, py = (bcx - acx) / len;
-        const ctrl = { x: mx + px * offset, y: my + py * offset };
-
-        const p0 = anchorPoint(a, ctrl.x, ctrl.y);
-        const p1 = anchorPoint(b, ctrl.x, ctrl.y);
+        let d, lx, ly;
+        if (elbow) {
+          const pts = elbowPoints(a, b, offset);
+          d = roundedPath(pts);
+          lx = (pts[1].x + pts[2].x) / 2;
+          ly = (pts[1].y + pts[2].y) / 2;
+        } else {
+          const acx = a.x + W / 2, acy = a.y + heightOf(a) / 2;
+          const bcx = b.x + W / 2, bcy = b.y + heightOf(b) / 2;
+          const mx = (acx + bcx) / 2, my = (acy + bcy) / 2;
+          const len = Math.hypot(bcx - acx, bcy - acy) || 1;
+          const px = -(bcy - acy) / len, py = (bcx - acx) / len;
+          const ctrl = { x: mx + px * offset, y: my + py * offset };
+          const p0 = anchorPoint(a, ctrl.x, ctrl.y);
+          const p1 = anchorPoint(b, ctrl.x, ctrl.y);
+          d = `M${p0.x},${p0.y} Q${ctrl.x},${ctrl.y} ${p1.x},${p1.y}`;
+          lx = (p0.x + 2 * ctrl.x + p1.x) / 4;
+          ly = (p0.y + 2 * ctrl.y + p1.y) / 4;
+        }
 
         const path = svg('path', {
-          d: `M${p0.x},${p0.y} Q${ctrl.x},${ctrl.y} ${p1.x},${p1.y}`,
+          d,
           fill: 'none',
           stroke: 'currentColor',
           'stroke-opacity': 0.42,
@@ -220,8 +271,6 @@ export function createAccountsView({ host, store, requestEditor }) {
         path.appendChild(svg('title', {}, transferTitle(t, a, b)));
         layerLinks.appendChild(path);
 
-        const lx = (p0.x + 2 * ctrl.x + p1.x) / 4;
-        const ly = (p0.y + 2 * ctrl.y + p1.y) / 4;
         const text = t.label
           ? `${moneyShort(t.amount)} · ${t.label}`
           : `${moneyShort(t.amount)}${t.interval === 'jaehrlich' ? ' / Jahr' : ''}`;
@@ -296,7 +345,18 @@ export function createAccountsView({ host, store, requestEditor }) {
     }
   }
 
-  return { draw, toggleConnectMode, setConnectMode, tidy, renderNotes, isConnecting: () => connectMode };
+  function toggleEdgeStyle() {
+    data().edgeStyle = data().edgeStyle === 'knick' ? 'kurve' : 'knick';
+    store.commit({ silent: true });
+    draw();
+    return data().edgeStyle;
+  }
+
+  return {
+    draw, toggleConnectMode, setConnectMode, tidy, renderNotes, toggleEdgeStyle,
+    edgeStyle: () => data().edgeStyle,
+    isConnecting: () => connectMode,
+  };
 }
 
 export function createAccountsEditor({ accountHost, transferHost, store, requestChart }) {

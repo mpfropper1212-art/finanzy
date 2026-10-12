@@ -43,6 +43,7 @@ export function createDefaultData() {
       ],
     },
     accounts: {
+      edgeStyle: 'kurve',
       nodes: [
         { id: 'giro', name: 'Girokonto', type: 'giro', bank: 'DKB', info: 'Gehalt & Lastschriften', balance: 2400, x: 60, y: 60 },
         { id: 'tagesgeld', name: 'Tagesgeld', type: 'tagesgeld', bank: 'ING', info: 'Notgroschen, 3 Monatsausgaben', balance: 8500, x: 470, y: 30 },
@@ -120,7 +121,11 @@ export function migrate(raw) {
       nodes,
       flows,
     },
-    accounts: { nodes: accNodes, transfers },
+    accounts: {
+      edgeStyle: a.edgeStyle === 'knick' ? 'knick' : 'kurve',
+      nodes: accNodes,
+      transfers,
+    },
   };
 }
 

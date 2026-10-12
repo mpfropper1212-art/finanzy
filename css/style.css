@@ -298,7 +298,6 @@ button, input, select { font: inherit; color: inherit; }
   color: var(--text-faint); font-size: 12px; padding: 1px 4px; border-radius: 5px;
 }
 .sub-add:hover { color: var(--accent); background: var(--surface-2); }
-.cat-hint { margin: 0 0 0 18px; font-size: 11.5px; color: var(--warn-text); }
 
 .sum {
   margin: 4px 0 0;
@@ -316,6 +315,14 @@ button, input, select { font: inherit; color: inherit; }
 }
 .row input[type=number] { text-align: right; font-variant-numeric: tabular-nums; }
 .row input.is-invalid { border-color: var(--danger); }
+
+/* Kategoriebetrag, der sich aus den Unterposten ergibt */
+.row input.is-derived {
+  background: transparent;
+  border-style: dashed;
+  color: var(--text-soft);
+  cursor: default;
+}
 
 .row-color { display: flex; align-items: center; gap: 9px; padding: 3px 1px; }
 .row-color input[type=color] {
