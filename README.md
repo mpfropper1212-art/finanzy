@@ -1,10 +1,11 @@
-# Finanz-Sankey & Kontomodell
+# Finanzy
 
-Zwei Ansichten für die eigenen Finanzen, als statische Web-App ohne Build-Schritt und ohne Abhängigkeiten:
+Vier Werkzeuge rund um die eigenen Finanzen, als statische Web-App ohne Build-Schritt und ohne Abhängigkeiten:
 
 - **Geldfluss** – ein Sankey-Diagramm im Finanzfluss-Stil: alle Einnahmequellen laufen in einen Einnahmen-Knoten und von dort in Ausgabenkategorien und deren Unterposten.
 - **Konten** – das eigene Kontomodell: Konten als frei verschiebbare Knoten mit Kontostand, Bank und Notiz, verbunden durch Pfeile mit Beträgen.
 - **Immobilien** – ein Renditerechner für Kapitalanlagen: Kaufnebenkosten, Annuitätendarlehen, Mietrenditen, Cashflow vor und nach Steuern. Beliebig viele Objekte nebeneinander.
+- **Gerichte** – eine Sammlung günstiger, eiweißreicher Gerichte mit Nährwerten, Preis je Portion, Kochzeit sowie Skalen für Kochaufwand und Abwasch. Gerichte lassen sich merken und selbst anlegen; selbst angelegte sind für alle Nutzer sichtbar.
 
 Alles wird direkt in der Oberfläche eingetippt. Hinter einem Login mit E-Mail und Passwort liegen die Daten in einem eigenen Konto, sodass auf jedem Gerät dieselben Zahlen stehen.
 
@@ -49,6 +50,12 @@ Berechnet werden Bruttomietrendite (Jahresmiete ÷ Kaufpreis), Nettomietrendite 
 
 Die Zahlen sind eine Überschlagsrechnung, keine Steuerberatung. Vereinfacht gilt: gezeigt ist jeweils das erste Jahr, die Instandhaltungsrücklage wirkt steuerlich eigentlich erst beim tatsächlichen Ausgeben, und das Mietausfallwagnis mindert den Cashflow, ist aber keine Werbungskostenposition.
 
+**Gerichte.** Die Startdatenbank enthält 30 einfache Gerichte, ausgewählt nach viel Eiweiß für wenig Geld. Oben wird gefiltert (Suche, vegan / vegetarisch / mit Fleisch und Fisch, Höchstpreis, Höchstzeit, Mindest-Eiweiß) und sortiert – voreingestellt nach **Eiweiß je Euro**, der Kennzahl, um die es hier geht. Ein Filter auf „Vegetarisch" zeigt vegane Gerichte mit an.
+
+Das Herz merkt ein Gericht; „Nur gemerkte" blendet auf die eigene Auswahl ein. Die gemerkten Gerichte hängen am Konto und sind auf jedem Gerät dieselben.
+
+Rechts lassen sich eigene Gerichte anlegen. **Diese sind für alle Nutzer der Seite sichtbar** – ein eigenes Gericht kann nur sein Urheber wieder löschen. Die Startgerichte stehen im Code (`js/gerichte-daten.js`) und lassen sich dort erweitern; nur selbst angelegte liegen in der Datenbank.
+
 **Daten-Menü.** Diagramm als SVG oder PNG exportieren, eine Sicherung als JSON herunterladen und wieder einspielen, oder alles auf die Startwerte zurücksetzen.
 
 ## Konto und Datenablage
@@ -82,7 +89,37 @@ create policy "Eigene Daten anlegen" on public.finanzen for insert with check (a
 create policy "Eigene Daten aendern" on public.finanzen for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
 ```
 
-– unter *Authentication → Email* die Bestätigungsmail abschalten und `BASE` sowie `KEY` oben in `js/cloud.js` eintragen.
+Für die geteilten Gerichte zusätzlich:
+
+```sql
+create table if not exists public.gerichte (
+  id uuid primary key default gen_random_uuid(),
+  autor uuid not null references auth.users on delete cascade,
+  autor_name text,
+  name text not null check (char_length(name) between 1 and 120),
+  beschreibung text check (beschreibung is null or char_length(beschreibung) <= 1000),
+  art text not null default 'vegetarisch' check (art in ('vegan','vegetarisch','fisch','fleisch')),
+  kcal int not null default 0 check (kcal between 0 and 5000),
+  protein int not null default 0 check (protein between 0 and 500),
+  kh int not null default 0 check (kh between 0 and 1000),
+  fett int not null default 0 check (fett between 0 and 500),
+  preis numeric(6,2) not null default 0 check (preis between 0 and 999),
+  zeit int not null default 0 check (zeit between 0 and 1440),
+  aufwand int not null default 1 check (aufwand between 1 and 5),
+  abwasch int not null default 1 check (abwasch between 1 and 5),
+  created_at timestamptz not null default now()
+);
+alter table public.gerichte enable row level security;
+grant select, insert, update, delete on public.gerichte to authenticated;
+create policy "Gerichte lesen"   on public.gerichte for select to authenticated using (true);
+create policy "Gericht anlegen"  on public.gerichte for insert to authenticated with check (auth.uid() = autor);
+create policy "Eigenes aendern"  on public.gerichte for update to authenticated using (auth.uid() = autor) with check (auth.uid() = autor);
+create policy "Eigenes loeschen" on public.gerichte for delete to authenticated using (auth.uid() = autor);
+```
+
+Anders als bei `finanzen` darf hier jeder jede Zeile **lesen** – das ist der Zweck der geteilten Sammlung. Ändern und löschen kann weiterhin nur, wem die Zeile gehört. Die CHECK-Bedingungen begrenzen, was eine fremde Eingabe anrichten kann.
+
+Zum Schluss unter *Authentication → Email* die Bestätigungsmail abschalten und `BASE` sowie `KEY` oben in `js/cloud.js` eintragen.
 
 ## Aufbau
 
@@ -97,6 +134,8 @@ js/sankey.js          Sankey-Layout und SVG-Rendering
 js/sankey-editor.js   Einnahmen/Ausgaben-Editor und Farbzuweisung
 js/accounts.js        Kontengraph (Ziehen, Verbinden) und dessen Editor
 js/immobilien.js      Immobilienrechner: Berechnung, Kennzahlen, Tilgungskurve
+js/gerichte.js        Gerichte: Filter, Karten, Merken, Formular
+js/gerichte-daten.js  Startdatenbank der Gerichte
 js/export.js          SVG-, PNG- und JSON-Download
 js/util.js            Formatierung, Farbhilfen, DOM-Helfer
 ```

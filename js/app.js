@@ -7,6 +7,7 @@ import { computeLayout, renderSankey } from './sankey.js';
 import { createFlowEditor } from './sankey-editor.js';
 import { createAccountsView, createAccountsEditor, netWorth, monthlyTransferSum } from './accounts.js';
 import { createImmobilienView } from './immobilien.js';
+import { createGerichteView } from './gerichte.js';
 import * as dl from './export.js';
 import { el, clear, money } from './util.js';
 
@@ -17,6 +18,7 @@ let flowEditor = null;
 let accountsView = null;
 let accountsEditor = null;
 let immoView = null;
+let gerichteView = null;
 let activeTab = 'flow';
 let mode = 'login';
 
@@ -157,6 +159,15 @@ function enterApp(data) {
     store,
   });
 
+  gerichteView = createGerichteView({
+    listHost: $('#gerichte-liste'),
+    filterHost: $('#gerichte-filter'),
+    formHost: $('#gerichte-form'),
+    statusHost: $('#gerichte-status'),
+    store,
+  });
+  gerichteView.ladeGeteilte();
+
   $('#sankey-title').value = data.sankey.title;
   $('#sankey-height').value = data.sankey.height;
 
@@ -169,7 +180,7 @@ function enterApp(data) {
 function leaveApp() {
   store.detach();
   cloud.signOut();
-  flowEditor = accountsEditor = accountsView = immoView = null;
+  flowEditor = accountsEditor = accountsView = immoView = gerichteView = null;
   $('#app-view').hidden = true;
   $('#login-view').hidden = false;
   $('#accounts-host').replaceChildren();
@@ -249,6 +260,7 @@ function rebuildAll() {
   flowEditor.renderAll();
   accountsEditor.renderAll();
   immoView.renderAll();
+  gerichteView.renderAll();
   refreshFlowChart();
   refreshAccounts();
 }
@@ -261,9 +273,11 @@ function setTab(tab) {
   $('#panel-flow').hidden = tab !== 'flow';
   $('#panel-accounts').hidden = tab !== 'accounts';
   $('#panel-immo').hidden = tab !== 'immo';
+  $('#panel-gerichte').hidden = tab !== 'gerichte';
   if (tab === 'flow') refreshFlowChart();
   else if (tab === 'accounts') refreshAccounts();
-  else immoView?.renderAll();
+  else if (tab === 'immo') immoView?.renderAll();
+  else gerichteView?.renderAll();
 }
 
 /* ------------------------- Geldfluss ------------------------- */

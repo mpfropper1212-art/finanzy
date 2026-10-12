@@ -193,6 +193,36 @@ export async function saveData(data) {
   });
 }
 
+/* --------- Geteilte Gerichte: alle lesen, nur eigene ändern --------- */
+
+const GERICHTE = 'gerichte';
+
+export async function loadGerichte() {
+  const rows = await rest(`${GERICHTE}?select=*&order=created_at.desc&limit=500`);
+  return Array.isArray(rows) ? rows : [];
+}
+
+export async function createGericht(gericht) {
+  const rows = await rest(GERICHTE, {
+    method: 'POST',
+    headers: { Prefer: 'return=representation' },
+    body: { ...gericht, autor: session.user.id },
+  });
+  return rows?.[0] ?? null;
+}
+
+export async function updateGericht(id, felder) {
+  await rest(`${GERICHTE}?id=eq.${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=minimal' },
+    body: felder,
+  });
+}
+
+export async function deleteGericht(id) {
+  await rest(`${GERICHTE}?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' });
+}
+
 // Letzter Stand lokal, damit ein Serverausfall mitten im Tippen keine
 // Eingaben kostet. Wird beim nächsten erfolgreichen Speichern überflüssig.
 const backupKey = () => `finanzsankey.backup.${session?.user?.id}`;

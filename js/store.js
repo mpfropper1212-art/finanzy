@@ -56,6 +56,7 @@ export function createDefaultData() {
       ],
     },
     immobilien: createImmobilienTeil(),
+    gerichte: { favoriten: [] },
   };
 }
 
@@ -131,6 +132,11 @@ export function migrate(raw) {
       transfers,
     },
     immobilien: migrateImmobilien(raw.immobilien),
+    gerichte: {
+      favoriten: Array.isArray(raw.gerichte?.favoriten)
+        ? raw.gerichte.favoriten.filter(x => typeof x === 'string')
+        : [],
+    },
   };
 }
 

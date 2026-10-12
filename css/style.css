@@ -452,6 +452,120 @@ button, input, select { font: inherit; color: inherit; }
 }
 .feld-einheit { font-size: 11.5px; color: var(--text-faint); white-space: nowrap; min-width: 48px; }
 
+/* ---------- Gerichte ---------- */
+.gerichte-filter {
+  display: grid;
+  gap: 9px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.filter-suche {
+  width: 100%;
+  padding: 7px 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.filter-arten { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pill {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 4px 13px;
+  cursor: pointer;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+.pill:hover { color: var(--text); }
+.pill.is-active { background: var(--accent); border-color: transparent; color: var(--accent-text); font-weight: 600; }
+
+.filter-zahlen { display: flex; flex-wrap: wrap; gap: 14px; }
+.filter-zahl { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-soft); }
+.filter-zahl input {
+  width: 72px;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  text-align: right;
+}
+.filter-einheit { color: var(--text-faint); font-size: 12px; }
+.filter-sort {
+  margin-left: auto;
+  padding: 4px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.gerichte-liste { padding: 14px 16px 18px; display: grid; gap: 11px; }
+.listen-kopf { margin: 0; font-size: 12.5px; color: var(--text-faint); }
+
+.gericht {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  padding: 13px 15px;
+  display: grid;
+  gap: 9px;
+}
+.gericht-kopf { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.gericht-titel { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.gericht-titel h3 { margin: 0; font-size: 15px; letter-spacing: -.01em; }
+.gericht-art {
+  font-size: 11px; font-weight: 600;
+  padding: 2px 9px; border-radius: 999px;
+  color: var(--art);
+  border: 1px solid color-mix(in srgb, var(--art) 40%, transparent);
+  background: color-mix(in srgb, var(--art) 10%, transparent);
+}
+.gericht-quelle { font-size: 11.5px; color: var(--text-faint); }
+.gericht-text { margin: 0; font-size: 13px; color: var(--text-soft); line-height: 1.5; }
+
+.herz {
+  border: 0; background: none; cursor: pointer;
+  font-size: 20px; line-height: 1; padding: 2px 4px;
+  color: var(--text-faint); flex: none;
+}
+.herz:hover { color: #dc2626; }
+.herz.is-an { color: #dc2626; }
+
+.gericht-werte { display: flex; flex-wrap: wrap; gap: 16px; }
+.gw { display: grid; }
+.gw strong { font-size: 15px; font-variant-numeric: tabular-nums; }
+.gw span { font-size: 11px; color: var(--text-faint); }
+.gw-stark strong { color: var(--accent); }
+
+.gericht-fuss {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 16px;
+  font-size: 12px; color: var(--text-soft);
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+.gericht-skala { display: flex; align-items: center; gap: 6px; }
+.skala { display: inline-flex; gap: 3px; }
+.skala-punkt {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--border-strong);
+}
+.skala-punkt.is-voll { background: var(--text-soft); }
+.gericht-loeschen { margin-left: auto; font-size: 12px; }
+
+.feld-breit { grid-template-columns: 1fr; gap: 4px; }
+.feld-breit textarea, .feld-breit input {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface-2);
+  font: inherit;
+  resize: vertical;
+}
+.feld-hinweis { margin: 10px 0; font-size: 12px; color: var(--text-faint); }
+
 /* ---------- Diagram bits ---------- */
 .sankey-node { cursor: default; }
 .sankey-link { transition: opacity .12s; }
