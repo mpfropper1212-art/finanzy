@@ -4,6 +4,7 @@ Zwei Ansichten für die eigenen Finanzen, als statische Web-App ohne Build-Schri
 
 - **Geldfluss** – ein Sankey-Diagramm im Finanzfluss-Stil: alle Einnahmequellen laufen in einen Einnahmen-Knoten und von dort in Ausgabenkategorien und deren Unterposten.
 - **Konten** – das eigene Kontomodell: Konten als frei verschiebbare Knoten mit Kontostand, Bank und Notiz, verbunden durch Pfeile mit Beträgen.
+- **Immobilien** – ein Renditerechner für Kapitalanlagen: Kaufnebenkosten, Annuitätendarlehen, Mietrenditen, Cashflow vor und nach Steuern. Beliebig viele Objekte nebeneinander.
 
 Alles wird direkt in der Oberfläche eingetippt. Hinter einem Login mit E-Mail und Passwort liegen die Daten in einem eigenen Konto, sodass auf jedem Gerät dieselben Zahlen stehen.
 
@@ -39,6 +40,14 @@ Farben vergibt die App automatisch: der Einnahmen-Knoten bleibt neutral, jede Au
 **Konten.** Konten lassen sich mit der Maus frei anordnen; die Positionen werden mitgespeichert. Neben Name, Art und Kontostand gibt es optional eine **Bank** (erscheint in der Kopfzeile des Knotens, z. B. `GIROKONTO · DKB`) und eine **Info** für eine kurze Notiz wie „Gehalt & Lastschriften“ – Konten ohne Notiz bleiben kompakt. Der vollständige Text steht im Tooltip, falls er auf dem Knoten gekürzt wird.
 
 Für eine Umbuchung auf **Verbinden** klicken, dann Quell- und Zielkonto anklicken und rechts den Betrag eintragen. Kredite werden mit negativem Stand erfasst und gehen so korrekt ins Nettovermögen ein.
+
+**Immobilien.** Oben die angelegten Objekte als Reiter, daneben *+ Immobilie*, *Duplizieren* und *Löschen* – Duplizieren eignet sich, um zwei Finanzierungsvarianten desselben Objekts zu vergleichen. Rechts die Eingaben in fünf Blöcken (Objekt, Kaufpreis und Nebenkosten, Finanzierung, Miete und Bewirtschaftung, Steuer).
+
+Zwei Felder füllen sich von selbst und lassen sich trotzdem überschreiben: Die Wahl des **Bundeslands** setzt die Grunderwerbsteuer, das **Baujahr** den AfA-Satz (2,5 % vor 1925, 2 % bis 2022, 3 % ab 2023).
+
+Berechnet werden Bruttomietrendite (Jahresmiete ÷ Kaufpreis), Nettomietrendite (nach Bewirtschaftung, auf die Gesamtinvestition), Kaufpreisfaktor, Cashflow vor und nach Steuern sowie die Eigenkapitalrendite. Das Darlehen wird als Annuitätendarlehen monatsgenau durchgerechnet; darunter zeigt eine Kurve die Restschuld bis zum Ende der Zinsbindung.
+
+Die Zahlen sind eine Überschlagsrechnung, keine Steuerberatung. Vereinfacht gilt: gezeigt ist jeweils das erste Jahr, die Instandhaltungsrücklage wirkt steuerlich eigentlich erst beim tatsächlichen Ausgeben, und das Mietausfallwagnis mindert den Cashflow, ist aber keine Werbungskostenposition.
 
 **Daten-Menü.** Diagramm als SVG oder PNG exportieren, eine Sicherung als JSON herunterladen und wieder einspielen, oder alles auf die Startwerte zurücksetzen.
 
@@ -87,6 +96,7 @@ js/store.js           Zustand, Startdaten, Migration, gebündeltes Speichern
 js/sankey.js          Sankey-Layout und SVG-Rendering
 js/sankey-editor.js   Einnahmen/Ausgaben-Editor und Farbzuweisung
 js/accounts.js        Kontengraph (Ziehen, Verbinden) und dessen Editor
+js/immobilien.js      Immobilienrechner: Berechnung, Kennzahlen, Tilgungskurve
 js/export.js          SVG-, PNG- und JSON-Download
 js/util.js            Formatierung, Farbhilfen, DOM-Helfer
 ```

@@ -1,8 +1,8 @@
 // Editor für den Geldfluss: Einnahmen oben, Ausgaben darunter, Unterposten
 // eingerückt. Alles hängt am Einnahmen-Knoten, deshalb braucht es kein Von/Nach.
 
-import { uid, HUB_ID } from './store.js';
-import { el, clear, isValidHex, money } from './util.js';
+import { HUB_ID } from './store.js';
+import { el, clear, isValidHex, money, uid } from './util.js';
 
 function nodeById(data, id) {
   return data.sankey.nodes.find(n => n.id === id);

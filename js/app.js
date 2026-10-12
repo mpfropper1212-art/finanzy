@@ -6,6 +6,7 @@ import { Store, createDefaultData, migrate } from './store.js';
 import { computeLayout, renderSankey } from './sankey.js';
 import { createFlowEditor } from './sankey-editor.js';
 import { createAccountsView, createAccountsEditor, netWorth, monthlyTransferSum } from './accounts.js';
+import { createImmobilienView } from './immobilien.js';
 import * as dl from './export.js';
 import { el, clear, money } from './util.js';
 
@@ -15,6 +16,7 @@ const store = new Store();
 let flowEditor = null;
 let accountsView = null;
 let accountsEditor = null;
+let immoView = null;
 let activeTab = 'flow';
 let mode = 'login';
 
@@ -147,6 +149,14 @@ function enterApp(data) {
     },
   });
 
+  immoView = createImmobilienView({
+    listHost: $('#immo-list'),
+    formHost: $('#immo-form'),
+    resultHost: $('#immo-result'),
+    chartHost: $('#immo-chart'),
+    store,
+  });
+
   $('#sankey-title').value = data.sankey.title;
   $('#sankey-height').value = data.sankey.height;
 
@@ -159,7 +169,7 @@ function enterApp(data) {
 function leaveApp() {
   store.detach();
   cloud.signOut();
-  flowEditor = accountsEditor = accountsView = null;
+  flowEditor = accountsEditor = accountsView = immoView = null;
   $('#app-view').hidden = true;
   $('#login-view').hidden = false;
   $('#accounts-host').replaceChildren();
@@ -238,6 +248,7 @@ function rebuildAll() {
   $('#sankey-height').value = store.data.sankey.height;
   flowEditor.renderAll();
   accountsEditor.renderAll();
+  immoView.renderAll();
   refreshFlowChart();
   refreshAccounts();
 }
@@ -249,8 +260,10 @@ function setTab(tab) {
   }
   $('#panel-flow').hidden = tab !== 'flow';
   $('#panel-accounts').hidden = tab !== 'accounts';
+  $('#panel-immo').hidden = tab !== 'immo';
   if (tab === 'flow') refreshFlowChart();
-  else refreshAccounts();
+  else if (tab === 'accounts') refreshAccounts();
+  else immoView?.renderAll();
 }
 
 /* ------------------------- Geldfluss ------------------------- */
@@ -344,6 +357,12 @@ for (const btn of document.querySelectorAll('.tab')) {
   btn.addEventListener('click', () => setTab(btn.dataset.tab));
 }
 
+/* ------------------------- Immobilien ------------------------- */
+
+$('#btn-immo-add').addEventListener('click', () => immoView?.hinzufuegen());
+$('#btn-immo-copy').addEventListener('click', () => immoView?.duplizieren());
+$('#btn-immo-del').addEventListener('click', () => immoView?.entfernen());
+
 /* --------------------------- Menü --------------------------- */
 
 const menuPop = $('#menu-pop');
@@ -364,15 +383,15 @@ document.addEventListener('click', ev => {
 });
 
 function activeSvg() {
-  return activeTab === 'flow'
-    ? $('#sankey-host svg')
-    : $('#accounts-host svg');
+  if (activeTab === 'flow') return $('#sankey-host svg');
+  if (activeTab === 'accounts') return $('#accounts-host svg');
+  return $('#immo-chart svg');
 }
 
 function activeName() {
-  return activeTab === 'flow'
-    ? store.data.sankey.title || 'geldfluss'
-    : 'kontomodell';
+  if (activeTab === 'flow') return store.data.sankey.title || 'geldfluss';
+  if (activeTab === 'accounts') return 'kontomodell';
+  return `${immoView?.aktiv()?.name || 'immobilie'}-restschuld`;
 }
 
 menuPop.addEventListener('click', async ev => {

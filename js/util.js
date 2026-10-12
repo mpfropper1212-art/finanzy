@@ -2,6 +2,10 @@
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
+export function uid(prefix) {
+  return prefix + Math.random().toString(36).slice(2, 9);
+}
+
 export const PALETTE = [
   '#2f6feb', '#16a34a', '#dc2626', '#d97706', '#7c3aed', '#0891b2',
   '#db2777', '#65a30d', '#ea580c', '#4f46e5', '#0d9488', '#a16207',

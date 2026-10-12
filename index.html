@@ -72,6 +72,7 @@
       <nav class="tabs" role="tablist">
         <button class="tab is-active" data-tab="flow" role="tab">Geldfluss</button>
         <button class="tab" data-tab="accounts" role="tab">Konten</button>
+        <button class="tab" data-tab="immo" role="tab">Immobilien</button>
       </nav>
     </div>
     <div class="topbar-right">
@@ -173,6 +174,30 @@
         <button class="btn btn-primary btn-sm" id="btn-add-transfer">+ Umbuchung</button>
       </div>
       <div id="transfer-rows" class="rows"></div>
+    </aside>
+  </main>
+
+  <!-- ---- Immobilien ---- -->
+  <main id="panel-immo" class="panel" hidden>
+    <div class="chart-wrap">
+      <div class="chart-head">
+        <div id="immo-list" class="obj-chips"></div>
+        <div class="chart-head-right">
+          <button class="btn btn-primary btn-sm" id="btn-immo-add">+ Immobilie</button>
+          <button class="btn btn-ghost btn-sm" id="btn-immo-copy">Duplizieren</button>
+          <button class="btn btn-ghost btn-sm" id="btn-immo-del">Löschen</button>
+        </div>
+      </div>
+      <div id="immo-result" class="immo-result"></div>
+      <div class="immo-chart-head">Restschuld über die Zinsbindung</div>
+      <div id="immo-chart" class="svg-host"></div>
+    </div>
+
+    <aside class="editor">
+      <div class="editor-head">
+        <h2>Eingaben</h2>
+      </div>
+      <div id="immo-form" class="immo-form"></div>
     </aside>
   </main>
 </div>

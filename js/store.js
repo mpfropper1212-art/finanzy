@@ -1,6 +1,8 @@
 // Zustand der App: halten, verteilen, verschlüsselt zurückschreiben.
 
 import * as cloud from './cloud.js';
+import { createImmobilie, BUNDESLAENDER } from './immobilien.js';
+import { uid } from './util.js';
 
 export const DATA_VERSION = 2;
 const SAVE_DEBOUNCE_MS = 400;
@@ -8,10 +10,6 @@ const SAVE_DEBOUNCE_MS = 400;
 // Der Knoten, in den alle Einnahmen laufen und aus dem alle Ausgaben kommen.
 // Der Editor ist um ihn herum gebaut, deshalb hat er eine feste id.
 export const HUB_ID = 'einnahmen';
-
-export function uid(prefix) {
-  return prefix + Math.random().toString(36).slice(2, 9);
-}
 
 export function createDefaultData() {
   const n = (id, name) => ({ id, name, color: null });
@@ -57,7 +55,13 @@ export function createDefaultData() {
         { id: uid('t'), from: 'giro', to: 'kreditkarte', amount: 320, label: 'Ausgleich', interval: 'monatlich' },
       ],
     },
+    immobilien: createImmobilienTeil(),
   };
+}
+
+function createImmobilienTeil() {
+  const erste = createImmobilie('Beispielwohnung');
+  return { items: [erste], activeId: erste.id };
 }
 
 // Fehlende Felder auffüllen, damit eine ältere oder handgeschriebene Datei nicht
@@ -126,7 +130,26 @@ export function migrate(raw) {
       nodes: accNodes,
       transfers,
     },
+    immobilien: migrateImmobilien(raw.immobilien),
   };
+}
+
+function migrateImmobilien(raw) {
+  const items = Array.isArray(raw?.items) ? raw.items.filter(x => x && x.id).map(x => {
+    const vorlage = createImmobilie();
+    const o = { ...vorlage, id: String(x.id), name: String(x.name ?? vorlage.name) };
+    for (const key of Object.keys(vorlage)) {
+      if (key === 'id' || key === 'name' || x[key] === undefined) continue;
+      o[key] = key === 'bundesland'
+        ? (BUNDESLAENDER[x[key]] !== undefined ? x[key] : vorlage.bundesland)
+        : Number(x[key]) || 0;
+    }
+    return o;
+  }) : [];
+
+  if (!items.length) return createImmobilienTeil();
+  const activeId = items.some(x => x.id === raw?.activeId) ? raw.activeId : items[0].id;
+  return { items, activeId };
 }
 
 export class Store {

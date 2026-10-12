@@ -1,7 +1,6 @@
 // Kontomodell: Konten als verschiebbare Knoten, Umbuchungen als Pfeile.
 
-import { uid } from './store.js';
-import { money, moneyShort, svg, el, clear, fitText } from './util.js';
+import { money, moneyShort, svg, el, clear, fitText, uid } from './util.js';
 
 const W = 214;
 const H_BASE = 72;
