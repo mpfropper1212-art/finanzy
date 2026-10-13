@@ -122,6 +122,8 @@ export function createWochenplanView({ planHost, listeHost, store, alleGerichte 
         renderListe();
       });
       zeile.append(portionen, el('span', { class: 'slot-einheit' }, 'Port.'));
+      zeile.appendChild(el('span', { class: 'slot-preis' },
+        money(Math.round(gericht.preis * eintrag.portionen * 100) / 100)));
 
       // Beim Mittagessen entscheidet die Temperatur, ob es ins Büro taugt.
       const t = gericht.temperatur ?? 'warm';
@@ -172,6 +174,24 @@ export function createWochenplanView({ planHost, listeHost, store, alleGerichte 
     );
     listeHost.appendChild(summe);
 
+    // Was kostet welches Gericht - die Einzelpreise hinter der Gesamtsumme.
+    const aufstellung = el('details', { class: 'kosten-aufstellung' });
+    aufstellung.appendChild(el('summary', {}, 'Was kostet was'));
+    const nachPreis = [...alle].sort(
+      (a, b) => b.gericht.preis * b.eintrag.portionen - a.gericht.preis * a.eintrag.portionen,
+    );
+    for (const x of nachPreis) {
+      const zeile = el('div', { class: 'kosten-zeile' });
+      zeile.append(
+        el('span', { class: 'kosten-name' }, x.gericht.name),
+        el('span', { class: 'kosten-anzahl' }, `${x.eintrag.portionen}×`),
+        el('span', { class: 'kosten-wert' },
+          money(Math.round(x.gericht.preis * x.eintrag.portionen * 100) / 100)),
+      );
+      aufstellung.appendChild(zeile);
+    }
+    listeHost.appendChild(aufstellung);
+
     const liste = einkaufsliste(alle.map(x => ({
       zutaten: x.gericht.zutaten,
       faktor: x.eintrag.portionen,
@@ -217,5 +237,33 @@ export function createWochenplanView({ planHost, listeHost, store, alleGerichte 
     renderListe();
   }
 
-  return { renderAll };
+  // Von der Gerichteliste aus einplanen.
+  function einplanen(gerichtId, tag, mahlzeit, portionen = 1) {
+    const vorhanden = eintragFuer(tag, mahlzeit);
+    if (vorhanden) {
+      vorhanden.gerichtId = gerichtId;
+      vorhanden.portionen = Math.max(1, portionen);
+    } else {
+      plan().eintraege.push({
+        id: uid('w'), tag, mahlzeit, gerichtId, portionen: Math.max(1, portionen),
+      });
+    }
+    store.commit({ silent: true });
+    renderAll();
+  }
+
+  // Tage samt Datum und was dort schon steht - für die Auswahl auf der Karte.
+  function wocheninfo() {
+    return TAGE.map((name, tag) => ({
+      tag,
+      name,
+      datum: kurz(datumVon(plan().start, tag)),
+      belegt: Object.fromEntries(MAHLZEITEN.map(([schluessel]) => {
+        const e = eintragFuer(tag, schluessel);
+        return [schluessel, e ? gerichtZu(e.gerichtId)?.name ?? '' : ''];
+      })),
+    }));
+  }
+
+  return { renderAll, einplanen, wocheninfo };
 }

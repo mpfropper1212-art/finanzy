@@ -58,7 +58,7 @@ function skala(wert, titel) {
   return box;
 }
 
-export function createGerichteView({ listHost, filterHost, formHost, statusHost, store }) {
+export function createGerichteView({ listHost, filterHost, formHost, statusHost, store, planer }) {
   const seed = SEED_GERICHTE.map(g => ({ ...g, autor: null, autorName: null, quelle: 'start' }));
   let geteilt = [];
   let entwurf = leererEntwurf();
@@ -237,6 +237,12 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
       beschriftet('Aufwand', skala(g.aufwand, 'Kochaufwand')),
       beschriftet('Abwasch', skala(g.abwasch, 'Abwasch')),
     );
+    if (planer) {
+      const planen = el('button', { class: 'link-btn plan-knopf', type: 'button' }, '+ Wochenplan');
+      planen.addEventListener('click', () => planWaehler(box, g, planen));
+      fuss.appendChild(planen);
+    }
+
     if (g.autor && g.autor === cloud.currentUser()?.id) {
       const del = el('button', { type: 'button', class: 'link-btn gericht-loeschen' }, 'löschen');
       del.addEventListener('click', () => entferneGericht(g));
@@ -274,6 +280,49 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
     }
 
     return box;
+  }
+
+  // Kleine Auswahl direkt an der Karte: Tag, Mahlzeit, Portionen.
+  function planWaehler(karte, gericht, knopf) {
+    const vorhanden = karte.querySelector('.plan-waehler');
+    if (vorhanden) { vorhanden.remove(); return; }
+    document.querySelectorAll('.plan-waehler').forEach(n => n.remove());
+
+    const box = el('div', { class: 'plan-waehler' });
+    const woche = planer.wocheninfo();
+
+    const tagWahl = el('select');
+    for (const t of woche) {
+      tagWahl.appendChild(el('option', { value: String(t.tag) }, `${t.name} ${t.datum}`));
+    }
+    const mahlWahl = el('select');
+    for (const [wertKey, label] of [['mittag', 'Mittag'], ['abend', 'Abend']]) {
+      mahlWahl.appendChild(el('option', { value: wertKey }, label));
+    }
+    const portionen = el('input', { type: 'number', min: '1', max: '20', value: '1', title: 'Portionen' });
+
+    // Zeigen, was dort schon steht - sonst überschreibt man es ungewollt.
+    const belegt = el('span', { class: 'plan-belegt' });
+    const zeigeBelegung = () => {
+      const t = woche[Number(tagWahl.value)];
+      const da = t?.belegt[mahlWahl.value];
+      belegt.textContent = da ? `dort steht: ${da}` : 'noch frei';
+    };
+    tagWahl.addEventListener('change', zeigeBelegung);
+    mahlWahl.addEventListener('change', zeigeBelegung);
+    zeigeBelegung();
+
+    const ok = el('button', { class: 'btn btn-primary btn-sm', type: 'button' }, 'Einplanen');
+    ok.addEventListener('click', () => {
+      planer.einplanen(gericht.id, Number(tagWahl.value), mahlWahl.value, Number(portionen.value) || 1);
+      box.remove();
+      knopf.textContent = '✓ eingeplant';
+      setTimeout(() => { knopf.textContent = '+ Wochenplan'; }, 2200);
+    });
+
+    box.append(tagWahl, mahlWahl, portionen, el('span', { class: 'plan-einheit' }, 'Port.'), ok, belegt);
+    karte.appendChild(box);
+    tagWahl.focus();
   }
 
   function wert(zahl, label, hervor = false) {

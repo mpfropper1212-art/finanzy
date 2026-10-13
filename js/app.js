@@ -175,6 +175,10 @@ function enterApp(data) {
     formHost: $('#gerichte-form'),
     statusHost: $('#gerichte-status'),
     store,
+    planer: {
+      wocheninfo: () => wochenView.wocheninfo(),
+      einplanen: (...args) => wochenView.einplanen(...args),
+    },
   });
   gerichteView.ladeGeteilte();
 
