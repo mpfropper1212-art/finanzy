@@ -7,12 +7,12 @@ import { el, svg } from './util.js';
 // Kopfform, Flächenaufteilung und Proportionen sind meine, nicht die einer
 // bestehenden Spielfigur.
 const LAMA = {
-  kontur: '#4a2d63',
-  koerper: '#b6a8d4',
-  schatten: '#9789bd',
-  hell: '#ded6f2',
+  kontur: '#3b2357',
+  koerper: '#9b7fd4',
+  schatten: '#7a5fb5',
+  hell: '#ddd0f5',
   weiss: '#ffffff',
-  rosa: '#c98fc4',
+  rosa: '#d98fd4',
 };
 
 // Zahl-Seite: klotzige "#1" in Gold, weiß umrandet.
@@ -88,57 +88,66 @@ function lamaSvg(size = 46) {
     'stroke-linecap': 'round', 'paint-order': 'stroke fill',
   };
 
-  // Ohren zuerst, damit der Kopf ihre Ansätze überdeckt.
+  // Ohren zuerst, damit der Kopf ihre Ansätze überdeckt. Kantig statt rund -
+  // das Tier ist aus geklebtem Papier, nicht aus Plüsch.
   const ohr = (d, innen) => {
     g.appendChild(svg('path', { d, fill: LAMA.koerper, ...umriss }));
-    g.appendChild(svg('path', { d: innen, fill: LAMA.rosa, opacity: 0.75 }));
+    g.appendChild(svg('path', { d: innen, fill: LAMA.rosa }));
   };
-  ohr('M28,20 C25,12 26,5 30,3 C34,6 35,13 34,20 Z',
-      'M29,17 C27,12 28,8 30,7 C32,9 32,13 31.5,17 Z');
-  ohr('M40,19 C40,10 43,4 47,3 C50,7 49,14 46,20 Z',
-      'M41.5,16 C42,11 44,8 46,7 C47.5,10 47,14 45,17 Z');
+  ohr('M28,21 L29,6 L32,2 L35,7 L34,21 Z', 'M30,18 L30.5,8 L32,5.5 L33,9 L32.5,18 Z');
+  ohr('M40,20 L43,5 L47,2 L49,8 L46,21 Z', 'M42,17 L44,8 L46,5.5 L47,9 L45,17 Z');
+
+  const koerperPfad = 'M32,17 L44,17 L52,27 L54,57 L32,57 L29,44 L20,46 L12,46 '
+    + 'L9,38 L15,32 L23,23 Z';
 
   // Kopf, Schnauze und Hals als eine Form - eine durchgehende Kontur außen
   // herum ist das, was den Aufkleber-Look ausmacht.
-  g.appendChild(svg('path', {
-    d: 'M32,17 L44,17 L52,27 L54,57 L32,57 L29,44 L20,46 L12,46 L9,38 L15,32 L23,23 Z',
-    fill: LAMA.koerper, ...umriss,
-  }));
+  g.appendChild(svg('path', { d: koerperPfad, fill: LAMA.koerper, ...umriss }));
 
-  // Helle Flächen obenauf: Stirn, Schnauzenrücken, Halsvorderseite.
+  // Papierfransen auf dem Hals, am Körper abgeschnitten.
+  const id = `lamaK${++idZaehler}`;
+  const defs = svg('defs');
+  const clip = svg('clipPath', { id });
+  clip.appendChild(svg('path', { d: koerperPfad }));
+  defs.appendChild(clip);
+  g.appendChild(defs);
+
+  const fransen = svg('g', { 'clip-path': `url(#${id})` });
+  const zacken = (y, farbe) => {
+    let d = `M26,${y}`;
+    for (let x = 26; x <= 58; x += 4) d += ` L${x + 2},${y + 2.6} L${x + 4},${y}`;
+    d += ` L58,${y + 5.4} L26,${y + 5.4} Z`;
+    fransen.appendChild(svg('path', { d, fill: farbe }));
+  };
+  zacken(40, LAMA.hell);
+  zacken(46, LAMA.rosa);
+  zacken(52, LAMA.hell);
+  g.appendChild(fransen);
+
+  // Kontur erneut obendrauf, damit die Fransen sie nicht überdecken.
+  g.appendChild(svg('path', { d: koerperPfad, fill: 'none', ...umriss }));
+
+  // Helle Flächen auf Stirn und Schnauze.
   g.appendChild(svg('path', { d: 'M32,17 L44,17 L50,26 L27,31 L23,23 Z', fill: LAMA.hell }));
   g.appendChild(svg('path', { d: 'M15,32 L24,29 L26,40 L13,43 L9,38 Z', fill: LAMA.hell }));
-  g.appendChild(svg('path', { d: 'M34,57 L31,46 L41,44 L43,57 Z', fill: LAMA.hell }));
-  g.appendChild(svg('path', { d: 'M49,30 L52,30 L53.5,57 L47,57 Z', fill: LAMA.schatten }));
+  g.appendChild(svg('path', { d: 'M49,30 L52,30 L52.6,40 L47,41 Z', fill: LAMA.schatten }));
 
   // Maul und Nüstern
   g.appendChild(svg('path', {
-    d: 'M12,43 C15,41.5 19,41.5 21,43', fill: 'none',
+    d: 'M12,43 L16,41.6 L21,43', fill: 'none',
     stroke: LAMA.kontur, 'stroke-width': 2.2, 'stroke-linecap': 'round',
+    'stroke-linejoin': 'round',
   }));
-  g.appendChild(svg('ellipse', { cx: 13.5, cy: 36, rx: 1.4, ry: 2, fill: LAMA.kontur }));
-  g.appendChild(svg('ellipse', { cx: 18, cy: 35, rx: 1.4, ry: 2, fill: LAMA.kontur }));
+  g.appendChild(svg('path', { d: 'M12.5,34 L15,34.6 L14,38 Z', fill: LAMA.kontur }));
+  g.appendChild(svg('path', { d: 'M17,33 L19.4,33.6 L18.4,37 Z', fill: LAMA.kontur }));
 
   // Auge als abgerundetes Quadrat - das gibt dem Gesicht den Comic-Ausdruck.
   g.appendChild(svg('rect', {
-    x: 32, y: 27, width: 12, height: 12, rx: 3.8,
+    x: 32, y: 27, width: 12, height: 12, rx: 3.4,
     fill: LAMA.weiss, stroke: LAMA.kontur, 'stroke-width': 2.4,
   }));
   g.appendChild(svg('circle', { cx: 37, cy: 34, r: 2.7, fill: LAMA.kontur }));
   g.appendChild(svg('circle', { cx: 38.2, cy: 32.8, r: 0.9, fill: LAMA.weiss }));
-
-  // Halsband mit Zacken - das Lama ist geschmückt, nicht nackt.
-  g.appendChild(svg('path', {
-    d: 'M30,45 L50,41 L51,47 L31,51 Z', fill: LAMA.schatten,
-    stroke: LAMA.kontur, 'stroke-width': 2, 'stroke-linejoin': 'round',
-  }));
-  for (let i = 0; i < 3; i++) {
-    const x = 34 + i * 5.4;
-    const y = 47.8 - i * 1.1;
-    g.appendChild(svg('path', {
-      d: `M${x},${y} L${x + 3.2},${y - 0.7} L${x + 1.6},${y + 3} Z`, fill: LAMA.rosa,
-    }));
-  }
 
   return root;
 }
