@@ -178,6 +178,7 @@ function enterApp(data) {
     chartHost: $('#tank-chart'),
     tabelleHost: $('#tank-tabelle'),
     formHost: $('#tank-form'),
+    importHost: $('#tank-import'),
     store,
   });
 

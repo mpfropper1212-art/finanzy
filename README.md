@@ -65,6 +65,8 @@ Rechts lassen sich eigene Gerichte anlegen. **Diese sind für alle Nutzer der Se
 
 **Tanken.** Pro Tankfüllung werden nur vier Dinge eingetragen: Datum, getankte Liter, bezahlter Betrag und Tachostand. Die gefahrenen Kilometer sind die Differenz zum vorherigen Tachostand, daraus folgen Verbrauch (l/100 km), Preis je Liter und Kosten je Kilometer. Sortiert wird nach Tachostand, nicht nach Datum – so stimmt die Reihenfolge auch, wenn eine Quittung später nachgetragen wird.
 
+Unter dem Eingabeformular steht **Aus Tabelle übernehmen**: Zeilen aus Excel oder Numbers einfügen, auf *Auswerten* klicken, fertig. Die Spalten erkennt die App selbst – den Tachostand an der Größenordnung, die Literspalte daran, dass Betrag ÷ Liter einen realistischen Spritpreis ergibt. Die Zuordnung wird zum Prüfen angezeigt und lässt sich korrigieren. Überflüssige Spalten und Kopfzeilen stören nicht, und bereits vorhandene Tachostände werden übersprungen, sodass zweimaliges Einfügen keine Doppelten anlegt.
+
 Die erste Füllung liefert nur den Startpunkt und hat deshalb keinen Verbrauchswert; sie zählt auch nicht in den Gesamtverbrauch hinein. Ein neuer Tachostand muss über dem letzten liegen, sonst wird der Eintrag abgelehnt. Oben stehen die Gesamtwerte, darunter zeigt eine Kurve den Verbrauch je Füllung gegen den Schnitt.
 
 **Daten-Menü.** Diagramm als SVG oder PNG exportieren, eine Sicherung als JSON herunterladen und wieder einspielen, oder alles auf die Startwerte zurücksetzen.

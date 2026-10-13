@@ -139,7 +139,132 @@ function verbrauchsChart(host, a) {
   host.appendChild(root);
 }
 
-export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, store }) {
+/* --------------------- Import aus einer Tabelle --------------------- */
+
+// Deutsches Zahlformat: Punkt trennt Tausender, Komma die Dezimalstellen.
+export function zelleZuZahl(text) {
+  // Währungszeichen weg, der Rest muss reine Zahl sein - sonst würde aus
+  // einer Notiz wie "1st time full" eine 1.
+  // Ein Datum wie 16.05.2025 würde sonst als 16052025 durchgehen und als
+  // größte Zahl den Tachostand verdrängen.
+  if (zelleZuDatum(text) !== null) return null;
+  const roh = String(text ?? '').replace(/€|eur/gi, '').replace(/\s/g, '').trim();
+  if (!roh || !/^-?[\d.,]+$/.test(roh)) return null;
+  const normal = roh.includes(',') ? roh.replace(/\./g, '').replace(',', '.') : roh.replace(/\./g, '');
+  const n = Number(normal);
+  return Number.isFinite(n) ? n : null;
+}
+
+export function zelleZuDatum(text) {
+  const t = String(text ?? '').trim();
+  let m = t.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})$/);
+  if (m) {
+    const jahr = m[3].length === 2 ? `20${m[3]}` : m[3];
+    return `${jahr}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+  }
+  m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+  return null;
+}
+
+export function zerlege(text) {
+  const zeilen = String(text).split(/\r?\n/).map(z => z.trimEnd()).filter(z => z.trim());
+  const trenner = zeilen.some(z => z.includes('\t')) ? /\t/
+    : zeilen.some(z => z.includes(';')) ? /;/
+      : /\s{2,}/;
+  return zeilen.map(z => z.split(trenner).map(c => c.trim()));
+}
+
+// Spalten erraten: Tacho ist die größte aufsteigende Zahlenspalte, der Betrag
+// steht meist mit Währungszeichen da, Liter sind die kleineren Mengen.
+export function rateSpalten(gitter) {
+  const breite = Math.max(...gitter.map(z => z.length));
+  const spalten = [];
+
+  for (let i = 0; i < breite; i++) {
+    const zellen = gitter.map(z => z[i] ?? '');
+    const zahlen = zellen.map(zelleZuZahl).filter(n => n !== null);
+    const daten = zellen.map(zelleZuDatum).filter(Boolean);
+    const sortiert = [...zahlen].sort((a, b) => a - b);
+    spalten.push({
+      index: i,
+      beispiel: zellen.find(c => c) ?? '',
+      datumAnteil: zellen.length ? daten.length / zellen.length : 0,
+      zahlAnteil: zellen.length ? zahlen.length / zellen.length : 0,
+      median: sortiert.length ? sortiert[Math.floor(sortiert.length / 2)] : null,
+      max: zahlen.length ? Math.max(...zahlen) : null,
+      waehrung: zellen.some(c => /€|eur/i.test(c)),
+      steigend: zahlen.length > 2 && zahlen.every((n, k) => k === 0 || n >= zahlen[k - 1]),
+    });
+  }
+
+  const datum = spalten.find(s2 => s2.datumAnteil > 0.5)?.index ?? null;
+  const zahlSpalten = spalten.filter(s2 => s2.zahlAnteil > 0.5);
+  // Bei wenigen Zeilen lässt sich "steigend" nicht beurteilen - dann zählt
+  // nur noch die Größenordnung.
+  const tachoKandidaten = zahlSpalten.filter(s2 => s2.index !== datum && s2.max > 1000);
+  const tacho = tachoKandidaten
+    .filter(s2 => s2.steigend)
+    .sort((a, b) => b.max - a.max)[0]?.index
+    ?? [...tachoKandidaten].sort((a, b) => b.max - a.max)[0]?.index
+    ?? null;
+
+  const rest = zahlSpalten.filter(s2 => s2.index !== tacho && s2.index !== datum
+    && s2.median !== null && s2.median > 1);
+
+  // Betrag geteilt durch Liter muss einen realistischen Spritpreis ergeben.
+  // Das trennt die Literspalte zuverlässig von anderen Zahlenspalten, die
+  // zufällig in derselben Größenordnung liegen.
+  const guete = (euroWert, literWert) => {
+    if (!euroWert || !literWert || literWert <= 0) return null;
+    const preis = euroWert / literWert;
+    if (preis < 0.8 || preis > 3.5) return null;
+    return -Math.abs(preis - 1.75);
+  };
+
+  let euro = rest.find(s2 => s2.waehrung)?.index ?? null;
+  let liter = null;
+
+  if (euro !== null) {
+    const euroMedian = rest.find(s2 => s2.index === euro).median;
+    liter = rest
+      .filter(s2 => s2.index !== euro)
+      .map(s2 => ({ index: s2.index, wert: guete(euroMedian, s2.median) }))
+      .filter(x => x.wert !== null)
+      .sort((a, b) => b.wert - a.wert)[0]?.index ?? null;
+  } else {
+    let beste = null;
+    for (const a of rest) {
+      for (const b of rest) {
+        if (a.index === b.index) continue;
+        const wert = guete(a.median, b.median);
+        if (wert !== null && (!beste || wert > beste.wert)) {
+          beste = { euro: a.index, liter: b.index, wert };
+        }
+      }
+    }
+    if (beste) { euro = beste.euro; liter = beste.liter; }
+  }
+
+  return { datum, liter, euro, tacho, spalten };
+}
+
+export function zeilenAusGitter(gitter, zuordnung) {
+  const treffer = [];
+  for (const zeile of gitter) {
+    const tacho = zelleZuZahl(zeile[zuordnung.tacho]);
+    if (tacho === null || tacho <= 0) continue;
+    treffer.push({
+      datum: zelleZuDatum(zeile[zuordnung.datum]) ?? '',
+      liter: Math.max(0, zelleZuZahl(zeile[zuordnung.liter]) ?? 0),
+      euro: Math.max(0, zelleZuZahl(zeile[zuordnung.euro]) ?? 0),
+      tacho,
+    });
+  }
+  return treffer;
+}
+
+export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, importHost, store }) {
   const eintraege = () => store.data.tanken.eintraege;
   let entwurf = createTankung();
 
@@ -289,12 +414,101 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, st
     formHost.appendChild(knopf);
   }
 
+  /* ----------------------------- Import ----------------------------- */
+
+  function renderImport() {
+    clear(importHost);
+
+    importHost.appendChild(el('p', { class: 'feld-hinweis' },
+      'Zeilen aus Excel oder Numbers hier einfügen – mit Kopfzeile, das macht nichts. '
+      + 'Die Spalten erkennt die App selbst und zeigt sie zum Prüfen an.'));
+
+    const feld = el('textarea', { rows: '5', placeholder: '16.05.2025\t82,39\t123,48 €\t196529' });
+    importHost.appendChild(feld);
+
+    const vorschau = el('div', { class: 'import-vorschau' });
+    importHost.appendChild(vorschau);
+
+    const pruefen = el('button', { class: 'btn btn-block', type: 'button' }, 'Auswerten');
+    pruefen.addEventListener('click', () => {
+      clear(vorschau);
+      const gitter = zerlege(feld.value);
+      if (!gitter.length) {
+        vorschau.appendChild(el('p', { class: 'msg is-error' }, 'Da war nichts zum Auswerten.'));
+        return;
+      }
+      zeigeZuordnung(vorschau, gitter, rateSpalten(gitter));
+    });
+    importHost.appendChild(pruefen);
+  }
+
+  function zeigeZuordnung(host, gitter, zuordnung) {
+    clear(host);
+    const auswahl = {};
+
+    const gitterBreite = Math.max(...gitter.map(z => z.length));
+    for (const [key, label] of [['datum', 'Datum'], ['liter', 'Liter'], ['euro', 'Betrag'], ['tacho', 'Tachostand']]) {
+      const row = el('label', { class: 'feld' });
+      row.appendChild(el('span', { class: 'feld-label' }, label));
+      const sel = el('select');
+      sel.appendChild(el('option', { value: '' }, '– keine –'));
+      for (let i = 0; i < gitterBreite; i++) {
+        const beispiel = gitter.find(z => z[i])?.[i] ?? '';
+        const opt = el('option', { value: String(i) }, `Spalte ${i + 1}: ${beispiel.slice(0, 14)}`);
+        if (zuordnung[key] === i) opt.selected = true;
+        sel.appendChild(opt);
+      }
+      sel.addEventListener('change', () => { auswahl[key] = sel.value === '' ? null : Number(sel.value); aktualisiere(); });
+      auswahl[key] = zuordnung[key];
+      const wrap = el('div', { class: 'feld-input' });
+      wrap.appendChild(sel);
+      row.appendChild(wrap);
+      host.appendChild(row);
+    }
+
+    const info = el('p', { class: 'feld-hinweis' });
+    host.appendChild(info);
+    const uebernehmen = el('button', { class: 'btn btn-primary btn-block', type: 'button' }, 'Übernehmen');
+    host.appendChild(uebernehmen);
+
+    let treffer = [];
+    function aktualisiere() {
+      treffer = auswahl.tacho === null || auswahl.tacho === undefined
+        ? []
+        : zeilenAusGitter(gitter, auswahl);
+      const vorhandene = new Set(eintraege().map(e => Number(e.tacho)));
+      const neue = treffer.filter(t2 => !vorhandene.has(t2.tacho));
+      info.textContent = treffer.length
+        ? `${treffer.length} Zeilen erkannt, davon ${neue.length} neu. `
+          + `Tachostände von ${Math.min(...treffer.map(t2 => t2.tacho)).toLocaleString('de-DE')} `
+          + `bis ${Math.max(...treffer.map(t2 => t2.tacho)).toLocaleString('de-DE')} km.`
+        : 'Keine brauchbaren Zeilen – ohne Tachostand geht es nicht.';
+      uebernehmen.disabled = neue.length === 0;
+      uebernehmen.textContent = neue.length ? `${neue.length} Tankfüllungen übernehmen` : 'Nichts zu übernehmen';
+    }
+
+    uebernehmen.addEventListener('click', () => {
+      // Schon vorhandene Tachostände überspringen, damit zweimaliges
+      // Einfügen keine Doppelten anlegt.
+      const vorhandene = new Set(eintraege().map(e => Number(e.tacho)));
+      for (const t2 of treffer) {
+        if (vorhandene.has(t2.tacho)) continue;
+        vorhandene.add(t2.tacho);
+        eintraege().push(createTankung(t2));
+      }
+      valueChange();
+    });
+
+    aktualisiere();
+  }
+
   function renderAll() {
     const a = auswerten(eintraege());
     renderKpis(a);
     verbrauchsChart(chartHost, a);
     renderTabelle(a);
     renderFormular();
+    renderImport();
   }
 
   return { renderAll };
