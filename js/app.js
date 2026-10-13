@@ -10,6 +10,7 @@ import { createImmobilienView } from './immobilien.js';
 import { createGerichteView } from './gerichte.js';
 import { createTankenView } from './tanken.js';
 import { createStromView } from './strom.js';
+import { createGymView } from './gym.js';
 import { createSchuldenView } from './schulden.js';
 import { createWochenplanView } from './wochenplan.js';
 import { createGruppenView } from './gruppen.js';
@@ -29,6 +30,7 @@ let immoView = null;
 let gerichteView = null;
 let tankenView = null;
 let stromView = null;
+let gymView = null;
 let schuldenView = null;
 let wochenView = null;
 let gruppenView = null;
@@ -207,6 +209,14 @@ function enterApp(data) {
     store,
   });
 
+  gymView = createGymView({
+    kpiHost: $('#gym-kpis'),
+    aktivHost: $('#gym-aktiv'),
+    verlaufHost: $('#gym-verlauf'),
+    seiteHost: $('#gym-seite'),
+    store,
+  });
+
   wochenView = createWochenplanView({
     planHost: $('#woche-plan'),
     listeHost: $('#woche-liste'),
@@ -247,7 +257,7 @@ function enterApp(data) {
 function leaveApp() {
   store.detach();
   cloud.signOut();
-  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = stromView = schuldenView = wochenView = gruppenView = dashboard = null;
+  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = stromView = gymView = schuldenView = wochenView = gruppenView = dashboard = null;
   $('#app-view').hidden = true;
   $('#login-view').hidden = false;
   $('#accounts-host').replaceChildren();
@@ -331,6 +341,7 @@ function rebuildAll() {
   gerichteView.renderAll();
   tankenView.renderAll();
   stromView.renderAll();
+  gymView.renderAll();
   schuldenView.renderAll();
   wochenView.renderAll();
   gruppenView.renderAll();
@@ -350,6 +361,7 @@ function setTab(tab) {
   $('#panel-gerichte').hidden = tab !== 'gerichte';
   $('#panel-tanken').hidden = tab !== 'tanken';
   $('#panel-strom').hidden = tab !== 'strom';
+  $('#panel-gym').hidden = tab !== 'gym';
   $('#panel-schulden').hidden = tab !== 'schulden';
   $('#panel-woche').hidden = tab !== 'woche';
   $('#panel-gruppen').hidden = tab !== 'gruppen';
@@ -360,6 +372,7 @@ function setTab(tab) {
   else if (tab === 'gerichte') gerichteView?.renderAll();
   else if (tab === 'tanken') tankenView?.renderAll();
   else if (tab === 'strom') stromView?.renderAll();
+  else if (tab === 'gym') gymView?.renderAll();
   else if (tab === 'schulden') schuldenView?.renderAll();
   else if (tab === 'woche') wochenView?.renderAll();
   else if (tab === 'gruppen') gruppenView?.renderAll();
@@ -631,6 +644,7 @@ $('#btn-theme').addEventListener('click', () => {
   else if (activeTab === 'immo') immoView?.renderAll();
   else if (activeTab === 'tanken') tankenView?.renderAll();
   else if (activeTab === 'strom') stromView?.renderAll();
+  else if (activeTab === 'gym') gymView?.renderAll();
 });
 
 theme.anwenden();

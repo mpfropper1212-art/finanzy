@@ -3,6 +3,7 @@
 import * as cloud from './cloud.js';
 import { createImmobilie, BUNDESLAENDER } from './immobilien.js';
 import { uid } from './util.js';
+import { SEED_GERAETE, SEED_UEBUNGEN, MUSKELGRUPPEN } from './gym-daten.js';
 
 export const DATA_VERSION = 2;
 const SAVE_DEBOUNCE_MS = 400;
@@ -61,6 +62,12 @@ export function createDefaultData() {
     schulden: { eintraege: [] },
     gruppen: { items: [], activeId: null },
     wochenplan: { start: montagVon(new Date()), eintraege: [], abgehakt: [] },
+    gym: {
+      geraete: SEED_GERAETE.map(g => ({ ...g })),
+      uebungen: SEED_UEBUNGEN.map(u => ({ ...u })),
+      workouts: [],
+      aktivId: null,
+    },
     strom: { staende: [], tarif: { arbeitspreis: 0.35, grundpreis: 12, abschlag: 0 } },
     tanken: { eintraege: [], zeitraum: 'alle', eigen: { monate: 1, von: '', bis: '' }, ausgeschlosseneTags: [], fixkosten: { versicherung: 0, steuer: 0, wartung: 0, sonstiges: 0 } },
   };
@@ -172,6 +179,7 @@ export function migrate(raw) {
         ? raw.wochenplan.abgehakt.filter(x => typeof x === 'string')
         : [],
     },
+    gym: migrateGym(raw.gym),
     strom: migrateStrom(raw.strom),
     tanken: {
       eintraege: migrateTankungen(raw.tanken?.eintraege),
@@ -191,6 +199,61 @@ export function migrate(raw) {
         sonstiges: Number(raw.tanken?.fixkosten?.sonstiges) || 0,
       },
     },
+  };
+}
+
+// Der Trainingsteil. Wer die Startliste leer räumt, soll sie nicht beim
+// nächsten Laden zurückbekommen - deshalb zählt nur, ob der Schlüssel fehlt.
+function migrateGym(roh) {
+  if (!roh || typeof roh !== 'object') {
+    return {
+      geraete: SEED_GERAETE.map(g => ({ ...g })),
+      uebungen: SEED_UEBUNGEN.map(u => ({ ...u })),
+      workouts: [],
+      aktivId: null,
+    };
+  }
+
+  const geraete = Array.isArray(roh.geraete)
+    ? roh.geraete.filter(x => x && x.id).map(x => ({ id: String(x.id), name: String(x.name ?? '') }))
+    : [];
+  const geraetIds = new Set(geraete.map(g => g.id));
+
+  const uebungen = Array.isArray(roh.uebungen)
+    ? roh.uebungen.filter(x => x && x.id).map(x => ({
+      id: String(x.id),
+      name: String(x.name ?? 'Übung'),
+      geraetId: geraetIds.has(x.geraetId) ? x.geraetId : null,
+      muskel: MUSKELGRUPPEN.includes(x.muskel) ? x.muskel : null,
+      zielWdh: Math.min(50, Math.max(1, Number(x.zielWdh) || 10)),
+      steigerung: Math.min(20, Math.max(0, Number(x.steigerung) || 0)),
+    }))
+    : [];
+  const uebungIds = new Set(uebungen.map(u => u.id));
+
+  const workouts = Array.isArray(roh.workouts)
+    ? roh.workouts.filter(x => x && x.id && typeof x.datum === 'string').map(x => ({
+      id: String(x.id),
+      datum: x.datum,
+      notiz: String(x.notiz ?? ''),
+      // Sätze zu längst gelöschten Übungen wären im Verlauf nicht mehr
+      // zuzuordnen und fallen deshalb raus.
+      saetze: Array.isArray(x.saetze)
+        ? x.saetze.filter(s => s && uebungIds.has(s.uebungId)).map(s => ({
+          id: s.id || uid('s'),
+          uebungId: s.uebungId,
+          wdh: Number(s.wdh) || 0,
+          gewicht: Number(s.gewicht) || 0,
+        }))
+        : [],
+    }))
+    : [];
+
+  return {
+    geraete,
+    uebungen,
+    workouts,
+    aktivId: workouts.some(w => w.id === roh.aktivId) ? roh.aktivId : null,
   };
 }
 
