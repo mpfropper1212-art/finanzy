@@ -69,9 +69,23 @@ Rechts lassen sich eigene Gerichte anlegen. **Diese sind für alle Nutzer der Se
 
 Unter dem Eingabeformular steht **Aus Tabelle übernehmen**: Zeilen aus Excel oder Numbers einfügen, auf *Auswerten* klicken, fertig. Die Spalten erkennt die App selbst – den Tachostand an der Größenordnung, die Literspalte daran, dass Betrag ÷ Liter einen realistischen Spritpreis ergibt. Die Zuordnung wird zum Prüfen angezeigt und lässt sich korrigieren. Überflüssige Spalten und Kopfzeilen stören nicht, und bereits vorhandene Tachostände werden übersprungen, sodass zweimaliges Einfügen keine Doppelten anlegt.
 
+Über den Kennzahlen lässt sich der **Zeitraum** umschalten (alle Daten, letzte 12 oder 3 Monate). Rechts unter **Feste Kosten** kommen Versicherung, Kfz-Steuer, Wartung und Sonstiges als Jahresbeträge hinein; die App rechnet sie auf Monat und Kilometer herunter. Damit zeigen die Kacheln nicht nur den Sprit, sondern was das Auto insgesamt kostet – je Monat, je Jahr und je gefahrenem Kilometer.
+
 Die erste Füllung liefert nur den Startpunkt und hat deshalb keinen Verbrauchswert; sie zählt auch nicht in den Gesamtverbrauch hinein. Ein neuer Tachostand muss über dem letzten liegen, sonst wird der Eintrag abgelehnt. Oben stehen die Gesamtwerte, darunter zeigt eine Kurve den Verbrauch je Füllung gegen den Schnitt.
 
 **Daten-Menü.** Diagramm als SVG oder PNG exportieren, eine Sicherung als JSON herunterladen und wieder einspielen, oder alles auf die Startwerte zurücksetzen.
+
+## Auf dem Handy
+
+Die App ist für beide Größen gebaut. Unter 760 px Breite:
+
+- Die Reiterleiste rückt in eine eigene, seitlich scrollbare Zeile – sonst wären die hinteren Bereiche nicht erreichbar.
+- Eingabezeilen brechen um, statt sich zusammenzuquetschen; Spaltenköpfe verschwinden, weil sie ohne feste Spalten nichts mehr ausrichten.
+- Alle Felder haben mindestens 16 px Schriftgröße, sonst zoomt iOS beim Antippen hinein.
+- Kennzahlen stehen zweispaltig, Knöpfe sind mindestens 38 px hoch.
+- Konten und Beschriftungen im Kontomodell haben `touch-action: none`, damit das Ziehen nicht die Seite mitscrollt.
+
+Breite Inhalte – Sankey, Kontenfläche, Tanktabelle – scrollen innerhalb ihres Rahmens; die Seite selbst läuft nie seitlich über.
 
 ## Konto und Datenablage
 

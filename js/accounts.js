@@ -433,7 +433,7 @@ export function createAccountsEditor({ accountHost, transferHost, store, request
       accountHost.appendChild(el('p', { class: 'empty' }, 'Noch keine Konten.'));
       return;
     }
-    const head = el('div', { class: 'row row-account' });
+    const head = el('div', { class: 'row row-account row-kopf' });
     head.append(
       el('span', { class: 'stat-label' }, 'Name'),
       el('span', { class: 'stat-label' }, 'Art'),

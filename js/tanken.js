@@ -26,9 +26,22 @@ const dezimal = (v, stellen = 2) =>
     minimumFractionDigits: stellen, maximumFractionDigits: stellen,
   });
 
+export const ZEITRAEUME = {
+  alle: { label: 'Alle Daten', monate: null },
+  '12monate': { label: 'Letzte 12 Monate', monate: 12 },
+  '3monate': { label: 'Letzte 3 Monate', monate: 3 },
+};
+
+export const FIXKOSTEN_FELDER = [
+  ['versicherung', 'Versicherung'],
+  ['steuer', 'Kfz-Steuer'],
+  ['wartung', 'Wartung und TÜV'],
+  ['sonstiges', 'Sonstiges'],
+];
+
 // Nach Tachostand sortieren, nicht nach Datum: der Zählerstand bestimmt die
 // Reihenfolge, auch wenn jemand eine Quittung später nachträgt.
-export function auswerten(eintraege) {
+export function auswerten(eintraege, optionen = {}) {
   const sortiert = [...eintraege].sort((a, b) => zahl(a.tacho) - zahl(b.tacho) || String(a.datum).localeCompare(String(b.datum)));
 
   const zeilen = sortiert.map((e, i) => {
@@ -46,33 +59,64 @@ export function auswerten(eintraege) {
     };
   });
 
-  const mitKm = zeilen.filter(z => z.km !== null);
-  const summeLiter = zeilen.reduce((s, z) => s + z.liter, 0);
-  const summeEuro = zeilen.reduce((s, z) => s + z.euro, 0);
+  // Kilometer zuerst über alle Zeilen rechnen, dann den Zeitraum ausschneiden -
+  // sonst fehlte der ersten Zeile im Fenster ihr Vorgänger.
+  const grenze = grenzDatum(optionen.zeitraum);
+  const imFenster = grenze ? zeilen.filter(z => z.datum && z.datum >= grenze) : zeilen;
+
+  const mitKm = imFenster.filter(z => z.km !== null);
+  const summeLiter = imFenster.reduce((s, z) => s + z.liter, 0);
+  const summeEuro = imFenster.reduce((s, z) => s + z.euro, 0);
   const summeKm = mitKm.reduce((s, z) => s + z.km, 0);
   // Für den Gesamtverbrauch zählt nur, was auch einer Strecke zugeordnet ist -
   // die allererste Füllung legt bloß den Startpunkt fest.
   const literMitKm = mitKm.reduce((s, z) => s + z.liter, 0);
 
-  const daten = zeilen.map(z => z.datum).filter(Boolean).sort();
+  const daten = imFenster.map(z => z.datum).filter(Boolean).sort();
   let monate = null;
   if (daten.length > 1) {
-    const von = new Date(daten[0]);
-    const bis = new Date(daten[daten.length - 1]);
-    const tage = (bis - von) / 86400000;
+    const tage = (new Date(daten[daten.length - 1]) - new Date(daten[0])) / 86400000;
     if (tage > 0) monate = tage / 30.44;
   }
 
+  const fix = optionen.fixkosten ?? {};
+  const fixProJahr = FIXKOSTEN_FELDER.reduce((s, [key]) => s + (Number(fix[key]) || 0), 0);
+  const fixProMonat = fixProJahr / 12;
+
+  const spritProMonat = monate ? summeEuro / monate : null;
+  const kmProMonat = monate ? summeKm / monate : null;
+  const gesamtProMonat = spritProMonat === null ? null : spritProMonat + fixProMonat;
+
   return {
     zeilen,
+    imFenster,
     summeLiter,
     summeEuro,
     summeKm,
+    monate,
     verbrauch: summeKm > 0 ? (literMitKm / summeKm) * 100 : null,
     preisProLiter: summeLiter > 0 ? summeEuro / summeLiter : null,
-    kostenProKm: summeKm > 0 ? summeEuro / summeKm : null,
-    kostenProMonat: monate ? summeEuro / monate : null,
+    spritProKm: summeKm > 0 ? summeEuro / summeKm : null,
+    spritProMonat,
+    fixProJahr,
+    fixProMonat,
+    gesamtProMonat,
+    gesamtProJahr: gesamtProMonat === null ? null : gesamtProMonat * 12,
+    kmProMonat,
+    kmProJahr: kmProMonat === null ? null : kmProMonat * 12,
+    // Vollkosten je Kilometer: Sprit plus anteilige Fixkosten.
+    kostenProKm: summeKm > 0 && monate
+      ? (summeEuro + fixProMonat * monate) / summeKm
+      : (summeKm > 0 ? summeEuro / summeKm : null),
   };
+}
+
+function grenzDatum(zeitraum) {
+  const monate = ZEITRAEUME[zeitraum]?.monate;
+  if (!monate) return null;
+  const d = new Date();
+  d.setMonth(d.getMonth() - monate);
+  return d.toISOString().slice(0, 10);
 }
 
 function kachel(label, wert, hint) {
@@ -264,8 +308,12 @@ export function zeilenAusGitter(gitter, zuordnung) {
   return treffer;
 }
 
-export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, importHost, store }) {
+export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fixHost, importHost, store }) {
   const eintraege = () => store.data.tanken.eintraege;
+  const einstellungen = () => ({
+    zeitraum: store.data.tanken.zeitraum,
+    fixkosten: store.data.tanken.fixkosten,
+  });
   let entwurf = createTankung();
 
   function valueChange() {
@@ -275,16 +323,41 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, im
 
   function renderKpis(a) {
     clear(kpiHost);
+
+    const kopf = el('div', { class: 'tank-zeitraum' });
+    for (const [key, z] of Object.entries(ZEITRAEUME)) {
+      const btn = el('button', {
+        type: 'button',
+        class: 'pill' + (einstellungen().zeitraum === key ? ' is-active' : ''),
+      }, z.label);
+      btn.addEventListener('click', () => {
+        store.data.tanken.zeitraum = key;
+        valueChange();
+      });
+      kopf.appendChild(btn);
+    }
+    kpiHost.appendChild(kopf);
+
+    const euro = v => (v === null ? '–' : money(Math.round(v)));
     const box = el('div', { class: 'kpis' });
     box.append(
-      kachel('Verbrauch', a.verbrauch === null ? '–' : `${dezimal(a.verbrauch)} l`, 'je 100 km, gesamt'),
-      kachel('Preis je Liter', a.preisProLiter === null ? '–' : `${dezimal(a.preisProLiter, 3)} €`, 'Schnitt über alle Füllungen'),
-      kachel('Kosten je km', a.kostenProKm === null ? '–' : `${dezimal(a.kostenProKm, 3)} €`, 'nur Kraftstoff'),
-      kachel('Kosten je Monat', a.kostenProMonat === null ? '–' : money(Math.round(a.kostenProMonat)), 'Schnitt über den Zeitraum'),
-      kachel('Gefahren', `${a.summeKm.toLocaleString('de-DE')} km`, `${a.zeilen.length} Tankfüllungen`),
-      kachel('Gesamtkosten', money(a.summeEuro), `${dezimal(a.summeLiter, 2)} Liter`),
+      kachel('Verbrauch', a.verbrauch === null ? '–' : `${dezimal(a.verbrauch)} l`, 'je 100 km'),
+      kachel('Preis je Liter', a.preisProLiter === null ? '–' : `${dezimal(a.preisProLiter, 3)} €`, 'Schnitt im Zeitraum'),
+      kachel('Sprit je Monat', euro(a.spritProMonat),
+        a.kmProMonat === null ? '' : `${Math.round(a.kmProMonat).toLocaleString('de-DE')} km im Monat`),
+      kachel('Fixkosten je Monat', euro(a.fixProMonat),
+        a.fixProJahr ? `${money(Math.round(a.fixProJahr))} im Jahr` : 'rechts eintragen'),
+      kachel('Alles zusammen', euro(a.gesamtProMonat),
+        a.gesamtProJahr === null ? 'je Monat' : `${money(Math.round(a.gesamtProJahr))} im Jahr`),
+      kachel('Kosten je km', a.kostenProKm === null ? '–' : `${dezimal(a.kostenProKm, 3)} €`,
+        a.fixProJahr ? 'Sprit und Fixkosten' : 'nur Sprit'),
     );
     kpiHost.appendChild(box);
+
+    kpiHost.appendChild(el('p', { class: 'feld-hinweis' },
+      `${a.imFenster.length} von ${a.zeilen.length} Tankfüllungen im Zeitraum · `
+      + `${a.summeKm.toLocaleString('de-DE')} km · ${money(a.summeEuro)} Sprit · `
+      + `${dezimal(a.summeLiter, 2)} Liter`));
   }
 
   function renderTabelle(a) {
@@ -502,12 +575,39 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, im
     aktualisiere();
   }
 
+  function renderEinstellungen() {
+    clear(fixHost);
+    fixHost.appendChild(el('p', { class: 'feld-hinweis' },
+      'Was das Auto unabhängig vom Fahren kostet. Jahresbeträge – die App rechnet '
+      + 'sie auf Monat und Kilometer herunter.'));
+
+    for (const [key, label] of FIXKOSTEN_FELDER) {
+      const row = el('label', { class: 'feld' });
+      row.appendChild(el('span', { class: 'feld-label' }, label));
+      const input = el('input', {
+        type: 'number', min: '0', step: '10',
+        value: einstellungen().fixkosten[key] || '',
+        placeholder: '0',
+      });
+      input.addEventListener('input', () => {
+        store.data.tanken.fixkosten[key] = Math.max(0, Number(input.value) || 0);
+        store.commit({ silent: true });
+        renderKpis(auswerten(eintraege(), einstellungen()));
+      });
+      const wrap = el('div', { class: 'feld-input' });
+      wrap.append(input, el('span', { class: 'feld-einheit' }, '€/Jahr'));
+      row.appendChild(wrap);
+      fixHost.appendChild(row);
+    }
+  }
+
   function renderAll() {
-    const a = auswerten(eintraege());
+    const a = auswerten(eintraege(), einstellungen());
     renderKpis(a);
     verbrauchsChart(chartHost, a);
     renderTabelle(a);
     renderFormular();
+    renderEinstellungen();
     renderImport();
   }
 

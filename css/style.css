@@ -467,6 +467,7 @@ button, input, select { font: inherit; color: inherit; }
 .obj-chip.is-active { background: var(--accent); border-color: transparent; color: var(--accent-text); font-weight: 600; }
 
 .immo-result { padding: 16px 16px 4px; }
+.tank-zeitraum { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 
 .kpis {
   display: grid;
@@ -714,3 +715,59 @@ button, input, select { font: inherit; color: inherit; }
   .panel { grid-template-columns: minmax(0, 1fr); }
   .editor { position: static; max-height: none; }
 }
+
+/* ---------- Handy ---------- */
+@media (max-width: 760px) {
+  /* Reiter in eine eigene, seitlich scrollbare Zeile - sonst sind die
+     hinteren Bereiche schlicht nicht erreichbar. */
+  .topbar { padding: 8px 10px; gap: 8px; }
+  .topbar-left { width: 100%; flex-wrap: wrap; gap: 8px; }
+  .tabs {
+    order: 2; width: 100%;
+    overflow-x: auto; flex-wrap: nowrap;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: none; white-space: nowrap; }
+  .topbar-right { width: 100%; justify-content: space-between; }
+  .save-state { min-width: 0; text-align: left; }
+
+  .panel { padding: 10px; gap: 10px; }
+  .editor { padding: 12px; }
+  .migrate { margin: 10px 10px 0; }
+
+  /* iOS zoomt beim Antippen, wenn Felder kleiner als 16px sind. */
+  input, select, textarea { font-size: 16px; }
+  .btn, .pill, .tab, .seg-btn { min-height: 38px; }
+  .icon-btn { min-width: 34px; min-height: 34px; }
+
+  /* Zweispaltige Kacheln statt einer sehr langen Spalte. */
+  .kpis { grid-template-columns: repeat(auto-fit, minmax(142px, 1fr)); gap: 8px; }
+  .kpi { padding: 9px 10px; }
+  .kpi-value { font-size: 17px; }
+  .dash-gitter { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 14px 0 4px; }
+  .dash-kopf { padding: 18px 8px 2px; }
+  .dash-kopf .wortmarke-text { font-size: 24px; }
+
+  /* Eingabezeilen umbrechen lassen statt zusammenquetschen. */
+  .row, .row-account, .row-account-detail, .row-entry { display: flex; flex-wrap: wrap; gap: 6px; }
+  .row > *, .row-account > *, .row-account-detail > * { flex: 1 1 130px; min-width: 0; }
+  .row input[type=number] { flex: 0 1 100px; }
+  .row .icon-btn, .row-account .icon-btn { flex: 0 0 auto; }
+  .row-account-detail input[type=color] { flex: 0 0 34px; }
+  .row-sub { padding-left: 14px; }
+  /* Spaltenköpfe ergeben ohne feste Spalten keinen Sinn mehr. */
+  .row-kopf { display: none; }
+  .feld { grid-template-columns: 1fr; gap: 3px; }
+  .feld-input { width: 100%; }
+
+  .breakdowns { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .gericht-haupt { gap: 10px; }
+  .gericht-werte { gap: 11px; }
+  .filter-sort { margin-left: 0; width: 100%; }
+  .immo-result, .gerichte-liste, .gerichte-filter, .tank-host { padding-left: 12px; padding-right: 12px; }
+}
+
+/* Auf dem Touchscreen darf das Ziehen von Konten und Beschriftungen nicht
+   die Seite mitscrollen. */
+.acct-node, .acct-label { touch-action: none; }

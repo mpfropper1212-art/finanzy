@@ -26,7 +26,7 @@ function kennzahlen(data) {
   const aktiv = objekte.find(o => o.id === data.immobilien.activeId) ?? objekte[0];
   const immo = aktiv ? berechne(aktiv) : null;
 
-  const tank = auswerten(data.tanken.eintraege);
+  const tank = auswerten(data.tanken.eintraege, { fixkosten: data.tanken.fixkosten });
 
   return {
     flow: {
