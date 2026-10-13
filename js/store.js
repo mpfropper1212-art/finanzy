@@ -61,6 +61,7 @@ export function createDefaultData() {
     schulden: { eintraege: [] },
     gruppen: { items: [], activeId: null },
     wochenplan: { start: montagVon(new Date()), eintraege: [], abgehakt: [] },
+    strom: { staende: [], tarif: { arbeitspreis: 0.35, grundpreis: 12, abschlag: 0 } },
     tanken: { eintraege: [], zeitraum: 'alle', eigen: { monate: 1, von: '', bis: '' }, ausgeschlosseneTags: [], fixkosten: { versicherung: 0, steuer: 0, wartung: 0, sonstiges: 0 } },
   };
 }
@@ -171,6 +172,7 @@ export function migrate(raw) {
         ? raw.wochenplan.abgehakt.filter(x => typeof x === 'string')
         : [],
     },
+    strom: migrateStrom(raw.strom),
     tanken: {
       eintraege: migrateTankungen(raw.tanken?.eintraege),
       zeitraum: ['alle', '12monate', '3monate', 'eigen'].includes(raw.tanken?.zeitraum) ? raw.tanken.zeitraum : 'alle',
@@ -188,6 +190,28 @@ export function migrate(raw) {
         wartung: Number(raw.tanken?.fixkosten?.wartung) || 0,
         sonstiges: Number(raw.tanken?.fixkosten?.sonstiges) || 0,
       },
+    },
+  };
+}
+
+// Zählerstände: alles, was kein brauchbares Datum hat, ist nicht zu retten.
+function migrateStrom(roh) {
+  const t = roh?.tarif ?? {};
+  return {
+    staende: Array.isArray(roh?.staende)
+      ? roh.staende
+        .filter(x => x && typeof x.datum === 'string' && x.datum)
+        .map(x => ({
+          id: x.id || uid('st'),
+          datum: x.datum,
+          zaehler: Number(x.zaehler) || 0,
+          notiz: String(x.notiz ?? ''),
+        }))
+      : [],
+    tarif: {
+      arbeitspreis: Number(t.arbeitspreis) >= 0 ? Number(t.arbeitspreis) || 0.35 : 0.35,
+      grundpreis: Number(t.grundpreis) || 0,
+      abschlag: Number(t.abschlag) || 0,
     },
   };
 }

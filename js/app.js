@@ -9,6 +9,7 @@ import { createAccountsView, createAccountsEditor, netWorth, monthlyTransferSum 
 import { createImmobilienView } from './immobilien.js';
 import { createGerichteView } from './gerichte.js';
 import { createTankenView } from './tanken.js';
+import { createStromView } from './strom.js';
 import { createSchuldenView } from './schulden.js';
 import { createWochenplanView } from './wochenplan.js';
 import { createGruppenView } from './gruppen.js';
@@ -27,6 +28,7 @@ let accountsEditor = null;
 let immoView = null;
 let gerichteView = null;
 let tankenView = null;
+let stromView = null;
 let schuldenView = null;
 let wochenView = null;
 let gruppenView = null;
@@ -194,6 +196,15 @@ function enterApp(data) {
     store,
   });
 
+  stromView = createStromView({
+    kpiHost: $('#strom-kpis'),
+    chartHost: $('#strom-chart'),
+    tabelleHost: $('#strom-tabelle'),
+    formHost: $('#strom-form'),
+    tarifHost: $('#strom-tarif'),
+    store,
+  });
+
   wochenView = createWochenplanView({
     planHost: $('#woche-plan'),
     listeHost: $('#woche-liste'),
@@ -234,7 +245,7 @@ function enterApp(data) {
 function leaveApp() {
   store.detach();
   cloud.signOut();
-  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = schuldenView = wochenView = gruppenView = dashboard = null;
+  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = stromView = schuldenView = wochenView = gruppenView = dashboard = null;
   $('#app-view').hidden = true;
   $('#login-view').hidden = false;
   $('#accounts-host').replaceChildren();
@@ -317,6 +328,7 @@ function rebuildAll() {
   immoView.renderAll();
   gerichteView.renderAll();
   tankenView.renderAll();
+  stromView.renderAll();
   schuldenView.renderAll();
   wochenView.renderAll();
   gruppenView.renderAll();
@@ -335,6 +347,7 @@ function setTab(tab) {
   $('#panel-immo').hidden = tab !== 'immo';
   $('#panel-gerichte').hidden = tab !== 'gerichte';
   $('#panel-tanken').hidden = tab !== 'tanken';
+  $('#panel-strom').hidden = tab !== 'strom';
   $('#panel-schulden').hidden = tab !== 'schulden';
   $('#panel-woche').hidden = tab !== 'woche';
   $('#panel-gruppen').hidden = tab !== 'gruppen';
@@ -344,6 +357,7 @@ function setTab(tab) {
   else if (tab === 'immo') immoView?.renderAll();
   else if (tab === 'gerichte') gerichteView?.renderAll();
   else if (tab === 'tanken') tankenView?.renderAll();
+  else if (tab === 'strom') stromView?.renderAll();
   else if (tab === 'schulden') schuldenView?.renderAll();
   else if (tab === 'woche') wochenView?.renderAll();
   else if (tab === 'gruppen') gruppenView?.renderAll();
@@ -487,6 +501,7 @@ document.addEventListener('click', ev => {
 function activeSvg() {
   if (activeTab === 'flow') return $('#sankey-host svg');
   if (activeTab === 'accounts') return $('#accounts-host svg');
+  if (activeTab === 'strom') return $('#strom-chart svg');
   if (activeTab === 'tanken') return $('#tank-chart svg');
   return $('#immo-chart svg');
 }
@@ -494,6 +509,7 @@ function activeSvg() {
 function activeName() {
   if (activeTab === 'flow') return store.data.sankey.title || 'geldfluss';
   if (activeTab === 'accounts') return 'kontomodell';
+  if (activeTab === 'strom') return 'stromverbrauch';
   if (activeTab === 'tanken') return 'verbrauch';
   return `${immoView?.aktiv()?.name || 'immobilie'}-restschuld`;
 }
@@ -601,6 +617,7 @@ $('#btn-theme').addEventListener('click', () => {
   else if (activeTab === 'accounts') refreshAccounts();
   else if (activeTab === 'immo') immoView?.renderAll();
   else if (activeTab === 'tanken') tankenView?.renderAll();
+  else if (activeTab === 'strom') stromView?.renderAll();
 });
 
 theme.anwenden();

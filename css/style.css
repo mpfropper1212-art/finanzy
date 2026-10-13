@@ -505,6 +505,7 @@ button, input, select { font: inherit; color: inherit; }
 .dash-woche { background: color-mix(in srgb, #0891b2 14%, transparent); color: #0891b2; }
 .dash-gruppen { background: color-mix(in srgb, #7c3aed 14%, transparent); color: #7c3aed; }
 .dash-tanken { background: color-mix(in srgb, #d97706 14%, transparent); color: #d97706; }
+.dash-strom { background: color-mix(in srgb, #ca8a04 14%, transparent); color: #ca8a04; }
 
 .dash-karte-text { margin: 0; font-size: 13px; color: var(--text-soft); line-height: 1.5; }
 .dash-wert { display: grid; gap: 1px; margin-top: 2px; }
@@ -863,6 +864,9 @@ button, input, select { font: inherit; color: inherit; }
 .tank-eigen-info { margin-left: auto; color: var(--text-faint); }
 
 .tank-tabelle tr.is-ausgenommen td { opacity: 0.45; }
+/* Zeitraum, der nicht gerechnet werden kann - sichtbar, aber ohne Gewicht. */
+.tank-tabelle tr.ist-ungueltig td { opacity: 0.5; text-decoration: line-through; }
+.tank-tabelle tr.ist-ungueltig td:last-child { text-decoration: none; }
 
 .tank-tagfilter { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 12px 0 4px; }
 .tank-tagfilter-label { font-size: 12.5px; color: var(--text-faint); }

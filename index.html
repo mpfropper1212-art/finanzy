@@ -89,6 +89,7 @@
         <button class="tab" data-tab="schulden" role="tab">Schulden</button>
         <button class="tab" data-tab="gruppen" role="tab">Gruppenkasse</button>
         <button class="tab" data-tab="tanken" role="tab">Tanken</button>
+        <button class="tab" data-tab="strom" role="tab">Strom</button>
       </nav>
     </div>
     <div class="topbar-right">
@@ -292,6 +293,28 @@
         <h2>Aus Tabelle &uuml;bernehmen</h2>
       </div>
       <div id="tank-import" class="immo-form"></div>
+    </aside>
+  </main>
+
+  <!-- ---- Strom ---- -->
+  <main id="panel-strom" class="panel" hidden>
+    <div class="chart-wrap">
+      <div id="strom-kpis" class="immo-result"></div>
+      <div class="immo-chart-head">Verbrauch je Tag im Ablesezeitraum</div>
+      <div id="strom-chart" class="svg-host"></div>
+      <div id="strom-tabelle" class="tank-host"></div>
+    </div>
+
+    <aside class="editor">
+      <div class="editor-head">
+        <h2>Z&auml;hlerstand erfassen</h2>
+      </div>
+      <div id="strom-form" class="immo-form"></div>
+
+      <div class="editor-head editor-head-sep">
+        <h2>Dein Tarif</h2>
+      </div>
+      <div id="strom-tarif" class="immo-form"></div>
     </aside>
   </main>
 </div>

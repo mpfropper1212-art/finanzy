@@ -6,6 +6,7 @@ import { symbolSvg, wortmarke } from './logo.js';
 import { netWorth } from './accounts.js';
 import { berechne } from './immobilien.js';
 import { auswerten } from './tanken.js';
+import { auswerten as stromAuswerten } from './strom.js';
 import { SEED_GERICHTE } from './gerichte-daten.js';
 import { auswerten as schuldenAuswerten } from './schulden.js';
 import { salden, ausgleich } from './gruppen.js';
@@ -32,6 +33,7 @@ function kennzahlen(data) {
   const tank = auswerten(data.tanken.eintraege, { fixkosten: data.tanken.fixkosten });
   const m = monatsrest(data);
   const sch = schuldenAuswerten(data.schulden.eintraege);
+  const strom = stromAuswerten(data.strom.staende, data.strom.tarif);
 
   const nachId = new Map(SEED_GERICHTE.map(g => [g.id, g]));
   const plan = data.wochenplan.eintraege.filter(e => nachId.has(e.gerichtId));
@@ -76,6 +78,12 @@ function kennzahlen(data) {
         ? `${money(Math.round(sch.bekomme))} offen, ${money(Math.round(sch.schulde))} geschuldet`
         : 'nichts offen',
     },
+    strom: {
+      wert: strom.kostenProMonat === null ? '–' : `${money(Math.round(strom.kostenProMonat))} / Monat`,
+      zusatz: strom.proMonat === null
+        ? `${data.strom.staende.length} Zählerstände erfasst`
+        : `${dezimal(strom.proMonat, 0)} kWh im Monat`,
+    },
     tanken: {
       wert: tank.verbrauch === null ? '–' : `${dezimal(tank.verbrauch)} l`,
       zusatz: tank.zeilen.length
@@ -93,6 +101,7 @@ const BEREICHE = [
   { tab: 'woche', symbol: 'woche', titel: 'Wochenplan', text: 'Essen für die Woche planen – die Einkaufsliste entsteht daraus.', kennzahl: 'woche' },
   { tab: 'schulden', symbol: 'schulden', titel: 'Schulden', text: 'Wer dir was schuldet und was du schuldest – per Satz erfasst.', kennzahl: 'schulden' },
   { tab: 'gruppen', symbol: 'gruppen', titel: 'Gruppenkasse', text: 'Gemeinsame Ausgaben einer Reise – und wer am Ende wem was zahlt.', kennzahl: 'gruppen' },
+  { tab: 'strom', symbol: 'strom', titel: 'Strom', text: 'Zählerstände eintragen – Verbrauch und Monatskosten ergeben sich daraus.', kennzahl: 'strom' },
   { tab: 'tanken', symbol: 'tanken', titel: 'Tanken', text: 'Verbrauch und Spritkosten über alle Tankfüllungen.', kennzahl: 'tanken' },
 ];
 
