@@ -1,35 +1,102 @@
-// Münze für schnelle Entscheidungen. Kopf ist ein Lama, Zahl das Finanzy-Zeichen.
+// Münze für schnelle Entscheidungen. Kopf ist ein Lama, Zahl eine "#1".
 // Kein Knopf, sondern ein Ding, das herumliegt und sich antippen lässt.
 
 import { el, svg } from './util.js';
-import { markeSvg } from './logo.js';
 
-function lamaSvg(size = 40) {
+// Lama im Seitenprofil, flächig und kantig gezeichnet. Eigener Entwurf:
+// Haltung, Flächenaufteilung und Proportionen sind meine, nicht die einer
+// bestehenden Spielfigur.
+const LAMA = {
+  dunkel: '#7c6a9c',
+  koerper: '#b3a7d6',
+  hell: '#d9d2f0',
+  weiss: '#f6f4fd',
+  auge: '#3f4654',
+};
+
+// Zahl-Seite: eine klotzige "#1" in Gelb mit weißer Kontur.
+const EINS = { gelb: '#ffd200', kontur: '#ffffff' };
+
+function einsSvg(size = 44) {
   const root = svg('svg', { width: size, height: size, viewBox: '0 0 64 64', 'aria-hidden': 'true' });
 
-  const defs = svg('defs');
-  const clip = svg('clipPath', { id: 'lama-kopf' });
-  clip.appendChild(svg('rect', { x: 17, y: 13, width: 30, height: 31, rx: 13 }));
-  defs.appendChild(clip);
-  root.appendChild(defs);
+  // Die Kontur entsteht über paint-order: erst der breite Strich, dann die
+  // Füllung darüber - so braucht es keine zweite Pfadkopie.
+  const stil = {
+    fill: EINS.gelb,
+    stroke: EINS.kontur,
+    'stroke-width': 3.5,
+    'stroke-linejoin': 'round',
+    'paint-order': 'stroke fill',
+  };
 
-  // Ohren liegen hinter dem Kopf.
-  root.appendChild(svg('path', { d: 'M22,19 L17.5,5 L28,13 Z', fill: '#6d28d9' }));
-  root.appendChild(svg('path', { d: 'M42,19 L46.5,5 L36,13 Z', fill: '#6d28d9' }));
+  // Die Raute steht leicht schräg, wie beim handgemalten "#1". Die vier
+  // Balken kreuzen sich, deshalb erst alle weiß als Unterlage und dann alle
+  // gelb darüber - sonst zöge die Kontur Striche quer durchs Innere.
+  const balken = [
+    { x: 9, y: 18, width: 5.5, height: 32 },
+    { x: 19.5, y: 18, width: 5.5, height: 32 },
+    { x: 2, y: 25, width: 30, height: 5.5 },
+    { x: 2, y: 37.5, width: 30, height: 5.5 },
+  ];
+  const raute = svg('g', { transform: 'skewX(-9) translate(5,0)' });
+  for (const r of balken) {
+    raute.appendChild(svg('rect', {
+      ...r, fill: EINS.kontur, stroke: EINS.kontur,
+      'stroke-width': 3.5, 'stroke-linejoin': 'round',
+    }));
+  }
+  for (const r of balken) raute.appendChild(svg('rect', { ...r, fill: EINS.gelb }));
+  root.appendChild(raute);
 
-  root.appendChild(svg('rect', { x: 17, y: 13, width: 30, height: 31, rx: 13, fill: '#8b5cf6' }));
+  root.appendChild(svg('path', {
+    d: 'M57,10 L57,56 L46,56 L46,22 L38,26 L36,18 L48,10 Z',
+    ...stil,
+  }));
 
-  // Fransen wie bei einer Piñata, auf die Kopfform beschnitten.
-  const fransen = svg('g', { 'clip-path': 'url(#lama-kopf)' });
-  fransen.appendChild(svg('rect', { x: 17, y: 27, width: 30, height: 6, fill: '#22d3ee' }));
-  fransen.appendChild(svg('rect', { x: 17, y: 33, width: 30, height: 11, fill: '#f472b6' }));
-  root.appendChild(fransen);
+  return root;
+}
 
-  root.appendChild(svg('rect', { x: 23, y: 37, width: 18, height: 17, rx: 8.5, fill: '#f5f3ff' }));
-  root.appendChild(svg('circle', { cx: 25, cy: 22, r: 2.8, fill: '#1b2130' }));
-  root.appendChild(svg('circle', { cx: 39, cy: 22, r: 2.8, fill: '#1b2130' }));
-  root.appendChild(svg('circle', { cx: 29, cy: 46, r: 1.5, fill: '#a78bfa' }));
-  root.appendChild(svg('circle', { cx: 35, cy: 46, r: 1.5, fill: '#a78bfa' }));
+function lamaSvg(size = 46) {
+  const root = svg('svg', { width: size, height: size, viewBox: '0 0 64 64', 'aria-hidden': 'true' });
+
+  // Aus Grundformen statt Freihand-Polygonen: Hals, Kopf, Schnauze und zwei
+  // lange Ohren. Die langen Ohren und die stumpfe Schnauze sind das, woran
+  // man ein Lama erkennt - ein Pferd hat kurze Ohren und eine lange Nase.
+  const ohr = (x, y, winkel) => {
+    const g = svg('g', { transform: `rotate(${winkel} ${x + 3} ${y + 16})` });
+    g.appendChild(svg('rect', { x, y, width: 6.4, height: 21, rx: 3.2, fill: LAMA.dunkel }));
+    g.appendChild(svg('rect', {
+      x: x + 1.6, y: y + 3, width: 3.2, height: 14, rx: 1.6, fill: LAMA.hell,
+    }));
+    return g;
+  };
+  root.appendChild(ohr(25, 1, -17));
+  root.appendChild(ohr(39, 0, 11));
+
+  // Hals
+  root.appendChild(svg('rect', {
+    x: 33, y: 24, width: 18, height: 42, rx: 9,
+    fill: LAMA.koerper, transform: 'rotate(5 42 45)',
+  }));
+  root.appendChild(svg('rect', {
+    x: 36.5, y: 33, width: 8, height: 33, rx: 4,
+    fill: LAMA.hell, transform: 'rotate(5 42 45)',
+  }));
+
+  // Kopf
+  root.appendChild(svg('rect', { x: 21, y: 15, width: 28, height: 21, rx: 9, fill: LAMA.koerper }));
+  // Stirnschopf
+  root.appendChild(svg('rect', { x: 23, y: 14, width: 24, height: 10, rx: 5, fill: LAMA.hell }));
+
+  // Schnauze, stumpf und etwas abgesenkt
+  root.appendChild(svg('rect', { x: 8, y: 23, width: 21, height: 14, rx: 6.5, fill: LAMA.koerper }));
+  root.appendChild(svg('rect', { x: 9, y: 27, width: 19, height: 9, rx: 4.5, fill: LAMA.weiss }));
+  root.appendChild(svg('circle', { cx: 12.5, cy: 28, r: 1.6, fill: LAMA.dunkel }));
+
+  // Auge
+  root.appendChild(svg('circle', { cx: 31, cy: 25.5, r: 2.8, fill: LAMA.auge }));
+  root.appendChild(svg('circle', { cx: 32, cy: 24.6, r: 1, fill: LAMA.weiss }));
 
   return root;
 }
@@ -53,7 +120,7 @@ export function createMuenze() {
   kopf.appendChild(lamaSvg(46));
 
   const zahl = el('div', { class: 'muenze-seite muenze-zahl' });
-  zahl.appendChild(markeSvg({ size: 32, titel: 'Zahl' }));
+  zahl.appendChild(einsSvg(42));
 
   innen.append(kopf, zahl);
   muenze.appendChild(innen);
