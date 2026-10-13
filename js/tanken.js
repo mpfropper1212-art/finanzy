@@ -31,8 +31,9 @@ const dezimal = (v, stellen = 2) =>
 
 export const ZEITRAEUME = {
   alle: { label: 'Alle Daten', monate: null },
-  '12monate': { label: 'Letzte 12 Monate', monate: 12 },
-  '3monate': { label: 'Letzte 3 Monate', monate: 3 },
+  '12monate': { label: '12 Monate', monate: 12 },
+  '3monate': { label: '3 Monate', monate: 3 },
+  eigen: { label: 'Eigener Zeitraum', monate: null },
 };
 
 export const FIXKOSTEN_FELDER = [
@@ -64,9 +65,15 @@ export function auswerten(eintraege, optionen = {}) {
 
   // Kilometer zuerst über alle Zeilen rechnen, dann den Zeitraum ausschneiden -
   // sonst fehlte der ersten Zeile im Fenster ihr Vorgänger.
-  const grenze = grenzDatum(optionen.zeitraum);
+  const fenster = zeitfenster(optionen);
   const ausgeschlossen = new Set(optionen.ausgeschlossen ?? []);
-  const imZeitraum = grenze ? zeilen.filter(z => z.datum && z.datum >= grenze) : zeilen;
+  const imZeitraum = zeilen.filter(z => {
+    if (!fenster.von && !fenster.bis) return true;
+    if (!z.datum) return false;
+    if (fenster.von && z.datum < fenster.von) return false;
+    if (fenster.bis && z.datum > fenster.bis) return false;
+    return true;
+  });
   // Eine ausgeschlossene Füllung fällt mit ihren Kilometern heraus - die
   // Strecke gehört ja zu derselben Fahrt.
   const imFenster = ausgeschlossen.size
@@ -102,6 +109,8 @@ export function auswerten(eintraege, optionen = {}) {
     imZeitraum,
     tags: tagUebersicht(imZeitraum),
     ausgeschlossen: [...ausgeschlossen],
+    istAusgenommen: z => (z.tags ?? []).some(tag => ausgeschlossen.has(tag)),
+    fenster,
     summeLiter,
     summeEuro,
     summeKm,
@@ -146,12 +155,25 @@ function tagUebersicht(zeilen) {
   });
 }
 
-function grenzDatum(zeitraum) {
+// Vorgabe oder eigener Zeitraum. Sind Daten eingetragen, gewinnen die;
+// sonst zählt die Monatszahl zurück von heute.
+export function zeitfenster({ zeitraum, eigen } = {}) {
+  const vorMonaten = n => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - n);
+    return d.toISOString().slice(0, 10);
+  };
+
+  if (zeitraum === 'eigen') {
+    const von = eigen?.von || '';
+    const bis = eigen?.bis || '';
+    if (von || bis) return { von, bis };
+    const monate = Math.max(1, Number(eigen?.monate) || 1);
+    return { von: vorMonaten(monate), bis: '' };
+  }
+
   const monate = ZEITRAEUME[zeitraum]?.monate;
-  if (!monate) return null;
-  const d = new Date();
-  d.setMonth(d.getMonth() - monate);
-  return d.toISOString().slice(0, 10);
+  return monate ? { von: vorMonaten(monate), bis: '' } : { von: '', bis: '' };
 }
 
 function kachel(label, wert, hint) {
@@ -164,7 +186,7 @@ function kachel(label, wert, hint) {
 // Verbrauchsverlauf, damit Ausreißer und Trends auffallen.
 function verbrauchsChart(host, a) {
   clear(host);
-  const punkte = a.zeilen.filter(z => z.verbrauch !== null);
+  const punkte = a.imZeitraum.filter(z => z.verbrauch !== null);
   if (punkte.length < 2) {
     host.appendChild(el('p', { class: 'empty' }, 'Ab der zweiten Tankfüllung mit Tachostand erscheint hier der Verlauf.'));
     return;
@@ -359,6 +381,7 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
     zeitraum: store.data.tanken.zeitraum,
     fixkosten: store.data.tanken.fixkosten,
     ausgeschlossen: store.data.tanken.ausgeschlosseneTags,
+    eigen: store.data.tanken.eigen,
   });
 
   // Chips zum An- und Abwählen von Markierungen, einmal für den Entwurf und
@@ -397,6 +420,8 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
       kopf.appendChild(btn);
     }
     kpiHost.appendChild(kopf);
+
+    if (einstellungen().zeitraum === 'eigen') kpiHost.appendChild(eigenerZeitraum(a));
 
     const euro = v => (v === null ? '–' : money(Math.round(v)));
     const box = el('div', { class: 'kpis' });
@@ -460,6 +485,11 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
       tabelleHost.appendChild(el('p', { class: 'empty' }, 'Noch keine Tankfüllung erfasst – rechts die erste eintragen.'));
       return;
     }
+    if (!a.imZeitraum.length) {
+      tabelleHost.appendChild(el('p', { class: 'empty' },
+        'In diesem Zeitraum liegt keine Tankfüllung. Oben einen weiteren Zeitraum wählen.'));
+      return;
+    }
 
     const tabelle = el('table', { class: 'tank-tabelle' });
     const kopf = el('tr');
@@ -473,8 +503,10 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
 
     const body = el('tbody');
     // Neueste zuerst: der letzte Tankvorgang interessiert am meisten.
-    for (const z of [...a.zeilen].reverse()) {
-      const tr = el('tr');
+    for (const z of [...a.imZeitraum].reverse()) {
+      // Wegen einer Markierung ausgenommene Zeilen bleiben sichtbar, werden
+      // aber abgesetzt - sonst wäre unklar, warum die Summe nicht aufgeht.
+      const tr = el('tr', a.istAusgenommen(z) ? { class: 'is-ausgenommen' } : {});
       tr.append(
         el('td', {}, z.datum ? datumKurz(z.datum) : '–'),
         el('td', { class: 'num' }, dezimal(z.liter, 2)),
@@ -745,6 +777,49 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
     });
 
     aktualisiere();
+  }
+
+  function eigenerZeitraum(a) {
+    const eigen = store.data.tanken.eigen;
+    const box = el('div', { class: 'tank-eigen' });
+
+    const monate = el('input', { type: 'number', min: '1', max: '240', step: '1', value: eigen.monate });
+    monate.addEventListener('input', () => {
+      eigen.monate = Math.max(1, Number(monate.value) || 1);
+      eigen.von = '';
+      eigen.bis = '';
+      valueChange();
+    });
+    const monatsTeil = el('label', { class: 'tank-eigen-teil' });
+    monatsTeil.append(el('span', {}, 'Letzte'), monate, el('span', {}, 'Monate'));
+    box.appendChild(monatsTeil);
+
+    box.appendChild(el('span', { class: 'tank-eigen-oder' }, 'oder genau'));
+
+    for (const [key, label] of [['von', 'von'], ['bis', 'bis']]) {
+      const teil = el('label', { class: 'tank-eigen-teil' });
+      const feld = el('input', { type: 'date', value: eigen[key] });
+      feld.addEventListener('input', () => { eigen[key] = feld.value; valueChange(); });
+      teil.append(el('span', {}, label), feld);
+      box.appendChild(teil);
+    }
+
+    if (eigen.von || eigen.bis) {
+      const zuruecksetzen = el('button', { type: 'button', class: 'link-btn' }, 'Daten leeren');
+      zuruecksetzen.addEventListener('click', () => {
+        eigen.von = '';
+        eigen.bis = '';
+        valueChange();
+      });
+      box.appendChild(zuruecksetzen);
+    }
+
+    box.appendChild(el('span', { class: 'tank-eigen-info' },
+      a.fenster.von || a.fenster.bis
+        ? `${a.fenster.von ? datumKurz(a.fenster.von) : 'Anfang'} bis ${a.fenster.bis ? datumKurz(a.fenster.bis) : 'heute'}`
+        : 'alle Daten'));
+
+    return box;
   }
 
   function renderEinstellungen() {

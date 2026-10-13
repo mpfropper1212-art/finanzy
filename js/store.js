@@ -58,7 +58,7 @@ export function createDefaultData() {
     },
     immobilien: createImmobilienTeil(),
     gerichte: { favoriten: [] },
-    tanken: { eintraege: [], zeitraum: 'alle', ausgeschlosseneTags: [], fixkosten: { versicherung: 0, steuer: 0, wartung: 0, sonstiges: 0 } },
+    tanken: { eintraege: [], zeitraum: 'alle', eigen: { monate: 1, von: '', bis: '' }, ausgeschlosseneTags: [], fixkosten: { versicherung: 0, steuer: 0, wartung: 0, sonstiges: 0 } },
   };
 }
 
@@ -145,7 +145,12 @@ export function migrate(raw) {
     },
     tanken: {
       eintraege: migrateTankungen(raw.tanken?.eintraege),
-      zeitraum: ['alle', '12monate', '3monate'].includes(raw.tanken?.zeitraum) ? raw.tanken.zeitraum : 'alle',
+      zeitraum: ['alle', '12monate', '3monate', 'eigen'].includes(raw.tanken?.zeitraum) ? raw.tanken.zeitraum : 'alle',
+      eigen: {
+        monate: Math.max(1, Number(raw.tanken?.eigen?.monate) || 1),
+        von: typeof raw.tanken?.eigen?.von === 'string' ? raw.tanken.eigen.von : '',
+        bis: typeof raw.tanken?.eigen?.bis === 'string' ? raw.tanken.eigen.bis : '',
+      },
       ausgeschlosseneTags: Array.isArray(raw.tanken?.ausgeschlosseneTags)
         ? raw.tanken.ausgeschlosseneTags.filter(x => typeof x === 'string')
         : [],
