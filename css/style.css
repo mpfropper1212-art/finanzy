@@ -21,27 +21,52 @@
   --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
+/* Dunkel folgt dem Gerät, solange nichts von Hand gewählt wurde. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #15181d;
-    --surface: #1c2027;
-    --surface-2: #21262e;
-    --border: #2d343e;
-    --border-strong: #3c4553;
-    --text: #e8ebef;
-    --text-soft: #a3adbb;
-    --text-faint: #7b8694;
-    --accent: #5b8cf5;
-    --accent-text: #0e1116;
-    --danger: #f08a8a;
-    --warn-bg: #30270f;
-    --warn-border: #5e4d1c;
-    --warn-text: #e2c377;
-    --err-bg: #341a1a;
-    --err-border: #5e2c2c;
-    --err-text: #f0a8a8;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+  :root:not([data-theme="light"]) {
+  --bg: #15181d;
+  --surface: #1c2027;
+  --surface-2: #21262e;
+  --border: #2d343e;
+  --border-strong: #3c4553;
+  --text: #e8ebef;
+  --text-soft: #a3adbb;
+  --text-faint: #7b8694;
+  --accent: #5b8cf5;
+  --accent-text: #0e1116;
+  --danger: #f08a8a;
+  --warn-bg: #30270f;
+  --warn-border: #5e4d1c;
+  --warn-text: #e2c377;
+  --err-bg: #341a1a;
+  --err-border: #5e2c2c;
+  --err-text: #f0a8a8;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+
   }
+}
+
+/* Von Hand auf dunkel gestellt - schlägt die Geräteeinstellung. */
+:root[data-theme="dark"] {
+  --bg: #15181d;
+  --surface: #1c2027;
+  --surface-2: #21262e;
+  --border: #2d343e;
+  --border-strong: #3c4553;
+  --text: #e8ebef;
+  --text-soft: #a3adbb;
+  --text-faint: #7b8694;
+  --accent: #5b8cf5;
+  --accent-text: #0e1116;
+  --danger: #f08a8a;
+  --warn-bg: #30270f;
+  --warn-border: #5e4d1c;
+  --warn-text: #e2c377;
+  --err-bg: #341a1a;
+  --err-border: #5e2c2c;
+  --err-text: #f0a8a8;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+
 }
 
 * { box-sizing: border-box; }
@@ -80,6 +105,7 @@ button, input, select { font: inherit; color: inherit; }
 .btn-sm { padding: 4px 10px; font-size: 13px; }
 .btn-block { width: 100%; justify-content: center; }
 .btn.is-active { background: var(--accent); border-color: transparent; color: var(--accent-text); }
+.btn-symbol { display: grid; place-items: center; padding: 6px; width: 34px; height: 34px; }
 
 .link-btn {
   background: none; border: 0; padding: 0;

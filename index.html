@@ -6,6 +6,14 @@
 <title>Finanzy</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" id="favicon" href="data:,">
+<script>
+  /* Vor dem ersten Zeichnen setzen, sonst blitzt kurz das helle Design auf. */
+  try {
+    var m = localStorage.getItem('finanzsankey.theme');
+    if (m === 'hell') document.documentElement.dataset.theme = 'light';
+    else if (m === 'dunkel') document.documentElement.dataset.theme = 'dark';
+  } catch (e) {}
+</script>
 </head>
 <body>
 
@@ -82,6 +90,7 @@
     </div>
     <div class="topbar-right">
       <span id="save-state" class="save-state" aria-live="polite"></span>
+      <button class="btn btn-ghost btn-symbol" id="btn-theme" type="button"></button>
       <div class="menu">
         <button class="btn btn-ghost" id="btn-menu" aria-haspopup="true" aria-expanded="false">Daten &#9662;</button>
         <div class="menu-pop" id="menu-pop" hidden>

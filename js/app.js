@@ -10,7 +10,8 @@ import { createImmobilienView } from './immobilien.js';
 import { createGerichteView } from './gerichte.js';
 import { createTankenView } from './tanken.js';
 import { createDashboard } from './dashboard.js';
-import { wortmarke, faviconDataUri } from './logo.js';
+import { wortmarke, faviconDataUri, symbolSvg } from './logo.js';
+import * as theme from './theme.js';
 import * as dl from './export.js';
 import { el, clear, money } from './util.js';
 
@@ -542,6 +543,28 @@ document.addEventListener('visibilitychange', () => {
 });
 window.addEventListener('beforeunload', () => { store.flushNow(); });
 
+function zeigeTheme() {
+  const modus = theme.aktuellerModus();
+  const knopf = $('#btn-theme');
+  clear(knopf);
+  knopf.appendChild(symbolSvg(theme.MODI[modus].symbol, { size: 18 }));
+  knopf.title = `Darstellung: ${theme.MODI[modus].label} – klicken zum Wechseln`;
+  knopf.setAttribute('aria-label', knopf.title);
+}
+
+$('#btn-theme').addEventListener('click', () => {
+  theme.setzeModus(theme.naechsterModus());
+  zeigeTheme();
+  // Die Diagramme holen ihre Farben aus den Variablen, zeichnen aber nicht von
+  // selbst neu - sichtbar wäre sonst erst die nächste Änderung.
+  if (activeTab === 'flow') refreshFlowChart();
+  else if (activeTab === 'accounts') refreshAccounts();
+  else if (activeTab === 'immo') immoView?.renderAll();
+  else if (activeTab === 'tanken') tankenView?.renderAll();
+});
+
+theme.anwenden();
+zeigeTheme();
 $('#favicon').href = faviconDataUri();
 $('#login-marke').appendChild(wortmarke({ size: 56 }));
 $('#btn-brand').appendChild(wortmarke({ size: 24 }));

@@ -77,6 +77,12 @@ Die erste Füllung liefert nur den Startpunkt und hat deshalb keinen Verbrauchsw
 
 **Daten-Menü.** Diagramm als SVG oder PNG exportieren, eine Sicherung als JSON herunterladen und wieder einspielen, oder alles auf die Startwerte zurücksetzen.
 
+## Hell und dunkel
+
+Oben rechts schaltet ein Knopf zwischen **Folgt dem Gerät**, **Immer hell** und **Immer dunkel** um. Die Wahl liegt im `localStorage` und damit beim Gerät, nicht beim Konto – auf dem Handy darf dunkel sein, während der Rechner hell bleibt.
+
+Ein kleines Skript im `<head>` setzt die Einstellung vor dem ersten Zeichnen, sonst blitzt beim Laden kurz das helle Design auf. Im Stylesheet stehen die dunklen Farbwerte zweimal: einmal unter `prefers-color-scheme` mit `:root:not([data-theme="light"])`, damit die Geräteeinstellung greift, und einmal unter `:root[data-theme="dark"]` für die Wahl von Hand.
+
 ## Auf dem Handy
 
 Die App ist für beide Größen gebaut. Unter 760 px Breite:
