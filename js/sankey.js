@@ -6,11 +6,16 @@ const NODE_W = 15;
 const NODE_GAP = 16;
 const PAD = { top: 26, right: 150, bottom: 26, left: 18 };
 const MIN_COL_SPACE = 162;
+// "beides" setzt Betrag und Prozent nebeneinander und braucht mehr Platz.
+const BREIT = { right: 196, colSpace: 205 };
 const HUB_COLOR = '#64748b';
 const LABEL_PAD = 9;
 
 export function computeLayout(sankey, { width, height }) {
   const result = { nodes: [], links: [], warnings: [], error: null, width, height };
+  const breit = sankey.anzeige === 'beide';
+  const padRight = breit ? BREIT.right : PAD.right;
+  const colSpace = breit ? BREIT.colSpace : MIN_COL_SPACE;
 
   const byId = new Map(sankey.nodes.map(n => [n.id, n]));
   const flows = sankey.flows.filter(f =>
@@ -66,7 +71,7 @@ export function computeLayout(sankey, { width, height }) {
   for (const n of active) columns[depth.get(n.id)].push(n.id);
 
   // Breite so wählen, dass Labels zwischen die Spalten passen; sonst scrollt der Host.
-  const neededWidth = PAD.left + PAD.right + colCount * NODE_W + Math.max(0, colCount - 1) * (MIN_COL_SPACE - NODE_W);
+  const neededWidth = PAD.left + padRight + colCount * NODE_W + Math.max(0, colCount - 1) * (colSpace - NODE_W);
   const w = Math.max(width, neededWidth);
   const plotH = height - PAD.top - PAD.bottom;
 
@@ -85,9 +90,9 @@ export function computeLayout(sankey, { width, height }) {
     return result;
   }
 
-  const colStep = colCount > 1 ? (w - PAD.left - PAD.right - NODE_W) / (colCount - 1) : 0;
+  const colStep = colCount > 1 ? (w - PAD.left - padRight - NODE_W) / (colCount - 1) : 0;
   const xOf = d => PAD.left + d * colStep;
-  const labelSpace = (colCount > 1 ? colStep - NODE_W : PAD.right) - LABEL_PAD * 2;
+  const labelSpace = (colCount > 1 ? colStep - NODE_W : padRight) - LABEL_PAD * 2;
 
   const y0 = new Map();
   const stack = () => {
@@ -189,6 +194,11 @@ export function computeLayout(sankey, { width, height }) {
     });
   }
 
+  // Bezugsgröße für Prozente: alles, was oben hineinfließt.
+  result.basis = result.nodes
+    .filter(n => n.inSum === 0)
+    .reduce((s, n) => s + n.value, 0);
+
   for (const n of result.nodes) {
     if (n.inSum > 0 && n.outSum > 0 && Math.abs(n.inSum - n.outSum) > 0.005) {
       result.warnings.push({
@@ -202,7 +212,7 @@ export function computeLayout(sankey, { width, height }) {
 
   result.width = w;
   result.labelSpace = Math.max(60, labelSpace);
-  result.rightLabelSpace = PAD.right - LABEL_PAD * 2;
+  result.rightLabelSpace = padRight - LABEL_PAD * 2;
   return result;
 }
 
@@ -271,7 +281,18 @@ function assignColors({ order, active, byId, inL, outL, value }) {
   return colors;
 }
 
+// Wie die Zahl am Knoten steht: Betrag, Anteil an den Einnahmen oder beides.
+function wertText(value, layout, anzeige) {
+  const anteil = layout.basis > 0 ? (value / layout.basis) * 100 : null;
+  const prozent = anteil === null ? '–'
+    : `${anteil.toLocaleString('de-DE', { maximumFractionDigits: anteil < 10 ? 1 : 0 })} %`;
+  if (anzeige === 'prozent') return prozent;
+  if (anzeige === 'beide') return `${moneyShort(value)} · ${prozent}`;
+  return moneyShort(value);
+}
+
 export function renderSankey(host, sankey, layout) {
+  const anzeige = ['euro', 'prozent', 'beide'].includes(sankey.anzeige) ? sankey.anzeige : 'euro';
   clear(host);
 
   const root = svg('svg', {
@@ -347,7 +368,7 @@ export function renderSankey(host, sankey, layout) {
       fill: 'currentColor',
       'font-size': 11.5,
       opacity: 0.62,
-    }, moneyShort(n.value));
+    }, wertText(n.value, layout, anzeige));
     gLabels.appendChild(amount);
 
     if (!twoLines) inlinePairs.push({ name, amount, tx });

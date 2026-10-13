@@ -128,6 +128,9 @@ button, input, select { font: inherit; color: inherit; }
 }
 .seg-btn.is-active { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
 
+.seg-klein { margin: 0; padding: 2px; gap: 2px; grid-template-columns: repeat(3, auto); }
+.seg-klein .seg-btn { padding: 3px 10px; font-size: 12.5px; }
+
 .field { display: block; margin-bottom: 14px; }
 .field > span { display: block; font-size: 13px; color: var(--text-soft); margin-bottom: 5px; }
 .field input {
@@ -295,7 +298,11 @@ button, input, select { font: inherit; color: inherit; }
   align-items: center;
 }
 .row-account { grid-template-columns: 1fr 104px 92px 26px; }
-.row-account-detail { grid-template-columns: 112px 1fr 26px; margin-bottom: 4px; }
+.row-account-detail { grid-template-columns: 26px 96px 1fr 26px; margin-bottom: 4px; }
+.row-account-detail input[type=color] {
+  width: 26px; height: 26px; padding: 0; border: 1px solid var(--border);
+  border-radius: 6px; background: none; cursor: pointer;
+}
 .row-account-detail input { font-size: 13px; color: var(--text-soft); }
 
 /* Geldfluss-Editor: Bezeichnung, Betrag, Löschen */
@@ -661,6 +668,8 @@ button, input, select { font: inherit; color: inherit; }
 .acct-node { cursor: grab; }
 .acct-node.is-dragging { cursor: grabbing; }
 .acct-canvas.is-connecting .acct-node { cursor: crosshair; }
+.acct-label { cursor: move; }
+.acct-canvas.is-connecting .acct-label { cursor: crosshair; }
 
 @media (max-width: 1040px) {
   .panel { grid-template-columns: minmax(0, 1fr); }

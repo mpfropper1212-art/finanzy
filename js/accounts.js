@@ -1,6 +1,6 @@
 // Kontomodell: Konten als verschiebbare Knoten, Umbuchungen als Pfeile.
 
-import { money, moneyShort, svg, el, clear, fitText, uid } from './util.js';
+import { money, moneyShort, svg, el, clear, fitText, uid, isValidHex } from './util.js';
 
 const W = 214;
 const H_BASE = 72;
@@ -9,6 +9,12 @@ const MARGIN = 28;
 
 // Nur Konten mit Notiz brauchen die zusätzliche Zeile.
 const heightOf = node => (String(node.info || '').trim() ? H_INFO : H_BASE);
+
+// Eigene Farbe schlägt die Farbe der Kontoart.
+export function farbeVon(node) {
+  if (isValidHex(node.color)) return node.color;
+  return (ACCOUNT_TYPES[node.type] ?? ACCOUNT_TYPES.giro).color;
+}
 
 export const ACCOUNT_TYPES = {
   giro: { label: 'Girokonto', color: '#2f6feb' },
@@ -117,6 +123,22 @@ export function createAccountsView({ host, store, requestEditor }) {
   }
 
   function onPointerDown(ev) {
+    const label = ev.target.closest('[data-transfer-label]');
+    if (label && !connectMode) {
+      const t = data().transfers.find(x => x.id === label.dataset.transferLabel);
+      if (t) {
+        const p = canvasPoint(ev);
+        drag = {
+          typ: 'label', id: t.id, moved: false,
+          startX: p.x, startY: p.y,
+          startDx: Number(t.labelDx) || 0, startDy: Number(t.labelDy) || 0,
+        };
+        root.setPointerCapture(ev.pointerId);
+        ev.preventDefault();
+        return;
+      }
+    }
+
     const g = ev.target.closest('[data-account]');
     if (!g) return;
     const node = data().nodes.find(n => n.id === g.dataset.account);
@@ -130,13 +152,25 @@ export function createAccountsView({ host, store, requestEditor }) {
       return;
     }
     const p = canvasPoint(ev);
-    drag = { id: node.id, dx: p.x - node.x, dy: p.y - node.y, moved: false };
+    drag = { typ: 'konto', id: node.id, dx: p.x - node.x, dy: p.y - node.y, moved: false };
     root.setPointerCapture(ev.pointerId);
     ev.preventDefault();
   }
 
   function onPointerMove(ev) {
     if (!drag) return;
+
+    if (drag.typ === 'label') {
+      const t = data().transfers.find(x => x.id === drag.id);
+      if (!t) return;
+      const p = canvasPoint(ev);
+      t.labelDx = Math.round(drag.startDx + (p.x - drag.startX));
+      t.labelDy = Math.round(drag.startDy + (p.y - drag.startY));
+      drag.moved = true;
+      draw();
+      return;
+    }
+
     const node = data().nodes.find(n => n.id === drag.id);
     if (!node) return;
     const p = canvasPoint(ev);
@@ -197,6 +231,7 @@ export function createAccountsView({ host, store, requestEditor }) {
       n.x = MARGIN + (i % cols) * (W + 118);
       n.y = MARGIN + Math.floor(i / cols) * (H_INFO + 64);
     });
+    for (const t of data().transfers) { t.labelDx = 0; t.labelDy = 0; }
     store.commit({ silent: true });
     draw();
   }
@@ -275,19 +310,38 @@ export function createAccountsView({ host, store, requestEditor }) {
           : `${moneyShort(t.amount)}${t.interval === 'jaehrlich' ? ' / Jahr' : ''}`;
         const wBox = text.length * 6.2 + 12;
 
-        layerLinks.appendChild(svg('rect', {
-          x: lx - wBox / 2, y: ly - 10, width: wBox, height: 20, rx: 6,
+        const dx = Number(t.labelDx) || 0;
+        const dy = Number(t.labelDy) || 0;
+        const bx = lx + dx;
+        const by = ly + dy;
+
+        // Verschobene Beschriftungen bekommen eine dünne Linie zum Pfeil,
+        // damit klar bleibt, zu welcher Umbuchung sie gehören.
+        if (Math.hypot(dx, dy) > 24) {
+          layerLinks.appendChild(svg('line', {
+            x1: lx, y1: ly, x2: bx, y2: by,
+            stroke: 'currentColor', 'stroke-opacity': 0.25, 'stroke-dasharray': '2 3',
+          }));
+        }
+
+        const beschriftung = svg('g', { class: 'acct-label' });
+        beschriftung.setAttribute('data-transfer-label', t.id);
+        beschriftung.appendChild(svg('rect', {
+          x: bx - wBox / 2, y: by - 10, width: wBox, height: 20, rx: 6,
           fill: 'var(--surface)', stroke: 'var(--border)',
         }));
-        layerLinks.appendChild(svg('text', {
-          x: lx, y: ly + 4, 'text-anchor': 'middle',
+        beschriftung.appendChild(svg('text', {
+          x: bx, y: by + 4, 'text-anchor': 'middle',
           'font-size': 11.5, fill: 'currentColor', opacity: 0.8,
         }, text));
+        beschriftung.appendChild(svg('title', {}, `${text} – zum Verschieben ziehen`));
+        layerLinks.appendChild(beschriftung);
       });
     }
 
     for (const n of nodes) {
       const meta = ACCOUNT_TYPES[n.type] ?? ACCOUNT_TYPES.giro;
+      const farbe = farbeVon(n);
       const g = svg('g', {
         class: 'acct-node' + (connectFrom === n.id ? ' is-selected' : ''),
         transform: `translate(${n.x},${n.y})`,
@@ -301,10 +355,10 @@ export function createAccountsView({ host, store, requestEditor }) {
       g.appendChild(svg('rect', {
         x: 0, y: 0, width: W, height: h, rx: 11,
         fill: 'var(--surface)',
-        stroke: connectFrom === n.id ? meta.color : 'var(--border-strong)',
+        stroke: connectFrom === n.id ? farbe : 'var(--border-strong)',
         'stroke-width': connectFrom === n.id ? 2.5 : 1.2,
       }));
-      g.appendChild(svg('rect', { x: 0, y: 0, width: 5, height: h, rx: 2.5, fill: meta.color }));
+      g.appendChild(svg('rect', { x: 0, y: 0, width: 5, height: h, rx: 2.5, fill: farbe }));
       g.appendChild(svg('text', {
         x: 16, y: 25, 'font-size': 13.5, 'font-weight': 600, fill: 'currentColor',
       }, fitText(n.name, W - 28, 7)));
@@ -412,7 +466,11 @@ export function createAccountsEditor({ accountHost, transferHost, store, request
         }
         valueChange();
       });
-      type.addEventListener('change', () => { node.type = type.value; valueChange(); });
+      type.addEventListener('change', () => {
+        node.type = type.value;
+        if (!isValidHex(node.color)) farbe.value = farbeVon(node);
+        valueChange();
+      });
       balance.addEventListener('input', () => { node.balance = Number(balance.value) || 0; valueChange(); });
       del.addEventListener('click', () => {
         data().nodes = data().nodes.filter(n => n.id !== node.id);
@@ -424,11 +482,24 @@ export function createAccountsEditor({ accountHost, transferHost, store, request
       accountHost.appendChild(row);
 
       const detail = el('div', { class: 'row row-account-detail' });
-      const bank = el('input', { type: 'text', value: node.bank ?? '', placeholder: 'Bank (optional)' });
+      const farbe = el('input', {
+        type: 'color', value: farbeVon(node),
+        title: `Farbe für ${node.name} – Doppelklick setzt sie zurück`,
+      });
+      const bank = el('input', { type: 'text', value: node.bank ?? '', placeholder: 'Bank' });
       const info = el('input', { type: 'text', value: node.info ?? '', placeholder: 'Info (optional)' });
+
+      farbe.addEventListener('input', () => { node.color = farbe.value; valueChange(); });
+      // Zurück zur Farbe der Kontoart, ohne einen zweiten Knopf je Zeile.
+      farbe.addEventListener('dblclick', () => {
+        node.color = null;
+        farbe.value = farbeVon(node);
+        valueChange();
+      });
       bank.addEventListener('input', () => { node.bank = bank.value; valueChange(); });
       info.addEventListener('input', () => { node.info = info.value; valueChange(); });
-      detail.append(bank, info, el('span'));
+
+      detail.append(farbe, bank, info, el('span'));
       accountHost.appendChild(detail);
     }
   }
@@ -499,7 +570,7 @@ export function createAccountsEditor({ accountHost, transferHost, store, request
   function addAccount() {
     const n = data().nodes.length;
     const node = {
-      id: uid('a'), name: 'Neues Konto', type: 'giro', bank: '', info: '', balance: 0,
+      id: uid('a'), name: 'Neues Konto', type: 'giro', bank: '', info: '', color: null, balance: 0,
       x: MARGIN + (n % 3) * (W + 118), y: MARGIN + Math.floor(n / 3) * (H_INFO + 64),
     };
     data().nodes.push(node);

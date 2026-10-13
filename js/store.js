@@ -21,6 +21,7 @@ export function createDefaultData() {
       title: 'Monatsübersicht',
       currency: 'EUR',
       height: 620,
+      anzeige: 'euro',
       nodes: [
         n('gehalt', 'Gehalt'), n('nebenjob', 'Nebeneinkünfte'), n(HUB_ID, 'Einnahmen'),
         n('wohnen', 'Wohnen'), n('miete', 'Miete'), n('strom', 'Strom'),
@@ -43,11 +44,11 @@ export function createDefaultData() {
     accounts: {
       edgeStyle: 'kurve',
       nodes: [
-        { id: 'giro', name: 'Girokonto', type: 'giro', bank: 'DKB', info: 'Gehalt & Lastschriften', balance: 2400, x: 60, y: 60 },
-        { id: 'tagesgeld', name: 'Tagesgeld', type: 'tagesgeld', bank: 'ING', info: 'Notgroschen, 3 Monatsausgaben', balance: 8500, x: 470, y: 30 },
-        { id: 'depot', name: 'ETF-Depot', type: 'depot', bank: 'Trade Republic', info: 'MSCI World, Sparplan am 1.', balance: 12400, x: 470, y: 170 },
-        { id: 'kreditkarte', name: 'Kreditkarte', type: 'kredit', bank: 'DKB', info: '', balance: -320, x: 470, y: 310 },
-        { id: 'bargeld', name: 'Bargeld', type: 'bar', bank: '', info: '', balance: 150, x: 60, y: 310 },
+        { id: 'giro', name: 'Girokonto', type: 'giro', bank: 'DKB', info: 'Gehalt & Lastschriften', color: null, balance: 2400, x: 60, y: 60 },
+        { id: 'tagesgeld', name: 'Tagesgeld', type: 'tagesgeld', bank: 'ING', info: 'Notgroschen, 3 Monatsausgaben', color: null, balance: 8500, x: 470, y: 30 },
+        { id: 'depot', name: 'ETF-Depot', type: 'depot', bank: 'Trade Republic', info: 'MSCI World, Sparplan am 1.', color: null, balance: 12400, x: 470, y: 170 },
+        { id: 'kreditkarte', name: 'Kreditkarte', type: 'kredit', bank: 'DKB', info: '', color: null, balance: -320, x: 470, y: 310 },
+        { id: 'bargeld', name: 'Bargeld', type: 'bar', bank: '', info: '', color: null, balance: 150, x: 60, y: 310 },
       ],
       transfers: [
         { id: uid('t'), from: 'giro', to: 'tagesgeld', amount: 100, label: 'Notgroschen', interval: 'monatlich' },
@@ -103,6 +104,7 @@ export function migrate(raw) {
     type: ['giro', 'tagesgeld', 'depot', 'bar', 'kredit'].includes(x.type) ? x.type : 'giro',
     bank: String(x.bank ?? ''),
     info: String(x.info ?? ''),
+    color: typeof x.color === 'string' ? x.color : null,
     balance: Number(x.balance) || 0,
     x: Number.isFinite(Number(x.x)) ? Number(x.x) : 60 + (i % 3) * 320,
     y: Number.isFinite(Number(x.y)) ? Number(x.y) : 60 + Math.floor(i / 3) * 140,
@@ -116,6 +118,8 @@ export function migrate(raw) {
     amount: Number(x.amount) || 0,
     label: String(x.label ?? ''),
     interval: ['monatlich', 'jaehrlich', 'einmalig'].includes(x.interval) ? x.interval : 'monatlich',
+    labelDx: Number(x.labelDx) || 0,
+    labelDy: Number(x.labelDy) || 0,
   })) : [];
 
   return {
@@ -124,6 +128,7 @@ export function migrate(raw) {
       title: String(s.title ?? base.sankey.title),
       currency: String(s.currency ?? 'EUR'),
       height: Math.min(1400, Math.max(420, Number(s.height) || base.sankey.height)),
+      anzeige: ['euro', 'prozent', 'beide'].includes(s.anzeige) ? s.anzeige : 'euro',
       nodes,
       flows,
     },

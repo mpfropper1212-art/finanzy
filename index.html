@@ -122,8 +122,13 @@
       <div class="chart-head">
         <input id="sankey-title" class="title-input" type="text" placeholder="Titel, z. B. Oktober 2026">
         <div class="chart-head-right">
+          <div class="seg seg-klein" id="sankey-anzeige" role="group" aria-label="Werte anzeigen als">
+            <button type="button" class="seg-btn is-active" data-anzeige="euro">&euro;</button>
+            <button type="button" class="seg-btn" data-anzeige="prozent">%</button>
+            <button type="button" class="seg-btn" data-anzeige="beide">beides</button>
+          </div>
           <label class="mini-field">
-            <span>Höhe</span>
+            <span>H&ouml;he</span>
             <input id="sankey-height" type="range" min="420" max="1400" step="20">
           </label>
         </div>

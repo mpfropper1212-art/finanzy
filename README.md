@@ -37,11 +37,17 @@ Pages liefert über HTTPS aus, was Supabase für die Anmeldung voraussetzt.
 
 Stimmen die Unterposten nicht mit ihrer Kategorie überein, steht der Rest direkt darunter (*„120 € noch nicht aufgeteilt“*). Unter dem Diagramm erscheinen dieselben Hinweise für den gesamten Fluss, etwa *„Einnahmen: 2.800 € rein, 2.600 € raus → 200 € nicht zugeordnet“*. Beides sind Warnungen, keine Sperren – unvollständige Zwischenstände sind erlaubt.
 
+Über dem Diagramm schaltet **€ / % / beides** um, wie die Zahlen an den Posten stehen. Bezugsgröße für die Prozente ist die Summe aller Einnahmequellen – der Einnahmen-Knoten ist also immer 100 %.
+
 Farben vergibt die App automatisch: der Einnahmen-Knoten bleibt neutral, jede Ausgabenkategorie bekommt eine eigene Farbe und ihre Unterposten einen helleren Ton davon. Jede Farbe lässt sich unter „Farben“ überschreiben und mit „auto“ wieder freigeben.
 
 **Konten.** Konten lassen sich mit der Maus frei anordnen; die Positionen werden mitgespeichert. Neben Name, Art und Kontostand gibt es optional eine **Bank** (erscheint in der Kopfzeile des Knotens, z. B. `GIROKONTO · DKB`) und eine **Info** für eine kurze Notiz wie „Gehalt & Lastschriften“ – Konten ohne Notiz bleiben kompakt. Der vollständige Text steht im Tooltip, falls er auf dem Knoten gekürzt wird.
 
+Die **Farbe** eines Kontos steht im Farbfeld links neben Bank und Info. Ohne eigene Wahl richtet sie sich nach der Kontoart; ein Doppelklick auf das Feld gibt sie wieder frei.
+
 Für eine Umbuchung auf **Verbinden** klicken, dann Quell- und Zielkonto anklicken und rechts den Betrag eintragen. Kredite werden mit negativem Stand erfasst und gehen so korrekt ins Nettovermögen ein.
+
+Die **Beschriftung einer Umbuchung lässt sich frei verschieben**, wenn sie auf einer Linie liegt oder eine andere überdeckt. Weiter entfernte Beschriftungen bekommen eine gestrichelte Linie zu ihrem Pfeil. „Anordnen“ setzt Konten und Beschriftungen wieder auf die Standardpositionen.
 
 **Immobilien.** Oben die angelegten Objekte als Reiter, daneben *+ Immobilie*, *Duplizieren* und *Löschen* – Duplizieren eignet sich, um zwei Finanzierungsvarianten desselben Objekts zu vergleichen. Rechts die Eingaben in fünf Blöcken (Objekt, Kaufpreis und Nebenkosten, Finanzierung, Miete und Bewirtschaftung, Steuer).
 

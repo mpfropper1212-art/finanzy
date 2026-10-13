@@ -189,6 +189,7 @@ function enterApp(data) {
 
   $('#sankey-title').value = data.sankey.title;
   $('#sankey-height').value = data.sankey.height;
+  markiereAnzeige();
 
   flowEditor.renderAll();
   accountsEditor.renderAll();
@@ -276,6 +277,7 @@ $('#migrate-dismiss').addEventListener('click', () => {
 function rebuildAll() {
   $('#sankey-title').value = store.data.sankey.title;
   $('#sankey-height').value = store.data.sankey.height;
+  markiereAnzeige();
   flowEditor.renderAll();
   accountsEditor.renderAll();
   immoView.renderAll();
@@ -357,6 +359,21 @@ $('#sankey-title').addEventListener('input', ev => {
   store.data.sankey.title = ev.target.value;
   store.commit({ silent: true });
 });
+
+$('#sankey-anzeige').addEventListener('click', ev => {
+  const wahl = ev.target.dataset?.anzeige;
+  if (!wahl || !store.data) return;
+  store.data.sankey.anzeige = wahl;
+  store.commit({ silent: true });
+  markiereAnzeige();
+  refreshFlowChart();
+});
+
+function markiereAnzeige() {
+  for (const btn of document.querySelectorAll('#sankey-anzeige .seg-btn')) {
+    btn.classList.toggle('is-active', btn.dataset.anzeige === store.data?.sankey.anzeige);
+  }
+}
 
 $('#sankey-height').addEventListener('input', ev => {
   if (!store.data) return;
