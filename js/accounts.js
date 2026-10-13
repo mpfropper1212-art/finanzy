@@ -91,6 +91,17 @@ export function createAccountsView({ host, store, requestEditor }) {
   let connectFrom = null;
   let drag = null;
 
+  // Zoom: die Zeichenfläche behält ihre Koordinaten (viewBox), nur die
+  // dargestellte Größe wächst. Dadurch bleiben alle gespeicherten x/y-Werte
+  // gültig und der Container scrollt wie vorher.
+  const ZOOM_MIN = 0.35;
+  const ZOOM_MAX = 2.6;
+  let zoom = 1;
+  let inhalt = { w: 520, h: 420 };
+  let pinch = null;
+  const zeiger = new Map();
+  let onZoom = null;
+
   function ensureRoot() {
     if (root) return;
     root = svg('svg', {
@@ -111,18 +122,98 @@ export function createAccountsView({ host, store, requestEditor }) {
     root.append(defs, layerLinks, layerNodes);
     host.appendChild(root);
 
+    host.addEventListener('wheel', onWheel, { passive: false });
     root.addEventListener('pointerdown', onPointerDown);
     root.addEventListener('pointermove', onPointerMove);
     root.addEventListener('pointerup', onPointerUp);
     root.addEventListener('pointercancel', onPointerUp);
   }
 
+  // Über die Matrix der SVG rechnen statt über Rechtecke und Scrollwerte -
+  // das stimmt auch bei jedem Zoomfaktor.
   function canvasPoint(ev) {
-    const r = root.getBoundingClientRect();
-    return { x: ev.clientX - r.left + host.scrollLeft, y: ev.clientY - r.top + host.scrollTop };
+    const m = root.getScreenCTM();
+    if (!m) return { x: 0, y: 0 };
+    const p = root.createSVGPoint();
+    p.x = ev.clientX;
+    p.y = ev.clientY;
+    const q = p.matrixTransform(m.inverse());
+    return { x: q.x, y: q.y };
   }
 
+  /* ------------------------------ Zoom ------------------------------ */
+
+  // Wird der Finger zwischen zwei Ereignissen abgehoben, gibt es den Zeiger
+  // nicht mehr und das Fangen wirft. Das darf den Rest nicht abbrechen.
+  function fassePointer(id) {
+    try { root.setPointerCapture(id); } catch { /* Zeiger schon weg */ }
+  }
+
+  const begrenze = z => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
+
+  // Beim Zoomen soll der Punkt unter Finger oder Mauszeiger stehen bleiben,
+  // sonst rutscht einem das Bild unter der Hand weg.
+  function setzeZoom(neu, ankerClientX, ankerClientY) {
+    const vorher = zoom;
+    const z = begrenze(neu);
+    if (Math.abs(z - vorher) < 0.0005) return;
+
+    const r = host.getBoundingClientRect();
+    const ax = ankerClientX ?? r.left + host.clientWidth / 2;
+    const ay = ankerClientY ?? r.top + host.clientHeight / 2;
+    // Punkt unter dem Anker in Inhaltskoordinaten, vor dem Zoom.
+    const cx = (host.scrollLeft + ax - r.left) / vorher;
+    const cy = (host.scrollTop + ay - r.top) / vorher;
+
+    zoom = z;
+    groesseSetzen();
+    host.scrollLeft = cx * zoom - (ax - r.left);
+    host.scrollTop = cy * zoom - (ay - r.top);
+    onZoom?.(zoom);
+  }
+
+  function groesseSetzen() {
+    root.setAttribute('width', Math.round(inhalt.w * zoom));
+    root.setAttribute('height', Math.round(inhalt.h * zoom));
+    root.setAttribute('viewBox', `0 0 ${inhalt.w} ${inhalt.h}`);
+  }
+
+  // So weit herauszoomen, dass alles ins Fenster passt - aber nie vergrößern.
+  function passend() {
+    const platz = host.clientWidth - 4;
+    setzeZoom(Math.min(1, platz / inhalt.w));
+    host.scrollLeft = 0;
+    host.scrollTop = 0;
+  }
+
+  function onWheel(ev) {
+    // Nur mit Strg bzw. cmd zoomen, sonst bleibt normales Scrollen kaputt.
+    // Pinch auf dem Trackpad meldet sich beim Browser ebenfalls so.
+    if (!ev.ctrlKey && !ev.metaKey) return;
+    ev.preventDefault();
+    setzeZoom(zoom * (ev.deltaY < 0 ? 1.12 : 1 / 1.12), ev.clientX, ev.clientY);
+  }
+
+  const abstand = ([a, b]) => Math.hypot(a.x - b.x, a.y - b.y);
+  const mitte = ([a, b]) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+
   function onPointerDown(ev) {
+    zeiger.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+
+    // Zwei Finger heißt immer Zoomen, auch wenn der erste auf einem Konto
+    // gelandet ist - sonst zerrt man beim Aufziehen das Konto mit.
+    if (zeiger.size === 2) {
+      const punkte = [...zeiger.values()];
+      pinch = { startAbstand: abstand(punkte) || 1, startZoom: zoom };
+      if (drag) {
+        drag = null;
+        draw();
+      }
+      ev.preventDefault();
+      return;
+    }
+    if (zeiger.size > 2) return;
+
     const label = ev.target.closest('[data-transfer-label]');
     if (label && !connectMode) {
       const t = data().transfers.find(x => x.id === label.dataset.transferLabel);
@@ -133,14 +224,26 @@ export function createAccountsView({ host, store, requestEditor }) {
           startX: p.x, startY: p.y,
           startDx: Number(t.labelDx) || 0, startDy: Number(t.labelDy) || 0,
         };
-        root.setPointerCapture(ev.pointerId);
+        fassePointer(ev.pointerId);
         ev.preventDefault();
         return;
       }
     }
 
     const g = ev.target.closest('[data-account]');
-    if (!g) return;
+    // Auf dem leeren Hintergrund wird die Zeichenfläche verschoben. Auf dem
+    // Handy gibt es keinen Scrollbalken, also muss das Ziehen das erledigen.
+    if (!g) {
+      if (connectMode) return;
+      drag = {
+        typ: 'schieben', moved: false,
+        clientX: ev.clientX, clientY: ev.clientY,
+        scrollLeft: host.scrollLeft, scrollTop: host.scrollTop,
+      };
+      fassePointer(ev.pointerId);
+      ev.preventDefault();
+      return;
+    }
     const node = data().nodes.find(n => n.id === g.dataset.account);
     if (!node) return;
 
@@ -153,12 +256,29 @@ export function createAccountsView({ host, store, requestEditor }) {
     }
     const p = canvasPoint(ev);
     drag = { typ: 'konto', id: node.id, dx: p.x - node.x, dy: p.y - node.y, moved: false };
-    root.setPointerCapture(ev.pointerId);
+    fassePointer(ev.pointerId);
     ev.preventDefault();
   }
 
   function onPointerMove(ev) {
+    if (zeiger.has(ev.pointerId)) zeiger.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+
+    if (pinch && zeiger.size >= 2) {
+      const punkte = [...zeiger.values()].slice(0, 2);
+      const m = mitte(punkte);
+      setzeZoom(pinch.startZoom * (abstand(punkte) / pinch.startAbstand), m.x, m.y);
+      ev.preventDefault();
+      return;
+    }
+
     if (!drag) return;
+
+    if (drag.typ === 'schieben') {
+      host.scrollLeft = drag.scrollLeft - (ev.clientX - drag.clientX);
+      host.scrollTop = drag.scrollTop - (ev.clientY - drag.clientY);
+      drag.moved = true;
+      return;
+    }
 
     if (drag.typ === 'label') {
       const t = data().transfers.find(x => x.id === drag.id);
@@ -184,9 +304,13 @@ export function createAccountsView({ host, store, requestEditor }) {
   }
 
   function onPointerUp(ev) {
+    zeiger.delete(ev.pointerId);
+    if (zeiger.size < 2) pinch = null;
+
     if (!drag) return;
     if (root.hasPointerCapture(ev.pointerId)) root.releasePointerCapture(ev.pointerId);
-    if (drag.moved) store.commit({ silent: true });
+    // Schieben verändert keine Daten, da gibt es nichts zu speichern.
+    if (drag.moved && drag.typ !== 'schieben') store.commit({ silent: true });
     drag = null;
   }
 
@@ -243,11 +367,10 @@ export function createAccountsView({ host, store, requestEditor }) {
 
     const nodes = data().nodes;
     const byId = new Map(nodes.map(n => [n.id, n]));
-    const width = Math.max(host.clientWidth - 2, ...nodes.map(n => n.x + W + MARGIN), 520);
+    const width = Math.max((host.clientWidth - 2) / zoom, ...nodes.map(n => n.x + W + MARGIN), 520);
     const height = Math.max(420, ...nodes.map(n => n.y + heightOf(n) + MARGIN));
-    root.setAttribute('width', width);
-    root.setAttribute('height', height);
-    root.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    inhalt = { w: width, h: height };
+    groesseSetzen();
 
     if (!nodes.length) {
       layerNodes.appendChild(svg('text', {
@@ -409,6 +532,11 @@ export function createAccountsView({ host, store, requestEditor }) {
     draw, toggleConnectMode, setConnectMode, tidy, renderNotes, toggleEdgeStyle,
     edgeStyle: () => data().edgeStyle,
     isConnecting: () => connectMode,
+    zoomBy: f => setzeZoom(zoom * f),
+    zoomPassend: passend,
+    zoomZuruecksetzen: () => setzeZoom(1),
+    zoomWert: () => zoom,
+    aufZoom: fn => { onZoom = fn; },
   };
 }
 

@@ -1149,6 +1149,11 @@ button, input, select { font: inherit; color: inherit; }
 
 /* ---------- Handy ---------- */
 @media (max-width: 760px) {
+  /* Die Knopfzeile über der Zeichenfläche darf umbrechen, sonst schiebt die
+     Zoomleiste die anderen Knöpfe aus dem Bild. */
+  .chart-head-right { flex-wrap: wrap; gap: 6px; }
+  .zoomleiste { gap: 0; }
+
   /* Reiter in eine eigene, seitlich scrollbare Zeile - sonst sind die
      hinteren Bereiche schlicht nicht erreichbar. */
   .topbar { padding: 8px 10px; gap: 8px; }
@@ -1215,3 +1220,14 @@ button, input, select { font: inherit; color: inherit; }
 /* Auf dem Touchscreen darf das Ziehen von Konten und Beschriftungen nicht
    die Seite mitscrollen. */
 .acct-node, .acct-label { touch-action: none; }
+
+/* Alle Finger-Gesten werden selbst ausgewertet: ein Finger schiebt, zwei
+   zoomen. Ohne das zoomt der Browser stattdessen die ganze Seite. */
+.acct-canvas { touch-action: none; cursor: grab; }
+.acct-canvas:active { cursor: grabbing; }
+.acct-canvas .acct-node, .acct-canvas .acct-label { cursor: move; }
+
+.zoomleiste { display: inline-flex; gap: 2px; align-items: center; }
+.zoomleiste #btn-zoom-wert {
+  min-width: 56px; font-variant-numeric: tabular-nums;
+}

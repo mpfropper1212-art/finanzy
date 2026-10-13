@@ -164,6 +164,8 @@ function enterApp(data) {
       refreshAccounts();
     },
   });
+  // Beim Pinchen soll die Prozentzahl mitlaufen.
+  accountsView.aufZoom(zeigeZoom);
 
   immoView = createImmobilienView({
     listHost: $('#immo-list'),
@@ -448,6 +450,7 @@ function refreshAccounts() {
   if (!store.data || !accountsView) return;
   accountsView.draw();
   accountsView.renderNotes($('#accounts-notes'));
+  zeigeZoom(accountsView.zoomWert());
   $('#btn-edge-style').textContent =
     accountsView.edgeStyle() === 'knick' ? 'Pfeile: abgeknickt' : 'Pfeile: gebogen';
   $('#stat-networth').textContent = money(netWorth(store.data.accounts));
@@ -456,6 +459,16 @@ function refreshAccounts() {
 
 $('#btn-add-account').addEventListener('click', () => accountsEditor?.addAccount());
 $('#btn-add-transfer').addEventListener('click', () => accountsEditor?.addTransfer());
+// Der Zoomwert steht auf dem Knopf, der ihn zurücksetzt.
+function zeigeZoom(z) {
+  $('#btn-zoom-wert').textContent = `${Math.round(z * 100)} %`;
+}
+
+$('#btn-zoom-rein').addEventListener('click', () => accountsView?.zoomBy(1.2));
+$('#btn-zoom-raus').addEventListener('click', () => accountsView?.zoomBy(1 / 1.2));
+$('#btn-zoom-wert').addEventListener('click', () => accountsView?.zoomZuruecksetzen());
+$('#btn-zoom-passend').addEventListener('click', () => accountsView?.zoomPassend());
+
 $('#btn-connect').addEventListener('click', () => {
   accountsView?.toggleConnectMode();
   refreshAccounts();
