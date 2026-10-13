@@ -1,6 +1,6 @@
 # Finanzy
 
-Sieben Werkzeuge rund um den eigenen Alltag, als statische Web-App ohne Build-Schritt und ohne Abhängigkeiten. Eine Startseite führt in die Bereiche und zeigt je eine Kennzahl:
+Acht Werkzeuge rund um den eigenen Alltag, als statische Web-App ohne Build-Schritt und ohne Abhängigkeiten. Eine Startseite führt in die Bereiche und zeigt je eine Kennzahl:
 
 - **Geldfluss** – ein Sankey-Diagramm im Finanzfluss-Stil: alle Einnahmequellen laufen in einen Einnahmen-Knoten und von dort in Ausgabenkategorien und deren Unterposten.
 - **Konten** – das eigene Kontomodell: Konten als frei verschiebbare Knoten mit Kontostand, Bank und Notiz, verbunden durch Pfeile mit Beträgen.
@@ -8,6 +8,7 @@ Sieben Werkzeuge rund um den eigenen Alltag, als statische Web-App ohne Build-Sc
 - **Gerichte** – eine Sammlung günstiger, eiweißreicher Gerichte mit Nährwerten, Preis je Portion, Kochzeit sowie Skalen für Kochaufwand und Abwasch. Gerichte lassen sich merken und selbst anlegen; selbst angelegte sind für alle Nutzer sichtbar.
 - **Wochenplan** – Essen für die Woche einteilen; die Einkaufsliste entsteht daraus, mit zusammengerechneten Mengen je Portionenzahl.
 - **Schulden** – wer dir was schuldet und was du schuldest, erfasst über einen ganzen Satz statt über ein Formular.
+- **Gruppenkasse** – gemeinsame Ausgaben einer Reise oder WG, mit Ausgleichsrechnung am Ende.
 - **Tanken** – eine Tanktabelle: je Füllung Datum, Liter, Preis und Tachostand; Verbrauch, Preis je Liter und Kosten je Kilometer ergeben sich daraus.
 
 Alles wird direkt in der Oberfläche eingetippt. Hinter einem Login mit E-Mail und Passwort liegen die Daten in einem eigenen Konto, sodass auf jedem Gerät dieselben Zahlen stehen.
@@ -80,6 +81,12 @@ Aus einem **Screenshot** geht es über den Umweg des Telefons: auf dem iPhone la
 Dahinter steckt **kein Sprachmodell, sondern ein Regelwerk** (`js/schulden-text.js`). Ein Modell bräuchte einen Schlüssel im Browser, der in einem öffentlichen Repo für jeden lesbar wäre; für den engen Satzbau reichen Regeln, und sie laufen ohne Netz, ohne Kosten und ohne dass ein Satz das Gerät verlässt. Erkannt werden unter anderem „schuldet mir", „ich schulde", „hat mir geliehen", „für X bezahlt", „gestern" sowie Beträge mit Komma und Tausenderpunkt.
 
 Fehlt etwas, sagt die Vorschau welches Feld. Ist die Richtung nur geraten, wird das dazugeschrieben und lässt sich in der Liste mit einem Klick umdrehen. Posten werden nach Person gruppiert, erledigte wandern in einen eigenen Abschnitt statt gelöscht zu werden.
+
+**Gruppenkasse.** Für eine Reise oder WG: Personen anlegen, Ausgaben eintragen mit *wer hat gezahlt* und *wer war beteiligt*. Geteilt wird zu gleichen Teilen unter den Beteiligten – wer beim Abendessen nicht dabei war, wird abgewählt und zahlt nichts mit.
+
+Daraus ergibt sich je Person, was sie gezahlt hat und was ihr Anteil war. Der **Ausgleich** rechnet daraus die wenigsten nötigen Zahlungen aus: Er stellt immer den größten Schuldner dem größten Gläubiger gegenüber, wodurch bei drei Personen zwei Überweisungen genügen statt sechs.
+
+Eine Person ist als „ich" markiert; die Kopfzeile sagt dann direkt, ob du am Ende Geld bekommst oder zahlen musst.
 
 **Tanken.** Pro Tankfüllung werden nur vier Dinge eingetragen: Datum, getankte Liter, bezahlter Betrag und Tachostand. Die gefahrenen Kilometer sind die Differenz zum vorherigen Tachostand, daraus folgen Verbrauch (l/100 km), Preis je Liter und Kosten je Kilometer. Sortiert wird nach Tachostand, nicht nach Datum – so stimmt die Reihenfolge auch, wenn eine Quittung später nachgetragen wird.
 

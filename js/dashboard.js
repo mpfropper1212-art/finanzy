@@ -8,6 +8,7 @@ import { berechne } from './immobilien.js';
 import { auswerten } from './tanken.js';
 import { SEED_GERICHTE } from './gerichte-daten.js';
 import { auswerten as schuldenAuswerten } from './schulden.js';
+import { salden, ausgleich } from './gruppen.js';
 import { HUB_ID } from './store.js';
 import { renderNachrichten } from './nachrichten.js';
 
@@ -57,6 +58,17 @@ function kennzahlen(data) {
       wert: plan.length ? `${plan.length} Mahlzeiten` : 'leer',
       zusatz: plan.length ? `${portionen} Portionen · ${money(Math.round(kosten))}` : 'nichts geplant',
     },
+    gruppen: (() => {
+      const g = data.gruppen.items.find(x => x.id === data.gruppen.activeId) ?? data.gruppen.items[0];
+      if (!g) return { wert: '–', zusatz: 'keine Gruppe angelegt' };
+      const liste = salden(g);
+      const ich = liste.find(p => p.id === g.ichId);
+      const gesamt = g.ausgaben.reduce((s, a) => s + (Number(a.betrag) || 0), 0);
+      return {
+        wert: ich ? money(Math.round(ich.saldo * 100) / 100) : money(Math.round(gesamt * 100) / 100),
+        zusatz: `${g.name} · ${money(Math.round(gesamt))} · ${ausgleich(liste).length} Zahlungen offen`,
+      };
+    })(),
     schulden: {
       wert: money(Math.round(sch.saldo * 100) / 100),
       zusatz: sch.offen.length
@@ -79,6 +91,7 @@ const BEREICHE = [
   { tab: 'gerichte', symbol: 'gerichte', titel: 'Gerichte', text: 'Günstig und eiweißreich kochen, mit Preis und Aufwand je Portion.', kennzahl: 'gerichte' },
   { tab: 'woche', symbol: 'woche', titel: 'Wochenplan', text: 'Essen für die Woche planen – die Einkaufsliste entsteht daraus.', kennzahl: 'woche' },
   { tab: 'schulden', symbol: 'schulden', titel: 'Schulden', text: 'Wer dir was schuldet und was du schuldest – per Satz erfasst.', kennzahl: 'schulden' },
+  { tab: 'gruppen', symbol: 'gruppen', titel: 'Gruppenkasse', text: 'Gemeinsame Ausgaben einer Reise – und wer am Ende wem was zahlt.', kennzahl: 'gruppen' },
   { tab: 'tanken', symbol: 'tanken', titel: 'Tanken', text: 'Verbrauch und Spritkosten über alle Tankfüllungen.', kennzahl: 'tanken' },
 ];
 

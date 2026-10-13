@@ -87,6 +87,7 @@
         <button class="tab" data-tab="gerichte" role="tab">Gerichte</button>
         <button class="tab" data-tab="woche" role="tab">Wochenplan</button>
         <button class="tab" data-tab="schulden" role="tab">Schulden</button>
+        <button class="tab" data-tab="gruppen" role="tab">Gruppenkasse</button>
         <button class="tab" data-tab="tanken" role="tab">Tanken</button>
       </nav>
     </div>
@@ -256,6 +257,15 @@
       <div id="schuld-eingabe" class="schuld-eingabe"></div>
       <div id="schuld-liste" class="schuld-liste"></div>
     </div>
+  </main>
+
+  <!-- ---- Gruppenkasse ---- -->
+  <main id="panel-gruppen" class="panel" hidden>
+    <div class="chart-wrap">
+      <div id="gruppen-kopf" class="immo-result"></div>
+      <div id="gruppen-liste" class="gruppen-liste"></div>
+    </div>
+    <aside class="editor" id="gruppen-seite"></aside>
   </main>
 
   <!-- ---- Tanken ---- -->

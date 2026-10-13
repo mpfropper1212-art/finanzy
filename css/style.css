@@ -459,12 +459,69 @@ button, input, select { font: inherit; color: inherit; }
 .dash-gerichte { background: color-mix(in srgb, #16a34a 14%, transparent); color: #16a34a; }
 .dash-schulden { background: color-mix(in srgb, #db2777 14%, transparent); color: #db2777; }
 .dash-woche { background: color-mix(in srgb, #0891b2 14%, transparent); color: #0891b2; }
+.dash-gruppen { background: color-mix(in srgb, #7c3aed 14%, transparent); color: #7c3aed; }
 .dash-tanken { background: color-mix(in srgb, #d97706 14%, transparent); color: #d97706; }
 
 .dash-karte-text { margin: 0; font-size: 13px; color: var(--text-soft); line-height: 1.5; }
 .dash-wert { display: grid; gap: 1px; margin-top: 2px; }
 .dash-wert strong { font-size: 19px; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
 .dash-wert span { font-size: 12px; color: var(--text-faint); }
+
+/* ---------- Gruppenkasse ---------- */
+.gruppen-leiste { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 12px; }
+.gruppen-leiste .btn { margin-left: auto; }
+
+.gruppe-zahlen { display: flex; flex-wrap: wrap; gap: 28px; margin: 10px 0 18px; }
+.gruppe-posten { display: grid; gap: 1px; }
+.gruppe-posten strong { font-size: 22px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.gruppe-posten.ist-plus strong { color: #16a34a; }
+.gruppe-posten.ist-minus strong { color: var(--danger); }
+
+.salden { display: grid; gap: 2px; }
+.saldo-zeile {
+  display: grid;
+  grid-template-columns: 130px 1fr 150px 92px;
+  gap: 12px; align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.saldo-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.saldo-detail { color: var(--text-faint); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.saldo-balken {
+  position: relative; height: 8px; border-radius: 999px;
+  background: var(--surface-2); border: 1px solid var(--border);
+}
+.saldo-balken::after {
+  content: ''; position: absolute; left: 50%; top: -3px; bottom: -3px;
+  border-left: 1px solid var(--border-strong);
+}
+.saldo-fuellung { position: absolute; top: 0; bottom: 0; border-radius: 999px; }
+.saldo-fuellung.ist-plus { background: #16a34a; }
+.saldo-fuellung.ist-minus { background: var(--danger); }
+.saldo-wert { text-align: right; font-variant-numeric: tabular-nums; }
+
+.ausgleich {
+  margin-top: 18px; padding: 14px 15px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.ausgleich h3 {
+  margin: 0 0 8px;
+  font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--text-faint); font-weight: 600;
+}
+.ausgleich-zeile {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 6px 0; border-bottom: 1px solid var(--border);
+  font-size: 14.5px;
+}
+.ausgleich-zeile:last-of-type { border-bottom: 0; }
+.ausgleich-zeile strong { margin-left: auto; font-variant-numeric: tabular-nums; }
+.ausgleich-pfeil { color: var(--text-faint); }
+
+.gruppen-liste { padding: 0 16px 18px; }
 
 /* ---------- Wochenplan ---------- */
 .woche-plan { padding: 14px 16px 18px; }
@@ -1081,6 +1138,9 @@ button, input, select { font: inherit; color: inherit; }
   .news-zeile { flex-direction: column; gap: 2px; }
   .news-meta { white-space: normal; }
   .woche-gitter { grid-template-columns: minmax(0, 1fr); }
+  .saldo-zeile { grid-template-columns: 1fr 92px; row-gap: 3px; }
+  .saldo-detail { grid-column: 1 / -1; }
+  .saldo-balken { grid-column: 1 / -1; }
   .einkauf-zeile { grid-template-columns: 20px 68px 1fr; }
   .satz-zeile { flex-wrap: wrap; }
   .satz-feld { flex: 1 1 100%; }

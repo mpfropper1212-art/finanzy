@@ -11,6 +11,7 @@ import { createGerichteView } from './gerichte.js';
 import { createTankenView } from './tanken.js';
 import { createSchuldenView } from './schulden.js';
 import { createWochenplanView } from './wochenplan.js';
+import { createGruppenView } from './gruppen.js';
 import { createDashboard } from './dashboard.js';
 import { wortmarke, faviconDataUri, symbolSvg } from './logo.js';
 import * as theme from './theme.js';
@@ -28,6 +29,7 @@ let gerichteView = null;
 let tankenView = null;
 let schuldenView = null;
 let wochenView = null;
+let gruppenView = null;
 let dashboard = null;
 let activeTab = 'start';
 let mode = 'login';
@@ -199,6 +201,13 @@ function enterApp(data) {
     alleGerichte: () => gerichteView.alleGerichte(),
   });
 
+  gruppenView = createGruppenView({
+    kopfHost: $('#gruppen-kopf'),
+    listeHost: $('#gruppen-liste'),
+    seiteHost: $('#gruppen-seite'),
+    store,
+  });
+
   schuldenView = createSchuldenView({
     kopfHost: $('#schuld-kopf'),
     eingabeHost: $('#schuld-eingabe'),
@@ -225,7 +234,7 @@ function enterApp(data) {
 function leaveApp() {
   store.detach();
   cloud.signOut();
-  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = schuldenView = wochenView = dashboard = null;
+  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = schuldenView = wochenView = gruppenView = dashboard = null;
   $('#app-view').hidden = true;
   $('#login-view').hidden = false;
   $('#accounts-host').replaceChildren();
@@ -310,6 +319,7 @@ function rebuildAll() {
   tankenView.renderAll();
   schuldenView.renderAll();
   wochenView.renderAll();
+  gruppenView.renderAll();
   dashboard.renderAll();
   refreshFlowChart();
   refreshAccounts();
@@ -327,6 +337,7 @@ function setTab(tab) {
   $('#panel-tanken').hidden = tab !== 'tanken';
   $('#panel-schulden').hidden = tab !== 'schulden';
   $('#panel-woche').hidden = tab !== 'woche';
+  $('#panel-gruppen').hidden = tab !== 'gruppen';
   $('#panel-start').hidden = tab !== 'start';
   if (tab === 'flow') refreshFlowChart();
   else if (tab === 'accounts') refreshAccounts();
@@ -335,6 +346,7 @@ function setTab(tab) {
   else if (tab === 'tanken') tankenView?.renderAll();
   else if (tab === 'schulden') schuldenView?.renderAll();
   else if (tab === 'woche') wochenView?.renderAll();
+  else if (tab === 'gruppen') gruppenView?.renderAll();
   else dashboard?.renderAll();
 }
 

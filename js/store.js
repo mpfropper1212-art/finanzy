@@ -59,6 +59,7 @@ export function createDefaultData() {
     immobilien: createImmobilienTeil(),
     gerichte: { favoriten: [] },
     schulden: { eintraege: [] },
+    gruppen: { items: [], activeId: null },
     wochenplan: { start: montagVon(new Date()), eintraege: [], abgehakt: [] },
     tanken: { eintraege: [], zeitraum: 'alle', eigen: { monate: 1, von: '', bis: '' }, ausgeschlosseneTags: [], fixkosten: { versicherung: 0, steuer: 0, wartung: 0, sonstiges: 0 } },
   };
@@ -154,6 +155,7 @@ export function migrate(raw) {
         : [],
     },
     schulden: { eintraege: migrateSchulden(raw.schulden?.eintraege) },
+    gruppen: migrateGruppen(raw.gruppen),
     wochenplan: {
       start: typeof raw.wochenplan?.start === 'string' ? raw.wochenplan.start : montagVon(new Date()),
       eintraege: Array.isArray(raw.wochenplan?.eintraege)
@@ -188,6 +190,32 @@ export function migrate(raw) {
       },
     },
   };
+}
+
+function migrateGruppen(roh) {
+  const items = Array.isArray(roh?.items) ? roh.items.filter(x => x && x.id).map(x => {
+    const personen = Array.isArray(x.personen)
+      ? x.personen.filter(p => p && p.id).map(p => ({ id: String(p.id), name: String(p.name ?? '') }))
+      : [];
+    const bekannt = new Set(personen.map(p => p.id));
+    return {
+      id: String(x.id),
+      name: String(x.name ?? 'Gruppe'),
+      ichId: bekannt.has(x.ichId) ? x.ichId : (personen[0]?.id ?? null),
+      personen,
+      ausgaben: Array.isArray(x.ausgaben) ? x.ausgaben.filter(a => a && a.id).map(a => ({
+        id: String(a.id),
+        titel: String(a.titel ?? ''),
+        betrag: Number(a.betrag) || 0,
+        zahlerId: bekannt.has(a.zahlerId) ? a.zahlerId : (personen[0]?.id ?? ''),
+        beteiligte: Array.isArray(a.beteiligte) ? a.beteiligte.filter(id => bekannt.has(id)) : [],
+        datum: typeof a.datum === 'string' ? a.datum : '',
+      })) : [],
+    };
+  }).filter(g => g.personen.length) : [];
+
+  const activeId = items.some(g => g.id === roh?.activeId) ? roh.activeId : (items[0]?.id ?? null);
+  return { items, activeId };
 }
 
 function migrateSchulden(roh) {
