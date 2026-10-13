@@ -1,11 +1,12 @@
 # Finanzy
 
-Sechs Werkzeuge rund um den eigenen Alltag, als statische Web-App ohne Build-Schritt und ohne Abhängigkeiten. Eine Startseite führt in die Bereiche und zeigt je eine Kennzahl:
+Sieben Werkzeuge rund um den eigenen Alltag, als statische Web-App ohne Build-Schritt und ohne Abhängigkeiten. Eine Startseite führt in die Bereiche und zeigt je eine Kennzahl:
 
 - **Geldfluss** – ein Sankey-Diagramm im Finanzfluss-Stil: alle Einnahmequellen laufen in einen Einnahmen-Knoten und von dort in Ausgabenkategorien und deren Unterposten.
 - **Konten** – das eigene Kontomodell: Konten als frei verschiebbare Knoten mit Kontostand, Bank und Notiz, verbunden durch Pfeile mit Beträgen.
 - **Immobilien** – ein Renditerechner für Kapitalanlagen: Kaufnebenkosten, Annuitätendarlehen, Mietrenditen, Cashflow vor und nach Steuern. Beliebig viele Objekte nebeneinander.
 - **Gerichte** – eine Sammlung günstiger, eiweißreicher Gerichte mit Nährwerten, Preis je Portion, Kochzeit sowie Skalen für Kochaufwand und Abwasch. Gerichte lassen sich merken und selbst anlegen; selbst angelegte sind für alle Nutzer sichtbar.
+- **Wochenplan** – Essen für die Woche einteilen; die Einkaufsliste entsteht daraus, mit zusammengerechneten Mengen je Portionenzahl.
 - **Schulden** – wer dir was schuldet und was du schuldest, erfasst über einen ganzen Satz statt über ein Formular.
 - **Tanken** – eine Tanktabelle: je Füllung Datum, Liter, Preis und Tachostand; Verbrauch, Preis je Liter und Kosten je Kilometer ergeben sich daraus.
 
@@ -65,6 +66,14 @@ Das Herz merkt ein Gericht; „Nur gemerkte" blendet auf die eigene Auswahl ein.
 Die Teller-Abbildungen sind **gezeichnet, keine Fotos**: Fotos müssten gehostet und lizenziert werden, und ein beliebiges Bild wäre irreführender als gar keins. Die Anordnung leitet sich aus dem Namen ab, dasselbe Gericht sieht also immer gleich aus.
 
 Rechts lassen sich eigene Gerichte anlegen. **Diese sind für alle Nutzer der Seite sichtbar** – ein eigenes Gericht kann nur sein Urheber wieder löschen. Die Startgerichte stehen im Code (`js/gerichte-daten.js`) und lassen sich dort erweitern; nur selbst angelegte liegen in der Datenbank.
+
+**Wochenplan.** Sieben Tage mit je einem Platz für Mittag und Abend, dazu die Zahl der Portionen. Rechts entsteht daraus die **Einkaufsliste**: Mengen werden über alle Gerichte und Portionen zusammengerechnet (`250 g Magerquark` dreimal eingeplant werden zu `750 g`), alphabetisch sortiert und zum Abhaken. Zeilen ohne Zahl wie „Salz, Pfeffer" werden gezählt statt addiert.
+
+Jedes Gericht trägt zusätzlich, ob es **warm gemacht werden muss, kalt essbar ist oder beides geht**. Beim Mittagessen steht darum unter der Einkaufsliste, welche Gerichte eine Mikrowelle brauchen – ein Linsensalat geht kalt, eine Bolognese nicht. Im Gerichte-Bereich lässt sich danach filtern.
+
+**Rezept einfügen.** Im Formular unter „Rezept als Text einfügen" lässt sich ein ganzes Rezept hineinkopieren; Name, Zutaten und Schritte werden erkannt und oben eingetragen. Überschriften wie „Zutaten" und „Zubereitung" trennen die Abschnitte, nummerierte Zeilen gelten als Schritte, Zeilen mit Mengenangabe als Zutaten. Nährwerte und Preis bleiben Handarbeit.
+
+Aus einem **Screenshot** geht es über den Umweg des Telefons: auf dem iPhone lange auf den Text im Bild tippen, kopieren, einfügen. Die App selbst liest keine Bilder – dafür bräuchte sie Texterkennung samt Sprachmodell.
 
 **Schulden.** Erfasst wird über einen Satz: *„Max schuldet mir 20 Euro fürs Kino"*. Daraus liest die App Name, Betrag, Richtung, Grund und Datum und zeigt das Ergebnis zur Kontrolle an, bevor es eingetragen wird. Auf dem Handy kann der Satz diktiert werden – entweder über den Aufnahmeknopf oder über das Mikrofon der eigenen Tastatur.
 

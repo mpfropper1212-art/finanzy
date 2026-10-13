@@ -31,6 +31,11 @@ function kennzahlen(data) {
   const m = monatsrest(data);
   const sch = schuldenAuswerten(data.schulden.eintraege);
 
+  const nachId = new Map(SEED_GERICHTE.map(g => [g.id, g]));
+  const plan = data.wochenplan.eintraege.filter(e => nachId.has(e.gerichtId));
+  const portionen = plan.reduce((s, e) => s + e.portionen, 0);
+  const kosten = plan.reduce((s, e) => s + nachId.get(e.gerichtId).preis * e.portionen, 0);
+
   return {
     flow: {
       wert: money(Math.round(m.rest)),
@@ -47,6 +52,10 @@ function kennzahlen(data) {
     gerichte: {
       wert: `${data.gerichte.favoriten.length} gemerkt`,
       zusatz: `${SEED_GERICHTE.length} Gerichte in der Sammlung`,
+    },
+    woche: {
+      wert: plan.length ? `${plan.length} Mahlzeiten` : 'leer',
+      zusatz: plan.length ? `${portionen} Portionen · ${money(Math.round(kosten))}` : 'nichts geplant',
     },
     schulden: {
       wert: money(Math.round(sch.saldo * 100) / 100),
@@ -68,6 +77,7 @@ const BEREICHE = [
   { tab: 'accounts', symbol: 'konten', titel: 'Konten', text: 'Deine Konten, ihre Stände und die Umbuchungen dazwischen.', kennzahl: 'konten' },
   { tab: 'immo', symbol: 'immobilien', titel: 'Immobilien', text: 'Rendite, Finanzierung und Cashflow einer Kapitalanlage.', kennzahl: 'immobilien' },
   { tab: 'gerichte', symbol: 'gerichte', titel: 'Gerichte', text: 'Günstig und eiweißreich kochen, mit Preis und Aufwand je Portion.', kennzahl: 'gerichte' },
+  { tab: 'woche', symbol: 'woche', titel: 'Wochenplan', text: 'Essen für die Woche planen – die Einkaufsliste entsteht daraus.', kennzahl: 'woche' },
   { tab: 'schulden', symbol: 'schulden', titel: 'Schulden', text: 'Wer dir was schuldet und was du schuldest – per Satz erfasst.', kennzahl: 'schulden' },
   { tab: 'tanken', symbol: 'tanken', titel: 'Tanken', text: 'Verbrauch und Spritkosten über alle Tankfüllungen.', kennzahl: 'tanken' },
 ];

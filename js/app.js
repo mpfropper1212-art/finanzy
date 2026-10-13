@@ -10,6 +10,7 @@ import { createImmobilienView } from './immobilien.js';
 import { createGerichteView } from './gerichte.js';
 import { createTankenView } from './tanken.js';
 import { createSchuldenView } from './schulden.js';
+import { createWochenplanView } from './wochenplan.js';
 import { createDashboard } from './dashboard.js';
 import { wortmarke, faviconDataUri, symbolSvg } from './logo.js';
 import * as theme from './theme.js';
@@ -26,6 +27,7 @@ let immoView = null;
 let gerichteView = null;
 let tankenView = null;
 let schuldenView = null;
+let wochenView = null;
 let dashboard = null;
 let activeTab = 'start';
 let mode = 'login';
@@ -186,6 +188,13 @@ function enterApp(data) {
     store,
   });
 
+  wochenView = createWochenplanView({
+    planHost: $('#woche-plan'),
+    listeHost: $('#woche-liste'),
+    store,
+    alleGerichte: () => gerichteView.alleGerichte(),
+  });
+
   schuldenView = createSchuldenView({
     kopfHost: $('#schuld-kopf'),
     eingabeHost: $('#schuld-eingabe'),
@@ -212,7 +221,7 @@ function enterApp(data) {
 function leaveApp() {
   store.detach();
   cloud.signOut();
-  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = schuldenView = dashboard = null;
+  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = schuldenView = wochenView = dashboard = null;
   $('#app-view').hidden = true;
   $('#login-view').hidden = false;
   $('#accounts-host').replaceChildren();
@@ -296,6 +305,7 @@ function rebuildAll() {
   gerichteView.renderAll();
   tankenView.renderAll();
   schuldenView.renderAll();
+  wochenView.renderAll();
   dashboard.renderAll();
   refreshFlowChart();
   refreshAccounts();
@@ -312,6 +322,7 @@ function setTab(tab) {
   $('#panel-gerichte').hidden = tab !== 'gerichte';
   $('#panel-tanken').hidden = tab !== 'tanken';
   $('#panel-schulden').hidden = tab !== 'schulden';
+  $('#panel-woche').hidden = tab !== 'woche';
   $('#panel-start').hidden = tab !== 'start';
   if (tab === 'flow') refreshFlowChart();
   else if (tab === 'accounts') refreshAccounts();
@@ -319,6 +330,7 @@ function setTab(tab) {
   else if (tab === 'gerichte') gerichteView?.renderAll();
   else if (tab === 'tanken') tankenView?.renderAll();
   else if (tab === 'schulden') schuldenView?.renderAll();
+  else if (tab === 'woche') wochenView?.renderAll();
   else dashboard?.renderAll();
 }
 

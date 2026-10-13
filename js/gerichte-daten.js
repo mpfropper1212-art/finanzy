@@ -433,6 +433,30 @@ export const SEED_GERICHTE = [
       'Bei 200 °C 20 Minuten backen.']),
 ];
 
+// Was sich kalt essen lässt, taugt fürs Büro ohne Mikrowelle.
+// Alles Nichtgenannte muss warm gemacht werden.
+const KALT = new Set([
+  'seed-quark-hafer', 'seed-harzer-brot', 'seed-skyr-beeren', 'seed-couscous-kichererbsen',
+  'seed-joghurt-bowl', 'seed-linsensalat-feta', 'seed-kidneybohnen-salat',
+  'seed-wrap-huettenkaese', 'seed-kichererbsen-salat-ei', 'seed-grieß-protein',
+]);
+
+const BEIDES = new Set([
+  'seed-kartoffel-quark', 'seed-haehnchen-wrap', 'seed-bohnen-quesadilla',
+  'seed-bulgur-pfanne', 'seed-ofengemuese-feta', 'seed-eiermuffins',
+  'seed-gemueseomelett-mealprep', 'seed-protein-pancakes',
+]);
+
+for (const gericht of SEED_GERICHTE) {
+  gericht.temperatur = KALT.has(gericht.id) ? 'kalt' : BEIDES.has(gericht.id) ? 'beides' : 'warm';
+}
+
+export const TEMPERATUR_LABELS = {
+  warm: 'warm machen',
+  kalt: 'kalt essbar',
+  beides: 'warm oder kalt',
+};
+
 export const ART_LABELS = {
   vegan: 'vegan',
   vegetarisch: 'vegetarisch',

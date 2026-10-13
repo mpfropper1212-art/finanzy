@@ -2,7 +2,8 @@
 // sichtbar sind. Gespeichert wird pro Konto nur, was jemand gemerkt hat.
 
 import * as cloud from './cloud.js';
-import { SEED_GERICHTE, ART_LABELS, ART_FARBEN } from './gerichte-daten.js';
+import { SEED_GERICHTE, ART_LABELS, ART_FARBEN, TEMPERATUR_LABELS } from './gerichte-daten.js';
+import { leseRezept } from './gerichte-text.js';
 import { el, clear, money } from './util.js';
 import { tellerSvg } from './gerichte-bild.js';
 
@@ -17,7 +18,7 @@ const SORTIERUNGEN = {
 const leererEntwurf = () => ({
   name: '', art: 'vegetarisch', beschreibung: '', zutaten: '', schritte: '',
   kcal: '', protein: '', kh: '', fett: '', preis: '',
-  zeit: '', aufwand: 2, abwasch: 2,
+  zeit: '', aufwand: 2, abwasch: 2, temperatur: 'warm',
 });
 
 const alsListe = wert => (Array.isArray(wert)
@@ -31,6 +32,7 @@ function normalisiere(row) {
     id: row.id,
     name: row.name ?? '',
     art: ART_LABELS[row.art] ? row.art : 'vegetarisch',
+    temperatur: TEMPERATUR_LABELS[row.temperatur] ? row.temperatur : 'warm',
     beschreibung: row.beschreibung ?? '',
     zutaten: alsListe(row.zutaten),
     schritte: alsListe(row.schritte),
@@ -60,7 +62,7 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
   const seed = SEED_GERICHTE.map(g => ({ ...g, autor: null, autorName: null, quelle: 'start' }));
   let geteilt = [];
   let entwurf = leererEntwurf();
-  let filter = { suche: '', art: 'alle', maxPreis: '', maxZeit: '', minProtein: '', nurFavoriten: false, nurEigene: false };
+  let filter = { suche: '', art: 'alle', maxPreis: '', maxZeit: '', minProtein: '', nurFavoriten: false, nurEigene: false, nurKalt: false };
   let sortierung = 'proteinProEuro';
 
   const favoriten = () => store.data.gerichte.favoriten;
@@ -102,6 +104,7 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
       if (filter.maxPreis !== '' && g.preis > Number(filter.maxPreis)) return false;
       if (filter.maxZeit !== '' && g.zeit > Number(filter.maxZeit)) return false;
       if (filter.minProtein !== '' && g.protein < Number(filter.minProtein)) return false;
+      if (filter.nurKalt && (g.temperatur ?? 'warm') === 'warm') return false;
       if (filter.nurFavoriten && !istFavorit(g.id)) return false;
       if (filter.nurEigene && g.autor !== cloud.currentUser()?.id) return false;
       return true;
@@ -139,7 +142,7 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
     filterHost.appendChild(zahlen);
 
     const schalter = el('div', { class: 'filter-arten' });
-    for (const [key, label] of [['nurFavoriten', 'Nur gemerkte'], ['nurEigene', 'Nur meine']]) {
+    for (const [key, label] of [['nurFavoriten', 'Nur gemerkte'], ['nurEigene', 'Nur meine'], ['nurKalt', 'Kalt essbar']]) {
       const btn = el('button', { type: 'button', class: 'pill' + (filter[key] ? ' is-active' : '') }, label);
       btn.addEventListener('click', () => { filter[key] = !filter[key]; renderFilter(); renderListe(); });
       schalter.appendChild(btn);
@@ -188,6 +191,10 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
       el('h3', {}, g.name),
       el('span', { class: 'gericht-art', style: `--art: ${ART_FARBEN[g.art]}` }, ART_LABELS[g.art]),
     );
+    const t = g.temperatur ?? 'warm';
+    titel.appendChild(el('span', { class: `temp temp-${t}`, title: TEMPERATUR_LABELS[t] },
+      t === 'kalt' ? 'kalt essbar' : t === 'beides' ? 'warm oder kalt' : 'warm machen'));
+
     if (g.quelle === 'geteilt') {
       titel.appendChild(el('span', { class: 'gericht-quelle' },
         g.autor === cloud.currentUser()?.id ? 'von dir' : 'von einem anderen Nutzer'));
@@ -332,6 +339,20 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
     artRow.appendChild(artWrap);
     formHost.appendChild(artRow);
 
+    const tempRow = el('label', { class: 'feld' });
+    tempRow.appendChild(el('span', { class: 'feld-label' }, 'Temperatur'));
+    const temp = el('select');
+    for (const [wertKey, label] of Object.entries(TEMPERATUR_LABELS)) {
+      const opt = el('option', { value: wertKey }, label);
+      if (entwurf.temperatur === wertKey) opt.selected = true;
+      temp.appendChild(opt);
+    }
+    temp.addEventListener('change', () => { entwurf.temperatur = temp.value; });
+    const tempWrap = el('div', { class: 'feld-input' });
+    tempWrap.appendChild(temp);
+    tempRow.appendChild(tempWrap);
+    formHost.appendChild(tempRow);
+
     feld('preis', 'Preis je Portion', { type: 'number', min: '0', step: '0.1', 'data-einheit': '€' });
     feld('kcal', 'Kalorien', { type: 'number', min: '0', step: '10', 'data-einheit': 'kcal' });
     feld('protein', 'Eiweiß', { type: 'number', min: '0', step: '1', 'data-einheit': 'g' });
@@ -372,6 +393,31 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
       'Dein Gericht erscheint für alle Nutzer dieser Seite.');
     formHost.appendChild(hinweis);
 
+    const einfuegenKopf = el('details', { class: 'rezept-einfuegen' });
+    einfuegenKopf.appendChild(el('summary', {}, 'Rezept als Text einfügen'));
+    einfuegenKopf.appendChild(el('p', { class: 'feld-hinweis' },
+      'Rezepttext hier einfügen – Name, Zutaten und Schritte werden erkannt und oben '
+      + 'eingetragen. Bei einem Screenshot: auf dem iPhone lange auf den Text im Bild '
+      + 'tippen, kopieren, hier einfügen.'));
+    const rohfeld = el('textarea', { rows: '5', placeholder: 'Zutaten\n250 g Magerquark\n…\n\nZubereitung\n1. …' });
+    einfuegenKopf.appendChild(rohfeld);
+    const lesen = el('button', { class: 'btn btn-block', type: 'button' }, 'Übernehmen');
+    lesen.addEventListener('click', () => {
+      const r = leseRezept(rohfeld.value);
+      if (!r.erfolg) {
+        melde('Aus dem Text konnte ich nichts herauslesen.', 'err');
+        return;
+      }
+      if (r.name) entwurf.name = r.name;
+      if (r.zutaten.length) entwurf.zutaten = r.zutaten.join('\n');
+      if (r.schritte.length) entwurf.schritte = r.schritte.join('\n');
+      renderFormular();
+      melde(`Übernommen: ${r.zutaten.length} Zutaten, ${r.schritte.length} Schritte. `
+        + 'Nährwerte und Preis musst du noch ergänzen.');
+    });
+    einfuegenKopf.appendChild(lesen);
+    formHost.appendChild(einfuegenKopf);
+
     const senden = el('button', { class: 'btn btn-primary btn-block', type: 'button' }, 'Gericht veröffentlichen');
     senden.addEventListener('click', () => speichere(senden));
     formHost.appendChild(senden);
@@ -391,6 +437,7 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
         name: entwurf.name.trim(),
         art: entwurf.art,
         beschreibung: entwurf.beschreibung.trim(),
+        temperatur: entwurf.temperatur,
         zutaten: alsListe(entwurf.zutaten),
         schritte: alsListe(entwurf.schritte),
         kcal: Math.round(zahl(entwurf.kcal)),
@@ -422,5 +469,5 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
     renderListe();
   }
 
-  return { renderAll, ladeGeteilte };
+  return { renderAll, ladeGeteilte, alleGerichte };
 }

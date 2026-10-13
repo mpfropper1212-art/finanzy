@@ -458,12 +458,110 @@ button, input, select { font: inherit; color: inherit; }
 .dash-immo { background: color-mix(in srgb, #7c3aed 14%, transparent); color: #7c3aed; }
 .dash-gerichte { background: color-mix(in srgb, #16a34a 14%, transparent); color: #16a34a; }
 .dash-schulden { background: color-mix(in srgb, #db2777 14%, transparent); color: #db2777; }
+.dash-woche { background: color-mix(in srgb, #0891b2 14%, transparent); color: #0891b2; }
 .dash-tanken { background: color-mix(in srgb, #d97706 14%, transparent); color: #d97706; }
 
 .dash-karte-text { margin: 0; font-size: 13px; color: var(--text-soft); line-height: 1.5; }
 .dash-wert { display: grid; gap: 1px; margin-top: 2px; }
 .dash-wert strong { font-size: 19px; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
 .dash-wert span { font-size: 12px; color: var(--text-faint); }
+
+/* ---------- Wochenplan ---------- */
+.woche-plan { padding: 14px 16px 18px; }
+.woche-kopf { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.woche-spanne { font-size: 15px; font-variant-numeric: tabular-nums; }
+
+.woche-gitter {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(152px, 1fr));
+  gap: 10px;
+}
+.woche-tag {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  padding: 10px;
+  display: grid;
+  gap: 9px;
+  align-content: start;
+}
+.woche-tag.ist-heute { border-color: var(--accent); background: var(--surface); }
+.tag-kopf { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.tag-kopf b { font-size: 13px; }
+.tag-kopf span { font-size: 11px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+
+.slot { display: grid; gap: 4px; }
+.slot-label {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-faint);
+}
+.slot-wahl {
+  width: 100%; min-width: 0;
+  padding: 5px 7px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  font-size: 12.5px;
+}
+.slot-zeile { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.slot-portionen {
+  width: 46px;
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  text-align: right;
+  font-size: 12px;
+}
+.slot-einheit { font-size: 11px; color: var(--text-faint); }
+
+.temp {
+  font-size: 10.5px; font-weight: 600;
+  padding: 1px 7px; border-radius: 999px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.temp-warm { color: #c2410c; background: color-mix(in srgb, #c2410c 12%, transparent); }
+.temp-kalt { color: #0369a1; background: color-mix(in srgb, #0369a1 12%, transparent); }
+.temp-beides { color: var(--text-soft); background: color-mix(in srgb, #64748b 14%, transparent); }
+
+.liste-summe {
+  display: flex; flex-wrap: wrap; gap: 14px; align-items: baseline;
+  padding: 9px 11px; margin-bottom: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  font-size: 12.5px; color: var(--text-soft);
+}
+.liste-summe strong { font-size: 16px; color: var(--text); font-variant-numeric: tabular-nums; }
+
+.einkauf { display: grid; }
+.einkauf-zeile {
+  display: grid;
+  grid-template-columns: 20px 76px 1fr;
+  gap: 8px; align-items: baseline;
+  padding: 6px 2px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.einkauf-zeile:last-child { border-bottom: 0; }
+.einkauf-zeile.ist-ab { opacity: .45; text-decoration: line-through; }
+.einkauf-zeile input { justify-self: start; accent-color: var(--accent); }
+.einkauf-menge { font-variant-numeric: tabular-nums; color: var(--text-soft); text-align: right; }
+
+.rezept-einfuegen { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; }
+.rezept-einfuegen summary { cursor: pointer; font-size: 13px; color: var(--accent); }
+.rezept-einfuegen textarea {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface-2);
+  font-family: var(--mono);
+  font-size: 12px;
+  resize: vertical;
+}
 
 /* ---------- Nachrichten auf der Startseite ---------- */
 .news {
@@ -949,6 +1047,8 @@ button, input, select { font: inherit; color: inherit; }
   .dash-kopf .wortmarke-text { font-size: 23px; }
   .news-zeile { flex-direction: column; gap: 2px; }
   .news-meta { white-space: normal; }
+  .woche-gitter { grid-template-columns: minmax(0, 1fr); }
+  .einkauf-zeile { grid-template-columns: 20px 68px 1fr; }
   .satz-zeile { flex-wrap: wrap; }
   .satz-feld { flex: 1 1 100%; }
 

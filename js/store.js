@@ -59,8 +59,17 @@ export function createDefaultData() {
     immobilien: createImmobilienTeil(),
     gerichte: { favoriten: [] },
     schulden: { eintraege: [] },
+    wochenplan: { start: montagVon(new Date()), eintraege: [], abgehakt: [] },
     tanken: { eintraege: [], zeitraum: 'alle', eigen: { monate: 1, von: '', bis: '' }, ausgeschlosseneTags: [], fixkosten: { versicherung: 0, steuer: 0, wartung: 0, sonstiges: 0 } },
   };
+}
+
+// Wochen beginnen montags; der Plan hängt am Montagsdatum.
+export function montagVon(datum) {
+  const d = new Date(datum);
+  const tag = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - tag);
+  return d.toISOString().slice(0, 10);
 }
 
 function createImmobilienTeil() {
@@ -145,6 +154,21 @@ export function migrate(raw) {
         : [],
     },
     schulden: { eintraege: migrateSchulden(raw.schulden?.eintraege) },
+    wochenplan: {
+      start: typeof raw.wochenplan?.start === 'string' ? raw.wochenplan.start : montagVon(new Date()),
+      eintraege: Array.isArray(raw.wochenplan?.eintraege)
+        ? raw.wochenplan.eintraege.filter(x => x && x.id).map(x => ({
+          id: String(x.id),
+          tag: Math.min(6, Math.max(0, Number(x.tag) || 0)),
+          mahlzeit: x.mahlzeit === 'abend' ? 'abend' : 'mittag',
+          gerichtId: String(x.gerichtId ?? ''),
+          portionen: Math.max(1, Number(x.portionen) || 1),
+        }))
+        : [],
+      abgehakt: Array.isArray(raw.wochenplan?.abgehakt)
+        ? raw.wochenplan.abgehakt.filter(x => typeof x === 'string')
+        : [],
+    },
     tanken: {
       eintraege: migrateTankungen(raw.tanken?.eintraege),
       zeitraum: ['alle', '12monate', '3monate', 'eigen'].includes(raw.tanken?.zeitraum) ? raw.tanken.zeitraum : 'alle',
