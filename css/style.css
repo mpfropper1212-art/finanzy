@@ -605,6 +605,10 @@ button, input, select { font: inherit; color: inherit; }
   display: grid;
   gap: 9px;
 }
+.gericht-haupt { display: flex; gap: 14px; align-items: start; }
+.gericht-bild { flex: none; }
+.teller { display: block; }
+.gericht-inhalt { flex: 1; min-width: 0; display: grid; gap: 8px; }
 .gericht-kopf { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
 .gericht-titel { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
 .gericht-titel h3 { margin: 0; font-size: 15px; letter-spacing: -.01em; }
@@ -646,6 +650,28 @@ button, input, select { font: inherit; color: inherit; }
 }
 .skala-punkt.is-voll { background: var(--text-soft); }
 .gericht-loeschen { margin-left: auto; font-size: 12px; }
+
+.rezept { border-top: 1px solid var(--border); padding-top: 8px; }
+.rezept summary {
+  cursor: pointer; font-size: 12.5px; color: var(--accent); list-style: none;
+}
+.rezept summary::-webkit-details-marker { display: none; }
+.rezept summary::before { content: "▸ "; }
+.rezept[open] summary::before { content: "▾ "; }
+.rezept-koerper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+.rezept h4 {
+  margin: 0 0 5px;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-faint);
+}
+.zutaten, .schritte { margin: 0; padding-left: 18px; font-size: 13px; color: var(--text-soft); }
+.zutaten li, .schritte li { margin-bottom: 3px; line-height: 1.45; }
+.zutaten { list-style: none; padding-left: 0; }
+.zutaten li::before { content: "– "; color: var(--text-faint); }
 
 .feld-breit { grid-template-columns: 1fr; gap: 4px; }
 .feld-breit textarea, .feld-breit input {

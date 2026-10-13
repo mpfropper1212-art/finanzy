@@ -57,9 +57,11 @@ Berechnet werden Bruttomietrendite (Jahresmiete ÷ Kaufpreis), Nettomietrendite 
 
 Die Zahlen sind eine Überschlagsrechnung, keine Steuerberatung. Vereinfacht gilt: gezeigt ist jeweils das erste Jahr, die Instandhaltungsrücklage wirkt steuerlich eigentlich erst beim tatsächlichen Ausgeben, und das Mietausfallwagnis mindert den Cashflow, ist aber keine Werbungskostenposition.
 
-**Gerichte.** Die Startdatenbank enthält 30 einfache Gerichte, ausgewählt nach viel Eiweiß für wenig Geld. Oben wird gefiltert (Suche, vegan / vegetarisch / mit Fleisch und Fisch, Höchstpreis, Höchstzeit, Mindest-Eiweiß) und sortiert – voreingestellt nach **Eiweiß je Euro**, der Kennzahl, um die es hier geht. Ein Filter auf „Vegetarisch" zeigt vegane Gerichte mit an.
+**Gerichte.** Die Startdatenbank enthält 48 einfache Gerichte, ausgewählt nach viel Eiweiß für wenig Geld. Jedes bringt Zutatenliste und Schritt-für-Schritt-Anleitung mit, aufklappbar über „Zutaten und Zubereitung". Oben wird gefiltert (Suche, vegan / vegetarisch / mit Fleisch und Fisch, Höchstpreis, Höchstzeit, Mindest-Eiweiß) und sortiert – voreingestellt nach **Eiweiß je Euro**, der Kennzahl, um die es hier geht. Ein Filter auf „Vegetarisch" zeigt vegane Gerichte mit an.
 
 Das Herz merkt ein Gericht; „Nur gemerkte" blendet auf die eigene Auswahl ein. Die gemerkten Gerichte hängen am Konto und sind auf jedem Gerät dieselben.
+
+Die Teller-Abbildungen sind **gezeichnet, keine Fotos**: Fotos müssten gehostet und lizenziert werden, und ein beliebiges Bild wäre irreführender als gar keins. Die Anordnung leitet sich aus dem Namen ab, dasselbe Gericht sieht also immer gleich aus.
 
 Rechts lassen sich eigene Gerichte anlegen. **Diese sind für alle Nutzer der Seite sichtbar** – ein eigenes Gericht kann nur sein Urheber wieder löschen. Die Startgerichte stehen im Code (`js/gerichte-daten.js`) und lassen sich dort erweitern; nur selbst angelegte liegen in der Datenbank.
 
@@ -112,6 +114,8 @@ create table if not exists public.gerichte (
   name text not null check (char_length(name) between 1 and 120),
   beschreibung text check (beschreibung is null or char_length(beschreibung) <= 1000),
   art text not null default 'vegetarisch' check (art in ('vegan','vegetarisch','fisch','fleisch')),
+  zutaten text[] not null default '{}' check (array_length(zutaten, 1) is null or array_length(zutaten, 1) <= 40),
+  schritte text[] not null default '{}' check (array_length(schritte, 1) is null or array_length(schritte, 1) <= 40),
   kcal int not null default 0 check (kcal between 0 and 5000),
   protein int not null default 0 check (protein between 0 and 500),
   kh int not null default 0 check (kh between 0 and 1000),

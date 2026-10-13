@@ -4,6 +4,7 @@
 import * as cloud from './cloud.js';
 import { SEED_GERICHTE, ART_LABELS, ART_FARBEN } from './gerichte-daten.js';
 import { el, clear, money } from './util.js';
+import { tellerSvg } from './gerichte-bild.js';
 
 const SORTIERUNGEN = {
   proteinProEuro: { label: 'Eiweiß pro Euro', wert: g => (g.preis > 0 ? g.protein / g.preis : 0), absteigend: true },
@@ -14,10 +15,14 @@ const SORTIERUNGEN = {
 };
 
 const leererEntwurf = () => ({
-  name: '', art: 'vegetarisch', beschreibung: '',
+  name: '', art: 'vegetarisch', beschreibung: '', zutaten: '', schritte: '',
   kcal: '', protein: '', kh: '', fett: '', preis: '',
   zeit: '', aufwand: 2, abwasch: 2,
 });
+
+const alsListe = wert => (Array.isArray(wert)
+  ? wert.filter(Boolean)
+  : String(wert ?? '').split('\n').map(z => z.trim()).filter(Boolean));
 
 // Eigene Gerichte kommen als Datenbankzeilen, Startgerichte als Konstanten -
 // hier auf eine gemeinsame Form bringen.
@@ -27,6 +32,8 @@ function normalisiere(row) {
     name: row.name ?? '',
     art: ART_LABELS[row.art] ? row.art : 'vegetarisch',
     beschreibung: row.beschreibung ?? '',
+    zutaten: alsListe(row.zutaten),
+    schritte: alsListe(row.schritte),
     kcal: Number(row.kcal) || 0,
     protein: Number(row.protein) || 0,
     kh: Number(row.kh) || 0,
@@ -167,6 +174,13 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
 
   function karte(g) {
     const box = el('article', { class: 'gericht' });
+    const haupt = el('div', { class: 'gericht-haupt' });
+
+    const bild = el('div', { class: 'gericht-bild' });
+    bild.appendChild(tellerSvg(g));
+    haupt.appendChild(bild);
+
+    const inhalt = el('div', { class: 'gericht-inhalt' });
 
     const kopf = el('div', { class: 'gericht-kopf' });
     const titel = el('div', { class: 'gericht-titel' });
@@ -195,9 +209,9 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
     });
 
     kopf.append(titel, herz);
-    box.appendChild(kopf);
+    inhalt.appendChild(kopf);
 
-    if (g.beschreibung) box.appendChild(el('p', { class: 'gericht-text' }, g.beschreibung));
+    if (g.beschreibung) inhalt.appendChild(el('p', { class: 'gericht-text' }, g.beschreibung));
 
     const werte = el('div', { class: 'gericht-werte' });
     werte.append(
@@ -208,7 +222,7 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
       wert(`${g.fett} g`, 'Fett'),
       wert(g.preis > 0 ? `${(g.protein / g.preis).toFixed(0)} g` : '–', 'Eiweiß je €', true),
     );
-    box.appendChild(werte);
+    inhalt.appendChild(werte);
 
     const fuss = el('div', { class: 'gericht-fuss' });
     fuss.append(
@@ -221,7 +235,36 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
       del.addEventListener('click', () => entferneGericht(g));
       fuss.appendChild(del);
     }
-    box.appendChild(fuss);
+    inhalt.appendChild(fuss);
+    haupt.appendChild(inhalt);
+    box.appendChild(haupt);
+
+    const zutaten = g.zutaten ?? [];
+    const schritte = g.schritte ?? [];
+    if (zutaten.length || schritte.length) {
+      const rezept = el('details', { class: 'rezept' });
+      rezept.appendChild(el('summary', {}, 'Zutaten und Zubereitung'));
+      const koerper = el('div', { class: 'rezept-koerper' });
+
+      if (zutaten.length) {
+        const spalte = el('div');
+        spalte.appendChild(el('h4', {}, 'Zutaten'));
+        const liste = el('ul', { class: 'zutaten' });
+        for (const z of zutaten) liste.appendChild(el('li', {}, z));
+        spalte.appendChild(liste);
+        koerper.appendChild(spalte);
+      }
+      if (schritte.length) {
+        const spalte = el('div');
+        spalte.appendChild(el('h4', {}, 'Zubereitung'));
+        const liste = el('ol', { class: 'schritte' });
+        for (const z of schritte) liste.appendChild(el('li', {}, z));
+        spalte.appendChild(liste);
+        koerper.appendChild(spalte);
+      }
+      rezept.appendChild(koerper);
+      box.appendChild(rezept);
+    }
 
     return box;
   }
@@ -311,13 +354,19 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
       formHost.appendChild(row);
     }
 
-    const textRow = el('label', { class: 'feld feld-breit' });
-    textRow.appendChild(el('span', { class: 'feld-label' }, 'Zubereitung'));
-    const text = el('textarea', { rows: '4', placeholder: 'Kurz beschreiben, wie es geht.' });
-    text.value = entwurf.beschreibung;
-    text.addEventListener('input', () => { entwurf.beschreibung = text.value; });
-    textRow.appendChild(text);
-    formHost.appendChild(textRow);
+    const textfeld = (key, label, platzhalter, zeilen) => {
+      const row = el('label', { class: 'feld feld-breit' });
+      row.appendChild(el('span', { class: 'feld-label' }, label));
+      const feld = el('textarea', { rows: String(zeilen), placeholder: platzhalter });
+      feld.value = entwurf[key];
+      feld.addEventListener('input', () => { entwurf[key] = feld.value; });
+      row.appendChild(feld);
+      formHost.appendChild(row);
+    };
+
+    textfeld('beschreibung', 'Kurzbeschreibung', 'Ein Satz, warum sich das Gericht lohnt.', 2);
+    textfeld('zutaten', 'Zutaten (eine je Zeile)', '250 g Magerquark\n50 g Haferflocken\n1 Banane', 4);
+    textfeld('schritte', 'Zubereitung (ein Schritt je Zeile)', 'Quark cremig rühren.\nHaferflocken unterrühren.', 4);
 
     const hinweis = el('p', { class: 'feld-hinweis' },
       'Dein Gericht erscheint für alle Nutzer dieser Seite.');
@@ -342,6 +391,8 @@ export function createGerichteView({ listHost, filterHost, formHost, statusHost,
         name: entwurf.name.trim(),
         art: entwurf.art,
         beschreibung: entwurf.beschreibung.trim(),
+        zutaten: alsListe(entwurf.zutaten),
+        schritte: alsListe(entwurf.schritte),
         kcal: Math.round(zahl(entwurf.kcal)),
         protein: Math.round(zahl(entwurf.protein)),
         kh: Math.round(zahl(entwurf.kh)),
