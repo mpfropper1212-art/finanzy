@@ -468,6 +468,37 @@ button, input, select { font: inherit; color: inherit; }
 
 .immo-result { padding: 16px 16px 4px; }
 .tank-zeitraum { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.tank-tagfilter { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 12px 0 4px; }
+.tank-tagfilter-label { font-size: 12.5px; color: var(--text-faint); }
+
+.tag-chips { display: flex; flex-wrap: wrap; gap: 5px; margin: 4px 0 8px; }
+.tag {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-soft);
+  border-radius: 999px;
+  padding: 3px 11px;
+  font-size: 12.5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tag:hover { color: var(--text); }
+.tag.is-an { background: var(--accent); border-color: transparent; color: var(--accent-text); font-weight: 600; }
+.tag.is-aus { background: var(--surface-2); color: var(--text-faint); text-decoration: line-through; }
+.tag-klein { padding: 1px 8px; font-size: 11.5px; cursor: inherit; }
+.tag-leer { font-size: 11.5px; color: var(--text-faint); }
+.tag-zelle { cursor: pointer; }
+.tag-zelle:hover .tag-leer { color: var(--accent); }
+.tag-zelle .tag { margin-right: 3px; }
+.tag-editor-zeile td { background: var(--surface-2); }
+.tag-eingabe {
+  padding: 4px 9px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  font-size: 12.5px;
+  width: 170px;
+}
 
 .kpis {
   display: grid;

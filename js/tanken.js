@@ -5,6 +5,8 @@ import { el, svg, clear, money, uid } from './util.js';
 
 const zahl = v => (Number.isFinite(Number(v)) ? Number(v) : 0);
 
+export const TAG_VORSCHLAEGE = ['Urlaub', 'Autobahn', 'Stadt', 'Kurzstrecke', 'Anhänger', 'Winter'];
+
 export function createTankung(vorlage = {}) {
   return {
     id: uid('tk'),
@@ -13,6 +15,7 @@ export function createTankung(vorlage = {}) {
     euro: 0,
     tacho: 0,
     notiz: '',
+    tags: [],
     ...vorlage,
   };
 }
@@ -62,7 +65,13 @@ export function auswerten(eintraege, optionen = {}) {
   // Kilometer zuerst über alle Zeilen rechnen, dann den Zeitraum ausschneiden -
   // sonst fehlte der ersten Zeile im Fenster ihr Vorgänger.
   const grenze = grenzDatum(optionen.zeitraum);
-  const imFenster = grenze ? zeilen.filter(z => z.datum && z.datum >= grenze) : zeilen;
+  const ausgeschlossen = new Set(optionen.ausgeschlossen ?? []);
+  const imZeitraum = grenze ? zeilen.filter(z => z.datum && z.datum >= grenze) : zeilen;
+  // Eine ausgeschlossene Füllung fällt mit ihren Kilometern heraus - die
+  // Strecke gehört ja zu derselben Fahrt.
+  const imFenster = ausgeschlossen.size
+    ? imZeitraum.filter(z => !(z.tags ?? []).some(tag => ausgeschlossen.has(tag)))
+    : imZeitraum;
 
   const mitKm = imFenster.filter(z => z.km !== null);
   const summeLiter = imFenster.reduce((s, z) => s + z.liter, 0);
@@ -90,6 +99,9 @@ export function auswerten(eintraege, optionen = {}) {
   return {
     zeilen,
     imFenster,
+    imZeitraum,
+    tags: tagUebersicht(imZeitraum),
+    ausgeschlossen: [...ausgeschlossen],
     summeLiter,
     summeEuro,
     summeKm,
@@ -109,6 +121,29 @@ export function auswerten(eintraege, optionen = {}) {
       ? (summeEuro + fixProMonat * monate) / summeKm
       : (summeKm > 0 ? summeEuro / summeKm : null),
   };
+}
+
+// Je Markierung der eigene Verbrauch, damit sich Urlaub und Alltag
+// vergleichen lassen statt nur auszuschließen.
+function tagUebersicht(zeilen) {
+  const namen = new Set();
+  for (const z of zeilen) for (const tag of z.tags ?? []) namen.add(tag);
+
+  return [...namen].sort().map(tag => {
+    const mit = zeilen.filter(z => (z.tags ?? []).includes(tag) && z.km !== null);
+    const ohne = zeilen.filter(z => !(z.tags ?? []).includes(tag) && z.km !== null);
+    const schnitt = liste => {
+      const km = liste.reduce((s, z) => s + z.km, 0);
+      const liter = liste.reduce((s, z) => s + z.liter, 0);
+      return km > 0 ? (liter / km) * 100 : null;
+    };
+    return {
+      tag,
+      anzahl: zeilen.filter(z => (z.tags ?? []).includes(tag)).length,
+      verbrauchMit: schnitt(mit),
+      verbrauchOhne: schnitt(ohne),
+    };
+  });
 }
 
 function grenzDatum(zeitraum) {
@@ -174,9 +209,19 @@ function verbrauchsChart(host, a) {
 
   const d = punkte.map((p, i) => `${i ? 'L' : 'M'}${x(i)},${y(p.verbrauch)}`).join(' ');
   root.appendChild(svg('path', { d, fill: 'none', stroke: '#2f6feb', 'stroke-width': 2.2 }));
+  // Markierte Füllungen abgesetzt zeichnen - so sieht man sofort, ob ein
+  // Ausschlag eine Urlaubsfahrt war.
   punkte.forEach((p, i) => {
-    const kreis = svg('circle', { cx: x(i), cy: y(p.verbrauch), r: 3.2, fill: '#2f6feb' });
-    kreis.appendChild(svg('title', {}, `${p.datum}: ${dezimal(p.verbrauch)} l/100 km`));
+    const markiert = (p.tags ?? []).length > 0;
+    const kreis = svg('circle', {
+      cx: x(i), cy: y(p.verbrauch),
+      r: markiert ? 5 : 3.2,
+      fill: markiert ? 'var(--surface)' : '#2f6feb',
+      stroke: markiert ? '#d97706' : 'none',
+      'stroke-width': markiert ? 2.4 : 0,
+    });
+    const beschriftung = markiert ? ` · ${(p.tags ?? []).join(', ')}` : '';
+    kreis.appendChild(svg('title', {}, `${p.datum}: ${dezimal(p.verbrauch)} l/100 km${beschriftung}`));
     root.appendChild(kreis);
   });
 
@@ -313,7 +358,22 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
   const einstellungen = () => ({
     zeitraum: store.data.tanken.zeitraum,
     fixkosten: store.data.tanken.fixkosten,
+    ausgeschlossen: store.data.tanken.ausgeschlosseneTags,
   });
+
+  // Chips zum An- und Abwählen von Markierungen, einmal für den Entwurf und
+  // einmal für vorhandene Einträge.
+  function tagChips(aktuelle, umschalten, zusatz = []) {
+    const box = el('div', { class: 'tag-chips' });
+    const alle = [...new Set([...TAG_VORSCHLAEGE, ...zusatz, ...aktuelle])];
+    for (const tag of alle) {
+      const an = aktuelle.includes(tag);
+      const chip = el('button', { type: 'button', class: 'tag' + (an ? ' is-an' : '') }, tag);
+      chip.addEventListener('click', () => umschalten(tag, !an));
+      box.appendChild(chip);
+    }
+    return box;
+  }
   let entwurf = createTankung();
 
   function valueChange() {
@@ -354,8 +414,42 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
     );
     kpiHost.appendChild(box);
 
+    if (a.tags.length) {
+      const zeile = el('div', { class: 'tank-tagfilter' });
+      zeile.appendChild(el('span', { class: 'tank-tagfilter-label' }, 'Nicht mitrechnen:'));
+      for (const t of a.tags) {
+        const aus = a.ausgeschlossen.includes(t.tag);
+        const chip = el('button', {
+          type: 'button',
+          class: 'tag' + (aus ? ' is-aus' : ''),
+          title: t.verbrauchMit === null
+            ? `${t.anzahl} Tankfüllungen`
+            : `${t.anzahl} Tankfüllungen · ${dezimal(t.verbrauchMit)} l gegenüber ${dezimal(t.verbrauchOhne)} l sonst`,
+        }, `${t.tag} (${t.anzahl})`);
+        chip.addEventListener('click', () => {
+          const liste = store.data.tanken.ausgeschlosseneTags;
+          const i = liste.indexOf(t.tag);
+          if (i >= 0) liste.splice(i, 1);
+          else liste.push(t.tag);
+          valueChange();
+        });
+        zeile.appendChild(chip);
+      }
+      kpiHost.appendChild(zeile);
+
+      for (const t of a.tags) {
+        if (t.verbrauchMit === null || t.verbrauchOhne === null) continue;
+        const diff = t.verbrauchMit - t.verbrauchOhne;
+        if (Math.abs(diff) < 0.15) continue;
+        kpiHost.appendChild(el('p', { class: 'feld-hinweis' },
+          `Mit „${t.tag}" liegt der Verbrauch bei ${dezimal(t.verbrauchMit)} l, sonst bei `
+          + `${dezimal(t.verbrauchOhne)} l – ${diff > 0 ? 'ein Mehrverbrauch' : 'weniger'} von `
+          + `${dezimal(Math.abs(diff))} l je 100 km.`));
+      }
+    }
+
     kpiHost.appendChild(el('p', { class: 'feld-hinweis' },
-      `${a.imFenster.length} von ${a.zeilen.length} Tankfüllungen im Zeitraum · `
+      `${a.imFenster.length} von ${a.zeilen.length} Tankfüllungen gerechnet · `
       + `${a.summeKm.toLocaleString('de-DE')} km · ${money(a.summeEuro)} Sprit · `
       + `${dezimal(a.summeLiter, 2)} Liter`));
   }
@@ -371,7 +465,7 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
     const kopf = el('tr');
     for (const [titel, klasse] of [
       ['Datum', ''], ['Liter', 'num'], ['Preis', 'num'], ['€/l', 'num'],
-      ['Tacho', 'num'], ['km', 'num'], ['l/100km', 'num'], ['', ''],
+      ['Tacho', 'num'], ['km', 'num'], ['l/100km', 'num'], ['Markierung', ''], ['', ''],
     ]) kopf.appendChild(el('th', { class: klasse }, titel));
     const thead = el('thead');
     thead.appendChild(kopf);
@@ -390,6 +484,13 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
         el('td', { class: 'num' }, z.km === null ? '–' : z.km.toLocaleString('de-DE')),
         el('td', { class: 'num stark' }, dezimal(z.verbrauch)),
       );
+
+      const tagZelle = el('td', { class: 'tag-zelle' });
+      for (const tag of z.tags ?? []) tagZelle.appendChild(el('span', { class: 'tag tag-klein' }, tag));
+      if (!(z.tags ?? []).length) tagZelle.appendChild(el('span', { class: 'tag-leer' }, '+ markieren'));
+      tagZelle.addEventListener('click', () => oeffneTagEditor(z, tr));
+      tr.appendChild(tagZelle);
+
       const aktion = el('td', {});
       const del = el('button', { class: 'icon-btn', type: 'button', title: 'Eintrag löschen' }, '×');
       del.addEventListener('click', () => {
@@ -414,11 +515,67 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
       el('th', { class: 'num' }, a.summeKm.toLocaleString('de-DE')),
       el('th', { class: 'num stark' }, dezimal(a.verbrauch)),
       el('th', {}, ''),
+      el('th', {}, ''),
     );
     fuss.appendChild(summe);
     tabelle.appendChild(fuss);
 
     tabelleHost.appendChild(tabelle);
+  }
+
+  // Markierungen einer vorhandenen Zeile ändern, ohne die ganze Tabelle neu
+  // zu bauen - sonst klappt der Editor beim ersten Klick wieder zu.
+  function oeffneTagEditor(zeile, tr) {
+    const offen = tr.nextElementSibling?.classList.contains('tag-editor-zeile');
+    tr.parentElement.querySelectorAll('.tag-editor-zeile').forEach(n => n.remove());
+    if (offen) return;
+
+    const eintrag = eintraege().find(e => e.id === zeile.id);
+    if (!eintrag) return;
+    if (!Array.isArray(eintrag.tags)) eintrag.tags = [];
+
+    const editorZeile = el('tr', { class: 'tag-editor-zeile' });
+    const zelle = el('td', { colspan: '9' });
+    const bekannte = [...new Set(eintraege().flatMap(e => e.tags ?? []))];
+
+    const zeichne = () => {
+      clear(zelle);
+      zelle.appendChild(tagChips(eintrag.tags, (tag, an) => {
+        if (an) eintrag.tags.push(tag);
+        else eintrag.tags = eintrag.tags.filter(x => x !== tag);
+        store.commit({ silent: true });
+        zeichne();
+        // Nur die Abhängigen neu zeichnen, die Tabelle bleibt stehen.
+        const a = auswerten(eintraege(), einstellungen());
+        renderKpis(a);
+        verbrauchsChart(chartHost, a);
+        aktualisiereTagZelle(tr, eintrag);
+      }, bekannte));
+
+      const eigen = el('input', { type: 'text', placeholder: 'eigene Markierung', class: 'tag-eingabe' });
+      eigen.addEventListener('keydown', ev => {
+        if (ev.key !== 'Enter') return;
+        ev.preventDefault();
+        const wert = eigen.value.trim();
+        if (!wert || eintrag.tags.includes(wert)) return;
+        eintrag.tags.push(wert);
+        store.commit({ silent: true });
+        renderAll();
+      });
+      zelle.appendChild(eigen);
+    };
+
+    zeichne();
+    editorZeile.appendChild(zelle);
+    tr.after(editorZeile);
+  }
+
+  function aktualisiereTagZelle(tr, eintrag) {
+    const zelle = tr.querySelector('.tag-zelle');
+    if (!zelle) return;
+    clear(zelle);
+    for (const tag of eintrag.tags) zelle.appendChild(el('span', { class: 'tag tag-klein' }, tag));
+    if (!eintrag.tags.length) zelle.appendChild(el('span', { class: 'tag-leer' }, '+ markieren'));
   }
 
   function renderFormular() {
@@ -456,6 +613,20 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
     notizRow.appendChild(notiz);
     formHost.appendChild(notizRow);
 
+    const tagZeile = el('div', { class: 'feld feld-breit' });
+    tagZeile.appendChild(el('span', { class: 'feld-label' }, 'Markierung (optional)'));
+    const chipBox = el('div');
+    const zeichneChips = () => {
+      clear(chipBox);
+      chipBox.appendChild(tagChips(entwurf.tags, (tag, an) => {
+        entwurf.tags = an ? [...entwurf.tags, tag] : entwurf.tags.filter(x => x !== tag);
+        zeichneChips();
+      }, [...new Set(eintraege().flatMap(e => e.tags ?? []))]));
+    };
+    zeichneChips();
+    tagZeile.appendChild(chipBox);
+    formHost.appendChild(tagZeile);
+
     const fehler = el('p', { class: 'msg is-error', hidden: true });
     formHost.appendChild(fehler);
 
@@ -480,6 +651,7 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
         euro: zahl(entwurf.euro),
         tacho,
         notiz: entwurf.notiz.trim(),
+        tags: [...entwurf.tags],
       }));
       entwurf = createTankung();
       valueChange();
