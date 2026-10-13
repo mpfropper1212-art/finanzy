@@ -40,38 +40,67 @@ function aufkleber(ziel, form, attrs) {
 
 function einsSvg(size = 44) {
   const root = svg('svg', { width: size, height: size, viewBox: '0 0 64 64', 'aria-hidden': 'true' });
-  const id = `gold${++idZaehler}`;
-
+  const nr = ++idZaehler;
   const defs = svg('defs');
-  const lauf = svg('linearGradient', { id, x1: '0', y1: '0', x2: '0.4', y2: '1' });
-  lauf.appendChild(svg('stop', { offset: '0', 'stop-color': EINS.glanz }));
-  lauf.appendChild(svg('stop', { offset: '0.55', 'stop-color': EINS.gold }));
-  lauf.appendChild(svg('stop', { offset: '1', 'stop-color': '#f0a500' }));
-  defs.appendChild(lauf);
   root.appendChild(defs);
 
-  const fuellung = `url(#${id})`;
+  const lauf = svg('linearGradient', { id: `gold${nr}`, x1: '0', y1: '0', x2: '0.3', y2: '1' });
+  lauf.appendChild(svg('stop', { offset: '0', 'stop-color': EINS.glanz }));
+  lauf.appendChild(svg('stop', { offset: '0.5', 'stop-color': EINS.gold }));
+  lauf.appendChild(svg('stop', { offset: '1', 'stop-color': '#ef9f00' }));
+  defs.appendChild(lauf);
 
-  // Die Raute als ein einziger Umriss plus das Loch in der Mitte - so läuft
-  // die Kontur außen herum und nicht quer durch die Balken.
-  const raute = 'M8,0 L13.5,0 L13.5,8 L18,8 L18,0 L23.5,0 L23.5,8 L30,8 L30,13.5 '
-    + 'L23.5,13.5 L23.5,21 L30,21 L30,26.5 L23.5,26.5 L23.5,34 L18,34 L18,26.5 '
-    + 'L13.5,26.5 L13.5,34 L8,34 L8,26.5 L0,26.5 L0,21 L8,21 L8,13.5 L0,13.5 '
-    + 'L0,8 L8,8 Z M13.5,13.5 L18,13.5 L18,21 L13.5,21 Z';
+  // Ein Zeichen besteht aus drei Lagen: breite weiße Unterlage, Füllung mit
+  // orangefarbener Innenkante, und eine aufgehellte Hälfte als Glanzkante.
+  const zeichen = (d, regel) => {
+    const gruppe = svg('g');
+    const form = { d, ...(regel ? { 'fill-rule': regel } : {}) };
 
-  const g = svg('g', { transform: 'translate(3,15) skewX(-7)' });
-  aufkleber(g, 'path', { d: raute, 'fill-rule': 'evenodd', fill: fuellung });
-  root.appendChild(g);
+    gruppe.appendChild(svg('path', {
+      ...form, fill: EINS.kontur, stroke: EINS.kontur,
+      'stroke-width': 7, 'stroke-linejoin': 'round',
+    }));
+    gruppe.appendChild(svg('path', {
+      ...form, fill: `url(#gold${nr})`, stroke: EINS.rand,
+      'stroke-width': 2.2, 'stroke-linejoin': 'round', 'paint-order': 'stroke fill',
+    }));
 
-  aufkleber(root, 'path', {
-    d: 'M57,9 L57,57 L45,57 L45,22 L37,26 L34,17 L47,9 Z',
-    fill: fuellung,
-  });
+    const clipId = `c${nr}_${d.length}`;
+    const clip = svg('clipPath', { id: clipId });
+    clip.appendChild(svg('path', form));
+    defs.appendChild(clip);
 
-  // Ein schmaler Glanzstreifen oben, wie auf einem glänzenden Aufkleber.
-  root.appendChild(svg('path', {
-    d: 'M47,11 L55,11 L55,30 L47,34 Z', fill: '#ffffff', opacity: 0.32,
+    // Diagonale Trennung oben links heller - der typische Aufkleber-Glanz.
+    const glanz = svg('g', { 'clip-path': `url(#${clipId})` });
+    glanz.appendChild(svg('path', { d: 'M-20,-20 L80,-20 L-20,80 Z', fill: '#fff', opacity: 0.26 }));
+    gruppe.appendChild(glanz);
+    return gruppe;
+  };
+
+  // Die Raute als ein Umriss plus das Loch in der Mitte. Die kleinen Stufen
+  // an den Balkenenden geben ihr den Pixel-Look.
+  const raute = 'M9.5,0 L13.5,0 L13.5,8 L18,8 L18,2 L19.5,2 L19.5,0 L23.5,0 L23.5,8 '
+    + 'L28.5,8 L28.5,9.5 L30,9.5 L30,13.5 L23.5,13.5 L23.5,21 L28.5,21 L28.5,22.5 '
+    + 'L30,22.5 L30,26.5 L23.5,26.5 L23.5,32 L22,32 L22,34 L18,34 L18,26.5 '
+    + 'L13.5,26.5 L13.5,32 L12,32 L12,34 L8,34 L8,26.5 L1.5,26.5 L1.5,25 L0,25 '
+    + 'L0,21 L8,21 L8,13.5 L1.5,13.5 L1.5,12 L0,12 L0,8 L8,8 L8,2 L9.5,2 Z '
+    + 'M13.5,13.5 L18,13.5 L18,21 L13.5,21 Z';
+
+  const lockup = svg('g', { transform: 'rotate(-3 32 32)' });
+  const rauteG = zeichen(raute, 'evenodd');
+  rauteG.setAttribute('transform', 'translate(2,17) skewX(-6)');
+  lockup.append(rauteG, zeichen('M58,7 L58,58 L45,58 L45,22 L36,26 L33,16 L47,7 Z'));
+  root.appendChild(lockup);
+
+  // Funkel, wie auf einem Sticker.
+  const funke = (x, y, r) => root.appendChild(svg('path', {
+    d: 'M0,-1 C0.15,-0.15 0.15,-0.15 1,0 C0.15,0.15 0.15,0.15 0,1 '
+      + 'C-0.15,0.15 -0.15,0.15 -1,0 C-0.15,-0.15 -0.15,-0.15 0,-1 Z',
+    fill: '#fff', transform: `translate(${x} ${y}) scale(${r})`,
   }));
+  funke(52, 14, 3.4);
+  funke(56, 36, 2.2);
+  funke(26, 50, 2.6);
 
   return root;
 }
@@ -80,7 +109,9 @@ function lamaSvg(size = 46) {
   const root = svg('svg', { width: size, height: size, viewBox: '0 0 64 64', 'aria-hidden': 'true' });
   // Die Münze ist rund und schneidet die Ecken weg, also muss die Figur
   // kompakt in der Mitte sitzen statt bis an den Rand zu laufen.
-  const g = svg('g', { transform: 'translate(2,3)' });
+  // Die Figur misst 9..54 / 2..57 - so skaliert und verschoben liegt ihr
+  // Mittelpunkt genau auf der Kreismitte und nichts wird abgeschnitten.
+  const g = svg('g', { transform: 'translate(5.2,6.9) scale(0.85)' });
   root.appendChild(g);
 
   const umriss = {
