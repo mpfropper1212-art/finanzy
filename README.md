@@ -110,6 +110,8 @@ Die **Startseite** beantwortet zuerst „wie steht der Monat" und dann „wo wil
 
 ## Nachrichten auf der Startseite
 
+Oben rechts auf der Startseite liegt eine **Münze für schnelle Entscheidungen** – antippen, sie dreht sich und fällt auf Kopf oder Zahl. Kopf ist ein Piñata-Lama, Zahl das Finanzy-Zeichen. Das Lama ist selbst gezeichnet und keine Nachbildung einer geschützten Spielfigur.
+
 Unter den Bereichskacheln stehen sechs Wirtschaftsmeldungen von tagesschau und Spiegel, verlinkt auf den jeweiligen Artikel.
 
 Der Abruf passiert **nicht im Browser**: Beide Feeds senden keine CORS-Header, eine Seite auf `github.io` dürfte sie gar nicht laden. Stattdessen holt sie der Ablauf `.github/workflows/nachrichten.yml` einmal täglich um 05:17 UTC, `scripts/nachrichten.py` schreibt daraus `daten/nachrichten.json`, und der Ablauf committet die Datei nur, wenn sich etwas geändert hat. Die App lädt sie dann von ihrer eigenen Adresse – kein fremder Dienst zur Laufzeit, kein Schlüssel, keine Kosten.

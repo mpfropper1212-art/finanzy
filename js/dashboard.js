@@ -11,6 +11,7 @@ import { auswerten as schuldenAuswerten } from './schulden.js';
 import { salden, ausgleich } from './gruppen.js';
 import { HUB_ID } from './store.js';
 import { renderNachrichten } from './nachrichten.js';
+import { createMuenze } from './muenze.js';
 
 const dezimal = (v, stellen = 2) =>
   v === null || !Number.isFinite(v) ? '–' : v.toLocaleString('de-DE', {
@@ -100,9 +101,10 @@ export function createDashboard({ host, store, onOeffne }) {
     clear(host);
 
     const kopf = el('div', { class: 'dash-kopf' });
-    kopf.appendChild(wortmarke({ size: 40 }));
-    kopf.appendChild(el('p', { class: 'dash-text' },
-      'Such dir aus, womit du anfangen willst.'));
+    const text = el('div', { class: 'dash-kopf-text' });
+    text.appendChild(wortmarke({ size: 40 }));
+    text.appendChild(el('p', { class: 'dash-text' }, 'Such dir aus, womit du anfangen willst.'));
+    kopf.append(text, createMuenze());
     host.appendChild(kopf);
 
     const zahlen = kennzahlen(store.data);
