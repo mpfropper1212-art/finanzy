@@ -9,6 +9,7 @@ import { auswerten } from './tanken.js';
 import { SEED_GERICHTE } from './gerichte-daten.js';
 import { auswerten as schuldenAuswerten } from './schulden.js';
 import { HUB_ID } from './store.js';
+import { renderNachrichten } from './nachrichten.js';
 
 const dezimal = (v, stellen = 2) =>
   v === null || !Number.isFinite(v) ? '–' : v.toLocaleString('de-DE', {
@@ -102,6 +103,11 @@ export function createDashboard({ host, store, onOeffne }) {
     }
 
     host.appendChild(gitter);
+
+    // Lädt nebenher; die Kacheln sollen nicht auf das Netz warten.
+    const news = el('section', { class: 'news' });
+    host.appendChild(news);
+    renderNachrichten(news);
   }
 
   return { renderAll };

@@ -1,0 +1,33 @@
+name: Nachrichten holen
+
+# Einmal täglich, dazu von Hand auslösbar. Die Uhrzeit liegt bewusst
+# nicht auf einer vollen Stunde - da laufen bei GitHub die meisten Jobs
+# und die Warteschlange ist länger.
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  holen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Meldungen abrufen
+        run: python3 scripts/nachrichten.py
+
+      - name: Nur bei Änderungen committen
+        run: |
+          if [ -z "$(git status --porcelain daten/nachrichten.json)" ]; then
+            echo "Nichts Neues."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add daten/nachrichten.json
+          git commit -m "Nachrichten vom $(date -u +%d.%m.%Y)"
+          git push

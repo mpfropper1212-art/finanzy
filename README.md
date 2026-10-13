@@ -92,6 +92,20 @@ Für Browser-Tab und Home-Bildschirm gibt es dieselbe Form im abgerundeten Quadr
 
 Die **Startseite** beantwortet zuerst „wie steht der Monat" und dann „wo will ich hin": oben Einnahmen, Ausgaben und was übrig bleibt, dazu ein Balken, wie viel der Einnahmen die Ausgaben auffressen, und ein Satz zur Sparquote. Darunter die fünf Bereiche als Kacheln mit je einer Kennzahl.
 
+## Nachrichten auf der Startseite
+
+Unter den Bereichskacheln stehen sechs Wirtschaftsmeldungen von tagesschau und Spiegel, verlinkt auf den jeweiligen Artikel.
+
+Der Abruf passiert **nicht im Browser**: Beide Feeds senden keine CORS-Header, eine Seite auf `github.io` dürfte sie gar nicht laden. Stattdessen holt sie der Ablauf `.github/workflows/nachrichten.yml` einmal täglich um 05:17 UTC, `scripts/nachrichten.py` schreibt daraus `daten/nachrichten.json`, und der Ablauf committet die Datei nur, wenn sich etwas geändert hat. Die App lädt sie dann von ihrer eigenen Adresse – kein fremder Dienst zur Laufzeit, kein Schlüssel, keine Kosten.
+
+Das Skript braucht nur die Python-Standardbibliothek und lässt sich jederzeit von Hand ausführen:
+
+```bash
+python3 scripts/nachrichten.py
+```
+
+**Nebenwirkung:** Der Ablauf legt täglich einen Commit an. Vor dem nächsten eigenen Push muss also in GitHub Desktop erst **Fetch origin** und **Pull** gedrückt werden, sonst lehnt GitHub den Push ab.
+
 ## Hell und dunkel
 
 Oben rechts schaltet ein Knopf zwischen **Folgt dem Gerät**, **Immer hell** und **Immer dunkel** um. Die Wahl liegt im `localStorage` und damit beim Gerät, nicht beim Konto – auf dem Handy darf dunkel sein, während der Rechner hell bleibt.
