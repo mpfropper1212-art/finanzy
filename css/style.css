@@ -358,6 +358,92 @@ button, input, select { font: inherit; color: inherit; }
 
 .empty { color: var(--text-faint); font-size: 13px; padding: 7px 2px; }
 
+/* ---------- Marke ---------- */
+.wortmarke { display: inline-flex; align-items: center; gap: 9px; }
+.wortmarke-text { font-weight: 700; letter-spacing: -.02em; font-size: 1.05em; }
+.marke { flex: none; }
+
+.brand {
+  border: 0; background: none; cursor: pointer; padding: 2px 4px;
+  color: inherit; border-radius: 8px;
+}
+.brand:hover { background: var(--surface-2); }
+
+.login-marke { display: flex; justify-content: center; margin-bottom: 10px; }
+.login-marke .wortmarke-text { display: none; }
+.login-title { text-align: center; }
+.login-sub { text-align: center; }
+
+/* ---------- Dashboard ---------- */
+.panel-voll { grid-template-columns: minmax(0, 1fr); }
+
+.dash-kopf { text-align: center; padding: 26px 16px 6px; }
+.dash-kopf .wortmarke-text { font-size: 30px; }
+.dash-text { margin: 10px 0 0; color: var(--text-soft); }
+
+.dash-gitter {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
+  gap: 14px;
+  padding: 18px 2px 8px;
+}
+.dash-karte {
+  text-align: left;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 17px 18px;
+  display: grid;
+  gap: 9px;
+  align-content: start;
+  cursor: pointer;
+  color: inherit;
+  transition: border-color .12s, transform .12s;
+}
+.dash-karte:hover { border-color: var(--accent); transform: translateY(-2px); }
+.dash-karte:active { transform: translateY(0); }
+.dash-oben { display: flex; align-items: center; gap: 11px; }
+.dash-oben h3 { margin: 0; font-size: 16px; letter-spacing: -.01em; }
+.dash-symbol {
+  display: grid; place-items: center;
+  width: 40px; height: 40px; border-radius: 11px;
+  flex: none;
+}
+.dash-flow { background: color-mix(in srgb, #2f6feb 14%, transparent); color: #2f6feb; }
+.dash-accounts { background: color-mix(in srgb, #0d9488 14%, transparent); color: #0d9488; }
+.dash-immo { background: color-mix(in srgb, #7c3aed 14%, transparent); color: #7c3aed; }
+.dash-gerichte { background: color-mix(in srgb, #16a34a 14%, transparent); color: #16a34a; }
+.dash-tanken { background: color-mix(in srgb, #d97706 14%, transparent); color: #d97706; }
+
+.dash-karte-text { margin: 0; font-size: 13px; color: var(--text-soft); line-height: 1.5; }
+.dash-wert { display: grid; gap: 1px; margin-top: 2px; }
+.dash-wert strong { font-size: 20px; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.dash-wert span { font-size: 12px; color: var(--text-faint); }
+
+/* ---------- Tanktabelle ---------- */
+.tank-host { padding: 4px 16px 18px; overflow-x: auto; }
+.tank-tabelle { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tank-tabelle th, .tank-tabelle td {
+  padding: 6px 9px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+.tank-tabelle thead th {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--text-faint); font-weight: 600;
+}
+.tank-tabelle .num { text-align: right; font-variant-numeric: tabular-nums; }
+.tank-tabelle .stark { font-weight: 650; }
+.tank-tabelle tbody tr:hover { background: var(--surface-2); }
+.tank-tabelle tfoot th {
+  border-top: 2px solid var(--border-strong);
+  border-bottom: 0;
+  font-variant-numeric: tabular-nums;
+}
+#tank-chart svg { width: 100%; height: auto; }
+
 /* ---------- Immobilien ---------- */
 .obj-chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-width: 0; }
 .obj-chip {

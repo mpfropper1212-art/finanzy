@@ -3,16 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Finanz-Sankey &amp; Kontomodell</title>
+<title>Finanzy</title>
 <link rel="stylesheet" href="css/style.css">
+<link rel="icon" id="favicon" href="data:,">
 </head>
 <body>
 
 <!-- ============ Login ============ -->
 <section id="login-view" class="login-view">
   <div class="login-card">
-    <h1 class="login-title">Finanz&#8209;Sankey</h1>
-    <p class="login-sub">Geldfluss und Kontomodell &#8211; auf allen deinen Geräten.</p>
+    <div id="login-marke" class="login-marke"></div>
+    <h1 class="login-title">Finanzy</h1>
+    <p class="login-sub">Geldfluss, Konten, Immobilien, Gerichte und Tanken &#8211; auf allen deinen Geräten.</p>
 
     <div class="seg" role="tablist">
       <button type="button" class="seg-btn is-active" data-mode="login" role="tab">Anmelden</button>
@@ -68,12 +70,14 @@
 <div id="app-view" class="app" hidden>
   <header class="topbar">
     <div class="topbar-left">
-      <strong class="brand">Finanz&#8209;Sankey</strong>
+      <button type="button" class="brand" id="btn-brand" title="Zur Startseite"></button>
       <nav class="tabs" role="tablist">
-        <button class="tab is-active" data-tab="flow" role="tab">Geldfluss</button>
+        <button class="tab is-active" data-tab="start" role="tab">Start</button>
+        <button class="tab" data-tab="flow" role="tab">Geldfluss</button>
         <button class="tab" data-tab="accounts" role="tab">Konten</button>
         <button class="tab" data-tab="immo" role="tab">Immobilien</button>
         <button class="tab" data-tab="gerichte" role="tab">Gerichte</button>
+        <button class="tab" data-tab="tanken" role="tab">Tanken</button>
       </nav>
     </div>
     <div class="topbar-right">
@@ -108,6 +112,9 @@
     </form>
     <p id="migrate-msg" class="msg" role="alert" hidden></p>
   </div>
+
+  <!-- ---- Start ---- -->
+  <main id="panel-start" class="panel panel-voll"></main>
 
   <!-- ---- Geldfluss ---- -->
   <main id="panel-flow" class="panel">
@@ -215,6 +222,23 @@
         <h2>Gericht hinzufügen</h2>
       </div>
       <div id="gerichte-form" class="immo-form"></div>
+    </aside>
+  </main>
+
+  <!-- ---- Tanken ---- -->
+  <main id="panel-tanken" class="panel" hidden>
+    <div class="chart-wrap">
+      <div id="tank-kpis" class="immo-result"></div>
+      <div class="immo-chart-head">Verbrauch je Tankf&uuml;llung</div>
+      <div id="tank-chart" class="svg-host"></div>
+      <div id="tank-tabelle" class="tank-host"></div>
+    </div>
+
+    <aside class="editor">
+      <div class="editor-head">
+        <h2>Tankf&uuml;llung erfassen</h2>
+      </div>
+      <div id="tank-form" class="immo-form"></div>
     </aside>
   </main>
 </div>

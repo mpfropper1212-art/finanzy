@@ -8,6 +8,9 @@ import { createFlowEditor } from './sankey-editor.js';
 import { createAccountsView, createAccountsEditor, netWorth, monthlyTransferSum } from './accounts.js';
 import { createImmobilienView } from './immobilien.js';
 import { createGerichteView } from './gerichte.js';
+import { createTankenView } from './tanken.js';
+import { createDashboard } from './dashboard.js';
+import { wortmarke, faviconDataUri } from './logo.js';
 import * as dl from './export.js';
 import { el, clear, money } from './util.js';
 
@@ -19,7 +22,9 @@ let accountsView = null;
 let accountsEditor = null;
 let immoView = null;
 let gerichteView = null;
-let activeTab = 'flow';
+let tankenView = null;
+let dashboard = null;
+let activeTab = 'start';
 let mode = 'login';
 
 /* ----------------------------- Login ----------------------------- */
@@ -168,19 +173,33 @@ function enterApp(data) {
   });
   gerichteView.ladeGeteilte();
 
+  tankenView = createTankenView({
+    kpiHost: $('#tank-kpis'),
+    chartHost: $('#tank-chart'),
+    tabelleHost: $('#tank-tabelle'),
+    formHost: $('#tank-form'),
+    store,
+  });
+
+  dashboard = createDashboard({
+    host: $('#panel-start'),
+    store,
+    onOeffne: setTab,
+  });
+
   $('#sankey-title').value = data.sankey.title;
   $('#sankey-height').value = data.sankey.height;
 
   flowEditor.renderAll();
   accountsEditor.renderAll();
   refreshFlowChart();
-  setTab('flow');
+  setTab('start');
 }
 
 function leaveApp() {
   store.detach();
   cloud.signOut();
-  flowEditor = accountsEditor = accountsView = immoView = gerichteView = null;
+  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = dashboard = null;
   $('#app-view').hidden = true;
   $('#login-view').hidden = false;
   $('#accounts-host').replaceChildren();
@@ -261,6 +280,8 @@ function rebuildAll() {
   accountsEditor.renderAll();
   immoView.renderAll();
   gerichteView.renderAll();
+  tankenView.renderAll();
+  dashboard.renderAll();
   refreshFlowChart();
   refreshAccounts();
 }
@@ -274,10 +295,14 @@ function setTab(tab) {
   $('#panel-accounts').hidden = tab !== 'accounts';
   $('#panel-immo').hidden = tab !== 'immo';
   $('#panel-gerichte').hidden = tab !== 'gerichte';
+  $('#panel-tanken').hidden = tab !== 'tanken';
+  $('#panel-start').hidden = tab !== 'start';
   if (tab === 'flow') refreshFlowChart();
   else if (tab === 'accounts') refreshAccounts();
   else if (tab === 'immo') immoView?.renderAll();
-  else gerichteView?.renderAll();
+  else if (tab === 'gerichte') gerichteView?.renderAll();
+  else if (tab === 'tanken') tankenView?.renderAll();
+  else dashboard?.renderAll();
 }
 
 /* ------------------------- Geldfluss ------------------------- */
@@ -399,12 +424,14 @@ document.addEventListener('click', ev => {
 function activeSvg() {
   if (activeTab === 'flow') return $('#sankey-host svg');
   if (activeTab === 'accounts') return $('#accounts-host svg');
+  if (activeTab === 'tanken') return $('#tank-chart svg');
   return $('#immo-chart svg');
 }
 
 function activeName() {
   if (activeTab === 'flow') return store.data.sankey.title || 'geldfluss';
   if (activeTab === 'accounts') return 'kontomodell';
+  if (activeTab === 'tanken') return 'verbrauch';
   return `${immoView?.aktiv()?.name || 'immobilie'}-restschuld`;
 }
 
@@ -492,6 +519,11 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') store.flushNow();
 });
 window.addEventListener('beforeunload', () => { store.flushNow(); });
+
+$('#favicon').href = faviconDataUri();
+$('#login-marke').appendChild(wortmarke({ size: 56 }));
+$('#btn-brand').appendChild(wortmarke({ size: 24 }));
+$('#btn-brand').addEventListener('click', () => setTab('start'));
 
 setMode('login');
 

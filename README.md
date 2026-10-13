@@ -1,11 +1,12 @@
 # Finanzy
 
-Vier Werkzeuge rund um die eigenen Finanzen, als statische Web-App ohne Build-Schritt und ohne Abhängigkeiten:
+Fünf Werkzeuge rund um den eigenen Alltag, als statische Web-App ohne Build-Schritt und ohne Abhängigkeiten. Eine Startseite führt in die Bereiche und zeigt je eine Kennzahl:
 
 - **Geldfluss** – ein Sankey-Diagramm im Finanzfluss-Stil: alle Einnahmequellen laufen in einen Einnahmen-Knoten und von dort in Ausgabenkategorien und deren Unterposten.
 - **Konten** – das eigene Kontomodell: Konten als frei verschiebbare Knoten mit Kontostand, Bank und Notiz, verbunden durch Pfeile mit Beträgen.
 - **Immobilien** – ein Renditerechner für Kapitalanlagen: Kaufnebenkosten, Annuitätendarlehen, Mietrenditen, Cashflow vor und nach Steuern. Beliebig viele Objekte nebeneinander.
 - **Gerichte** – eine Sammlung günstiger, eiweißreicher Gerichte mit Nährwerten, Preis je Portion, Kochzeit sowie Skalen für Kochaufwand und Abwasch. Gerichte lassen sich merken und selbst anlegen; selbst angelegte sind für alle Nutzer sichtbar.
+- **Tanken** – eine Tanktabelle: je Füllung Datum, Liter, Preis und Tachostand; Verbrauch, Preis je Liter und Kosten je Kilometer ergeben sich daraus.
 
 Alles wird direkt in der Oberfläche eingetippt. Hinter einem Login mit E-Mail und Passwort liegen die Daten in einem eigenen Konto, sodass auf jedem Gerät dieselben Zahlen stehen.
 
@@ -55,6 +56,10 @@ Die Zahlen sind eine Überschlagsrechnung, keine Steuerberatung. Vereinfacht gil
 Das Herz merkt ein Gericht; „Nur gemerkte" blendet auf die eigene Auswahl ein. Die gemerkten Gerichte hängen am Konto und sind auf jedem Gerät dieselben.
 
 Rechts lassen sich eigene Gerichte anlegen. **Diese sind für alle Nutzer der Seite sichtbar** – ein eigenes Gericht kann nur sein Urheber wieder löschen. Die Startgerichte stehen im Code (`js/gerichte-daten.js`) und lassen sich dort erweitern; nur selbst angelegte liegen in der Datenbank.
+
+**Tanken.** Pro Tankfüllung werden nur vier Dinge eingetragen: Datum, getankte Liter, bezahlter Betrag und Tachostand. Die gefahrenen Kilometer sind die Differenz zum vorherigen Tachostand, daraus folgen Verbrauch (l/100 km), Preis je Liter und Kosten je Kilometer. Sortiert wird nach Tachostand, nicht nach Datum – so stimmt die Reihenfolge auch, wenn eine Quittung später nachgetragen wird.
+
+Die erste Füllung liefert nur den Startpunkt und hat deshalb keinen Verbrauchswert; sie zählt auch nicht in den Gesamtverbrauch hinein. Ein neuer Tachostand muss über dem letzten liegen, sonst wird der Eintrag abgelehnt. Oben stehen die Gesamtwerte, darunter zeigt eine Kurve den Verbrauch je Füllung gegen den Schnitt.
 
 **Daten-Menü.** Diagramm als SVG oder PNG exportieren, eine Sicherung als JSON herunterladen und wieder einspielen, oder alles auf die Startwerte zurücksetzen.
 
@@ -136,6 +141,9 @@ js/accounts.js        Kontengraph (Ziehen, Verbinden) und dessen Editor
 js/immobilien.js      Immobilienrechner: Berechnung, Kennzahlen, Tilgungskurve
 js/gerichte.js        Gerichte: Filter, Karten, Merken, Formular
 js/gerichte-daten.js  Startdatenbank der Gerichte
+js/tanken.js          Tanktabelle: Auswertung, Verbrauchskurve, Eingabe
+js/dashboard.js       Startseite mit den Bereichskacheln
+js/logo.js            Wortmarke, Bereichssymbole und Favicon als Inline-SVG
 js/export.js          SVG-, PNG- und JSON-Download
 js/util.js            Formatierung, Farbhilfen, DOM-Helfer
 ```

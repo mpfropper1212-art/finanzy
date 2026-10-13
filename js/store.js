@@ -57,6 +57,7 @@ export function createDefaultData() {
     },
     immobilien: createImmobilienTeil(),
     gerichte: { favoriten: [] },
+    tanken: { eintraege: [] },
   };
 }
 
@@ -137,7 +138,20 @@ export function migrate(raw) {
         ? raw.gerichte.favoriten.filter(x => typeof x === 'string')
         : [],
     },
+    tanken: { eintraege: migrateTankungen(raw.tanken?.eintraege) },
   };
+}
+
+function migrateTankungen(roh) {
+  if (!Array.isArray(roh)) return [];
+  return roh.filter(x => x && x.id).map(x => ({
+    id: String(x.id),
+    datum: typeof x.datum === 'string' ? x.datum : '',
+    liter: Number(x.liter) || 0,
+    euro: Number(x.euro) || 0,
+    tacho: Number(x.tacho) || 0,
+    notiz: String(x.notiz ?? ''),
+  }));
 }
 
 function migrateImmobilien(raw) {
