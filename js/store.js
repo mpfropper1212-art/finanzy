@@ -58,6 +58,7 @@ export function createDefaultData() {
     },
     immobilien: createImmobilienTeil(),
     gerichte: { favoriten: [] },
+    schulden: { eintraege: [] },
     tanken: { eintraege: [], zeitraum: 'alle', eigen: { monate: 1, von: '', bis: '' }, ausgeschlosseneTags: [], fixkosten: { versicherung: 0, steuer: 0, wartung: 0, sonstiges: 0 } },
   };
 }
@@ -143,6 +144,7 @@ export function migrate(raw) {
         ? raw.gerichte.favoriten.filter(x => typeof x === 'string')
         : [],
     },
+    schulden: { eintraege: migrateSchulden(raw.schulden?.eintraege) },
     tanken: {
       eintraege: migrateTankungen(raw.tanken?.eintraege),
       zeitraum: ['alle', '12monate', '3monate', 'eigen'].includes(raw.tanken?.zeitraum) ? raw.tanken.zeitraum : 'alle',
@@ -162,6 +164,19 @@ export function migrate(raw) {
       },
     },
   };
+}
+
+function migrateSchulden(roh) {
+  if (!Array.isArray(roh)) return [];
+  return roh.filter(x => x && x.id).map(x => ({
+    id: String(x.id),
+    person: String(x.person ?? ''),
+    betrag: Number(x.betrag) || 0,
+    richtung: x.richtung === 'schulde' ? 'schulde' : 'bekomme',
+    grund: String(x.grund ?? ''),
+    datum: typeof x.datum === 'string' ? x.datum : '',
+    erledigt: x.erledigt === true,
+  }));
 }
 
 function migrateTankungen(roh) {

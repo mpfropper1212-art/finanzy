@@ -1,11 +1,12 @@
 # Finanzy
 
-Fünf Werkzeuge rund um den eigenen Alltag, als statische Web-App ohne Build-Schritt und ohne Abhängigkeiten. Eine Startseite führt in die Bereiche und zeigt je eine Kennzahl:
+Sechs Werkzeuge rund um den eigenen Alltag, als statische Web-App ohne Build-Schritt und ohne Abhängigkeiten. Eine Startseite führt in die Bereiche und zeigt je eine Kennzahl:
 
 - **Geldfluss** – ein Sankey-Diagramm im Finanzfluss-Stil: alle Einnahmequellen laufen in einen Einnahmen-Knoten und von dort in Ausgabenkategorien und deren Unterposten.
 - **Konten** – das eigene Kontomodell: Konten als frei verschiebbare Knoten mit Kontostand, Bank und Notiz, verbunden durch Pfeile mit Beträgen.
 - **Immobilien** – ein Renditerechner für Kapitalanlagen: Kaufnebenkosten, Annuitätendarlehen, Mietrenditen, Cashflow vor und nach Steuern. Beliebig viele Objekte nebeneinander.
 - **Gerichte** – eine Sammlung günstiger, eiweißreicher Gerichte mit Nährwerten, Preis je Portion, Kochzeit sowie Skalen für Kochaufwand und Abwasch. Gerichte lassen sich merken und selbst anlegen; selbst angelegte sind für alle Nutzer sichtbar.
+- **Schulden** – wer dir was schuldet und was du schuldest, erfasst über einen ganzen Satz statt über ein Formular.
 - **Tanken** – eine Tanktabelle: je Füllung Datum, Liter, Preis und Tachostand; Verbrauch, Preis je Liter und Kosten je Kilometer ergeben sich daraus.
 
 Alles wird direkt in der Oberfläche eingetippt. Hinter einem Login mit E-Mail und Passwort liegen die Daten in einem eigenen Konto, sodass auf jedem Gerät dieselben Zahlen stehen.
@@ -64,6 +65,12 @@ Das Herz merkt ein Gericht; „Nur gemerkte" blendet auf die eigene Auswahl ein.
 Die Teller-Abbildungen sind **gezeichnet, keine Fotos**: Fotos müssten gehostet und lizenziert werden, und ein beliebiges Bild wäre irreführender als gar keins. Die Anordnung leitet sich aus dem Namen ab, dasselbe Gericht sieht also immer gleich aus.
 
 Rechts lassen sich eigene Gerichte anlegen. **Diese sind für alle Nutzer der Seite sichtbar** – ein eigenes Gericht kann nur sein Urheber wieder löschen. Die Startgerichte stehen im Code (`js/gerichte-daten.js`) und lassen sich dort erweitern; nur selbst angelegte liegen in der Datenbank.
+
+**Schulden.** Erfasst wird über einen Satz: *„Max schuldet mir 20 Euro fürs Kino"*. Daraus liest die App Name, Betrag, Richtung, Grund und Datum und zeigt das Ergebnis zur Kontrolle an, bevor es eingetragen wird. Auf dem Handy kann der Satz diktiert werden – entweder über den Aufnahmeknopf oder über das Mikrofon der eigenen Tastatur.
+
+Dahinter steckt **kein Sprachmodell, sondern ein Regelwerk** (`js/schulden-text.js`). Ein Modell bräuchte einen Schlüssel im Browser, der in einem öffentlichen Repo für jeden lesbar wäre; für den engen Satzbau reichen Regeln, und sie laufen ohne Netz, ohne Kosten und ohne dass ein Satz das Gerät verlässt. Erkannt werden unter anderem „schuldet mir", „ich schulde", „hat mir geliehen", „für X bezahlt", „gestern" sowie Beträge mit Komma und Tausenderpunkt.
+
+Fehlt etwas, sagt die Vorschau welches Feld. Ist die Richtung nur geraten, wird das dazugeschrieben und lässt sich in der Liste mit einem Klick umdrehen. Posten werden nach Person gruppiert, erledigte wandern in einen eigenen Abschnitt statt gelöscht zu werden.
 
 **Tanken.** Pro Tankfüllung werden nur vier Dinge eingetragen: Datum, getankte Liter, bezahlter Betrag und Tachostand. Die gefahrenen Kilometer sind die Differenz zum vorherigen Tachostand, daraus folgen Verbrauch (l/100 km), Preis je Liter und Kosten je Kilometer. Sortiert wird nach Tachostand, nicht nach Datum – so stimmt die Reihenfolge auch, wenn eine Quittung später nachgetragen wird.
 
