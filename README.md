@@ -77,6 +77,14 @@ Die erste Füllung liefert nur den Startpunkt und hat deshalb keinen Verbrauchsw
 
 **Daten-Menü.** Diagramm als SVG oder PNG exportieren, eine Sicherung als JSON herunterladen und wieder einspielen, oder alles auf die Startwerte zurücksetzen.
 
+## Zeichen und Startseite
+
+Das Zeichen ist ein **F**, dessen beide Querbalken keine Striche sind, sondern Bänder, die aus dem Stamm austreten und nach außen dünner werden – dieselbe Verjüngung wie bei einem Sankey-Band, das sich weiter aufteilt. Es trägt damit den Namen und den Vorgang, um den sich die App dreht.
+
+Für Browser-Tab und Home-Bildschirm gibt es dieselbe Form im abgerundeten Quadrat (`blockSvg`). Das ist kein zweites Logo, sondern nötig, weil ein freistehendes Zeichen auf einem bunten Hintergrundbild untergeht. Beides steht in `js/logo.js`; Kopfzeile, Startseite, Login und Favicon greifen auf dieselben Pfade zu.
+
+Die **Startseite** beantwortet zuerst „wie steht der Monat" und dann „wo will ich hin": oben Einnahmen, Ausgaben und was übrig bleibt, dazu ein Balken, wie viel der Einnahmen die Ausgaben auffressen, und ein Satz zur Sparquote. Darunter die fünf Bereiche als Kacheln mit je einer Kennzahl.
+
 ## Hell und dunkel
 
 Oben rechts schaltet ein Knopf zwischen **Folgt dem Gerät**, **Immer hell** und **Immer dunkel** um. Die Wahl liegt im `localStorage` und damit beim Gerät, nicht beim Konto – auf dem Handy darf dunkel sein, während der Rechner hell bleibt.

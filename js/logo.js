@@ -3,22 +3,36 @@
 
 import { svg } from './util.js';
 
-const MARKE_FARBEN = ['#2f6feb', '#16a34a', '#d97706'];
+// Der Stamm des F trägt zwei Bänder, die nach außen dünner werden - dieselbe
+// Verjüngung wie bei einem Sankey-Band, das sich weiter aufteilt.
+const F_STAMM = { x: 5, y: 4, width: 6.2, height: 24, rx: 2.4 };
+const F_ARM_OBEN = 'M11.2,4.5 C18,4.5 20,3.2 28,3.2 L28,7.8 C20,7.8 18,11.1 11.2,11.1 Z';
+const F_ARM_UNTEN = 'M11.2,14.4 C16,14.4 17.5,13.6 23,13.6 L23,17.3 C17.5,17.3 16,20.3 11.2,20.3 Z';
 
-// Ein Stamm, der sich nach rechts in drei Bänder aufteilt - dasselbe Bild wie
-// das Sankey, das der Kern der App ist.
 export function markeSvg({ size = 30, titel = 'Finanzy' } = {}) {
   const root = svg('svg', {
     width: size, height: size, viewBox: '0 0 32 32',
     role: 'img', 'aria-label': titel, class: 'marke',
   });
-  root.appendChild(svg('rect', { x: 3, y: 8, width: 7, height: 16, rx: 2.5, fill: '#64748b' }));
-  const baender = [
-    'M10,8 C18,8 20,4 28,4 L28,9 C20,9 18,13 10,13 Z',
-    'M10,13 C18,13 20,12 28,12 L28,18 C20,18 18,19 10,19 Z',
-    'M10,19 C18,19 20,22 28,22 L28,28 C20,28 18,24 10,24 Z',
-  ];
-  baender.forEach((d, i) => root.appendChild(svg('path', { d, fill: MARKE_FARBEN[i] })));
+  root.appendChild(svg('rect', { ...F_STAMM, fill: 'var(--marke-stamm)' }));
+  root.appendChild(svg('path', { d: F_ARM_OBEN, fill: 'var(--marke-a)' }));
+  root.appendChild(svg('path', { d: F_ARM_UNTEN, fill: 'var(--marke-b)' }));
+  return root;
+}
+
+// Dasselbe Zeichen im abgerundeten Quadrat. Freistehend geht es auf einem
+// bunten Hintergrundbild unter, deshalb für App- und Tab-Symbole der Rahmen.
+export function blockSvg({ size = 60 } = {}) {
+  const root = svg('svg', {
+    width: size, height: size, viewBox: '0 0 32 32',
+    role: 'img', 'aria-label': 'Finanzy', class: 'marke-block',
+  });
+  root.appendChild(svg('rect', { x: 0, y: 0, width: 32, height: 32, rx: 7.4, fill: '#1b2130' }));
+  const innen = svg('g', { transform: 'translate(5.4 5.4) scale(0.66)' });
+  innen.appendChild(svg('rect', { ...F_STAMM, fill: '#aeb8c7' }));
+  innen.appendChild(svg('path', { d: F_ARM_OBEN, fill: '#5b8cf5' }));
+  innen.appendChild(svg('path', { d: F_ARM_UNTEN, fill: '#22c55e' }));
+  root.appendChild(innen);
   return root;
 }
 
@@ -62,11 +76,11 @@ export function symbolSvg(name, { size = 22 } = {}) {
 // Dasselbe Zeichen als Browser-Symbol im Tab.
 export function faviconDataUri() {
   const markup = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">'
-    + '<rect width="32" height="32" rx="7" fill="#15191f"/>'
-    + '<rect x="4" y="9" width="6" height="14" rx="2" fill="#94a3b8"/>'
-    + '<path d="M10,9 C18,9 19,5 28,5 L28,10 C19,10 18,14 10,14 Z" fill="#5b8cf5"/>'
-    + '<path d="M10,14 C18,14 19,13 28,13 L28,18 C19,18 18,19 10,19 Z" fill="#22c55e"/>'
-    + '<path d="M10,19 C18,19 19,22 28,22 L28,27 C19,27 18,23 10,23 Z" fill="#f59e0b"/>'
-    + '</svg>';
+    + '<rect width="32" height="32" rx="7.4" fill="#1b2130"/>'
+    + '<g transform="translate(5.4 5.4) scale(0.66)">'
+    + `<rect x="5" y="4" width="6.2" height="24" rx="2.4" fill="#aeb8c7"/>`
+    + `<path d="${F_ARM_OBEN}" fill="#5b8cf5"/>`
+    + `<path d="${F_ARM_UNTEN}" fill="#22c55e"/>`
+    + '</g></svg>';
   return 'data:image/svg+xml,' + encodeURIComponent(markup);
 }

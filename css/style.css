@@ -19,6 +19,10 @@
   --shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 8px 24px rgba(16, 24, 40, .06);
   --radius: 10px;
   --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --marke-stamm: #64748b;
+  --marke-a: #2f6feb;
+  --marke-b: #16a34a;
 }
 
 /* Dunkel folgt dem Gerät, solange nichts von Hand gewählt wurde. */
@@ -42,6 +46,9 @@
   --err-border: #5e2c2c;
   --err-text: #f0a8a8;
   --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+  --marke-stamm: #94a3b8;
+  --marke-a: #5b8cf5;
+  --marke-b: #22c55e;
 
   }
 }
@@ -66,6 +73,9 @@
   --err-border: #5e2c2c;
   --err-text: #f0a8a8;
   --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+  --marke-stamm: #94a3b8;
+  --marke-a: #5b8cf5;
+  --marke-b: #22c55e;
 
 }
 
@@ -410,15 +420,53 @@ button, input, select { font: inherit; color: inherit; }
 /* ---------- Dashboard ---------- */
 .panel-voll { grid-template-columns: minmax(0, 1fr); }
 
-.dash-kopf { text-align: center; padding: 26px 16px 6px; }
-.dash-kopf .wortmarke-text { font-size: 30px; }
-.dash-text { margin: 10px 0 0; color: var(--text-soft); }
+.dash-kopf { padding: 24px 2px 18px; }
+.dash-kopf .wortmarke-text { font-size: 27px; }
+
+/* ---- Der Monat in einer Zeile ---- */
+.monat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 20px 22px 18px;
+  display: grid;
+  gap: 14px;
+}
+.monat-titel {
+  margin: 0;
+  font-size: 12px; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--text-faint); font-weight: 600;
+}
+.monat-zahlen { display: flex; flex-wrap: wrap; gap: 30px; }
+.monat-posten { display: grid; gap: 1px; }
+.monat-label { font-size: 12px; color: var(--text-faint); }
+.monat-posten strong { font-size: 25px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.monat-posten.ist-plus strong { color: #16a34a; }
+.monat-posten.ist-minus strong { color: var(--danger); }
+
+.monat-balken {
+  height: 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, #16a34a 26%, transparent);
+  overflow: hidden;
+}
+.monat-ausgaben { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.monat-ausgaben.ist-zuviel { background: var(--danger); }
+.monat-leer { display: block; height: 100%; background: var(--border); }
+.monat-hinweis { margin: 0; font-size: 13px; color: var(--text-soft); }
+
+.dash-ueberschrift {
+  margin: 30px 0 0;
+  font-size: 12px; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--text-faint); font-weight: 600;
+}
 
 .dash-gitter {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
-  gap: 14px;
-  padding: 18px 2px 8px;
+  grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
+  gap: 12px;
+  padding: 12px 0 8px;
 }
 .dash-karte {
   text-align: left;
@@ -437,10 +485,10 @@ button, input, select { font: inherit; color: inherit; }
 .dash-karte:hover { border-color: var(--accent); transform: translateY(-2px); }
 .dash-karte:active { transform: translateY(0); }
 .dash-oben { display: flex; align-items: center; gap: 11px; }
-.dash-oben h3 { margin: 0; font-size: 16px; letter-spacing: -.01em; }
+.dash-oben h4 { margin: 0; font-size: 15.5px; letter-spacing: -.01em; font-weight: 600; }
 .dash-symbol {
   display: grid; place-items: center;
-  width: 40px; height: 40px; border-radius: 11px;
+  width: 36px; height: 36px; border-radius: 10px;
   flex: none;
 }
 .dash-flow { background: color-mix(in srgb, #2f6feb 14%, transparent); color: #2f6feb; }
@@ -451,7 +499,7 @@ button, input, select { font: inherit; color: inherit; }
 
 .dash-karte-text { margin: 0; font-size: 13px; color: var(--text-soft); line-height: 1.5; }
 .dash-wert { display: grid; gap: 1px; margin-top: 2px; }
-.dash-wert strong { font-size: 20px; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.dash-wert strong { font-size: 19px; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
 .dash-wert span { font-size: 12px; color: var(--text-faint); }
 
 /* ---------- Tanktabelle ---------- */
@@ -828,9 +876,12 @@ button, input, select { font: inherit; color: inherit; }
   .kpis { grid-template-columns: repeat(auto-fit, minmax(142px, 1fr)); gap: 8px; }
   .kpi { padding: 9px 10px; }
   .kpi-value { font-size: 17px; }
-  .dash-gitter { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 14px 0 4px; }
-  .dash-kopf { padding: 18px 8px 2px; }
-  .dash-kopf .wortmarke-text { font-size: 24px; }
+  .dash-gitter { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 10px 0 4px; }
+  .dash-kopf { padding: 16px 0 14px; }
+  .dash-kopf .wortmarke-text { font-size: 23px; }
+  .monat { padding: 16px 16px 14px; }
+  .monat-zahlen { gap: 18px; }
+  .monat-posten strong { font-size: 21px; }
 
   /* Eingabezeilen umbrechen lassen statt zusammenquetschen. */
   .row, .row-account, .row-account-detail, .row-entry { display: flex; flex-wrap: wrap; gap: 6px; }

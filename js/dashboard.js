@@ -1,5 +1,5 @@
-// Startseite: eine Kachel je Bereich, jeweils mit der Zahl, die dort zählt.
-// Soll die Frage beantworten „wo will ich gerade hin" statt nur zu verlinken.
+// Startseite: erst der Monat in einer Zeile, dann die Bereiche.
+// Soll beantworten "wie stehe ich gerade" und danach "wo will ich hin".
 
 import { el, money, clear } from './util.js';
 import { symbolSvg, wortmarke } from './logo.js';
@@ -14,24 +14,24 @@ const dezimal = (v, stellen = 2) =>
     minimumFractionDigits: stellen, maximumFractionDigits: stellen,
   });
 
-function kennzahlen(data) {
-  const einnahmen = data.sankey.flows
-    .filter(f => f.to === HUB_ID)
-    .reduce((s, f) => s + (Number(f.amount) || 0), 0);
-  const ausgaben = data.sankey.flows
-    .filter(f => f.from === HUB_ID)
-    .reduce((s, f) => s + (Number(f.amount) || 0), 0);
+function monatszahlen(data) {
+  const summe = fn => data.sankey.flows.filter(fn).reduce((s, f) => s + (Number(f.amount) || 0), 0);
+  const einnahmen = summe(f => f.to === HUB_ID);
+  const ausgaben = summe(f => f.from === HUB_ID);
+  return { einnahmen, ausgaben, rest: einnahmen - ausgaben };
+}
 
+function kennzahlen(data) {
   const objekte = data.immobilien.items;
   const aktiv = objekte.find(o => o.id === data.immobilien.activeId) ?? objekte[0];
   const immo = aktiv ? berechne(aktiv) : null;
-
   const tank = auswerten(data.tanken.eintraege, { fixkosten: data.tanken.fixkosten });
+  const m = monatszahlen(data);
 
   return {
     flow: {
-      wert: money(Math.round(einnahmen - ausgaben)),
-      zusatz: `${money(Math.round(einnahmen))} rein, ${money(Math.round(ausgaben))} raus`,
+      wert: money(Math.round(m.rest)),
+      zusatz: `${money(Math.round(m.einnahmen))} rein, ${money(Math.round(m.ausgaben))} raus`,
     },
     konten: {
       wert: money(Math.round(netWorth(data.accounts))),
@@ -39,7 +39,7 @@ function kennzahlen(data) {
     },
     immobilien: {
       wert: immo ? `${money(Math.round(immo.cashflowNach / 12))} / Monat` : '–',
-      zusatz: objekte.length === 1 ? `${objekte.length} Objekt` : `${objekte.length} Objekte`,
+      zusatz: objekte.length === 1 ? '1 Objekt' : `${objekte.length} Objekte`,
     },
     gerichte: {
       wert: `${data.gerichte.favoriten.length} gemerkt`,
@@ -63,14 +63,60 @@ const BEREICHE = [
 ];
 
 export function createDashboard({ host, store, onOeffne }) {
+  // Ein Balken, der zeigt, wie viel der Einnahmen die Ausgaben auffressen.
+  function monatsbalken(m) {
+    const balken = el('div', { class: 'monat-balken' });
+    if (m.einnahmen <= 0) {
+      balken.appendChild(el('span', { class: 'monat-leer' }));
+      return balken;
+    }
+    const anteil = Math.min(100, (m.ausgaben / m.einnahmen) * 100);
+    balken.appendChild(el('span', {
+      class: 'monat-ausgaben' + (m.rest < 0 ? ' ist-zuviel' : ''),
+      style: `width:${anteil}%`,
+    }));
+    return balken;
+  }
+
+  function monatsblock(m) {
+    const box = el('section', { class: 'monat' });
+    box.appendChild(el('h2', { class: 'monat-titel' }, store.data.sankey.title || 'Dein Monat'));
+
+    const zahlen = el('div', { class: 'monat-zahlen' });
+    const posten = (label, wert, klasse) => {
+      const p = el('div', { class: `monat-posten${klasse ? ' ' + klasse : ''}` });
+      p.append(el('span', { class: 'monat-label' }, label), el('strong', {}, money(Math.round(wert))));
+      return p;
+    };
+    zahlen.append(
+      posten('Einnahmen', m.einnahmen),
+      posten('Ausgaben', m.ausgaben),
+      posten(m.rest < 0 ? 'Fehlt' : 'Bleibt übrig', Math.abs(m.rest),
+        m.rest < 0 ? 'ist-minus' : 'ist-plus'),
+    );
+    box.append(zahlen, monatsbalken(m));
+
+    const quote = m.einnahmen > 0 ? (m.rest / m.einnahmen) * 100 : null;
+    box.appendChild(el('p', { class: 'monat-hinweis' },
+      quote === null
+        ? 'Trage im Geldfluss deine Einnahmen ein, dann steht hier dein Monat.'
+        : m.rest < 0
+          ? `Du gibst ${dezimal(-quote, 0)} % mehr aus, als hereinkommt.`
+          : `Du legst ${dezimal(quote, 0)} % deiner Einnahmen zur Seite.`));
+
+    return box;
+  }
+
   function renderAll() {
     clear(host);
 
     const kopf = el('div', { class: 'dash-kopf' });
-    kopf.appendChild(wortmarke({ size: 44 }));
-    kopf.appendChild(el('p', { class: 'dash-text' },
-      'Alles an einem Ort. Such dir aus, womit du anfangen willst.'));
+    kopf.appendChild(wortmarke({ size: 40 }));
     host.appendChild(kopf);
+
+    host.appendChild(monatsblock(monatszahlen(store.data)));
+
+    host.appendChild(el('h3', { class: 'dash-ueberschrift' }, 'Bereiche'));
 
     const zahlen = kennzahlen(store.data);
     const gitter = el('div', { class: 'dash-gitter' });
@@ -81,8 +127,8 @@ export function createDashboard({ host, store, onOeffne }) {
 
       const oben = el('div', { class: 'dash-oben' });
       const symbol = el('span', { class: `dash-symbol dash-${b.tab}` });
-      symbol.appendChild(symbolSvg(b.symbol, { size: 24 }));
-      oben.append(symbol, el('h3', {}, b.titel));
+      symbol.appendChild(symbolSvg(b.symbol, { size: 22 }));
+      oben.append(symbol, el('h4', {}, b.titel));
 
       const wert = el('div', { class: 'dash-wert' });
       wert.append(el('strong', {}, z.wert), el('span', {}, z.zusatz));
