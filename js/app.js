@@ -347,9 +347,12 @@ function renderFlowNotes(layout) {
     host.appendChild(el('p', { class: 'note note-warn' },
       `… und ${layout.warnings.length - shown.length} weitere Posten stimmen nicht überein.`));
   }
-  if (layout.unusedCount > 0) {
+  const ohneBetrag = layout.unused ?? [];
+  if (ohneBetrag.length) {
+    const namen = ohneBetrag.slice(0, 5).join(', ')
+      + (ohneBetrag.length > 5 ? ` und ${ohneBetrag.length - 5} weitere` : '');
     host.appendChild(el('p', { class: 'note note-info' },
-      `${layout.unusedCount} Posten ohne Betrag werden nicht gezeichnet.`));
+      `Noch ohne Betrag und deshalb nicht im Diagramm: ${namen}.`));
   }
 }
 

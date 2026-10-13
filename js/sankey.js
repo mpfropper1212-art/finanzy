@@ -29,7 +29,8 @@ export function computeLayout(sankey, { width, height }) {
   const used = new Set();
   for (const f of flows) { used.add(f.from); used.add(f.to); }
   const active = sankey.nodes.filter(n => used.has(n.id));
-  result.unusedCount = sankey.nodes.length - active.length;
+  // Namen statt bloßer Anzahl: so sieht man sofort, wo noch eine Zahl fehlt.
+  result.unused = sankey.nodes.filter(n => !used.has(n.id)).map(n => n.name);
 
   const outL = new Map(), inL = new Map();
   for (const n of active) { outL.set(n.id, []); inL.set(n.id, []); }
