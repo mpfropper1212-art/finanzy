@@ -1,6 +1,6 @@
 // Wochenplan fürs Essen und die Einkaufsliste, die sich daraus ergibt.
 
-import { el, clear, money, uid } from './util.js';
+import { el, clear, money, uid, isoDatum } from './util.js';
 import { einkaufsliste, mengeText } from './gerichte-text.js';
 import { TEMPERATUR_LABELS } from './gerichte-daten.js';
 import { montagVon } from './store.js';
@@ -54,7 +54,7 @@ export function createWochenplanView({ planHost, listeHost, store, alleGerichte 
     const verschieben = tage => {
       const d = new Date(plan().start);
       d.setDate(d.getDate() + tage);
-      plan().start = d.toISOString().slice(0, 10);
+      plan().start = isoDatum(d);
       aenderung();
     };
     zurueck.addEventListener('click', () => verschieben(-7));
@@ -71,12 +71,12 @@ export function createWochenplanView({ planHost, listeHost, store, alleGerichte 
     );
     planHost.appendChild(kopf);
 
-    const heuteIso = new Date().toISOString().slice(0, 10);
+    const heuteIso = isoDatum();
     const gitter = el('div', { class: 'woche-gitter' });
 
     for (let tag = 0; tag < 7; tag++) {
       const datum = datumVon(plan().start, tag);
-      const istHeute = datum.toISOString().slice(0, 10) === heuteIso;
+      const istHeute = isoDatum(datum) === heuteIso;
       const spalte = el('div', { class: 'woche-tag' + (istHeute ? ' ist-heute' : '') });
 
       const tagKopf = el('div', { class: 'tag-kopf' });

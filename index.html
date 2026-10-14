@@ -79,6 +79,7 @@
   <header class="topbar">
     <div class="topbar-left">
       <button type="button" class="brand" id="btn-brand" title="Zur Startseite"></button>
+      <span class="version" id="version" aria-label="Version"></span>
       <nav class="tabs" role="tablist" id="tabs"></nav>
       <button type="button" class="btn btn-ghost btn-sm bereiche-knopf" id="btn-bereiche"
               aria-haspopup="true" aria-expanded="false">Bereiche &#9662;</button>
@@ -317,6 +318,15 @@
       </div>
       <div id="strom-tarif" class="immo-form"></div>
     </aside>
+  </main>
+
+  <!-- ---- Gewohnheiten ---- -->
+  <main id="panel-habits" class="panel" hidden>
+    <div class="chart-wrap">
+      <div id="habit-kalender" class="kal-host"></div>
+      <div id="habit-stat" class="kal-host"></div>
+    </div>
+    <aside class="editor" id="habit-seite"></aside>
   </main>
 
   <!-- ---- Training ---- -->

@@ -4,7 +4,7 @@
 // Verbrauch und Zeitraum. Deshalb ist jede Kennzahl hier eine Differenz
 // zwischen zwei Ablesungen, nie ein einzelner Wert.
 
-import { el, svg, clear, money, uid } from './util.js';
+import { el, svg, clear, money, uid, isoDatum } from './util.js';
 
 const zahl = v => (Number.isFinite(Number(v)) ? Number(v) : 0);
 
@@ -14,7 +14,7 @@ const TAGE_JE_MONAT = 365.25 / 12;
 export function createStand(vorlage = {}) {
   return {
     id: uid('st'),
-    datum: new Date().toISOString().slice(0, 10),
+    datum: isoDatum(),
     zaehler: 0,
     notiz: '',
     ...vorlage,

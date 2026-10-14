@@ -5,6 +5,8 @@
 // Satzbau "X schuldet mir Y Euro für Z" reichen Regeln, und sie laufen ohne
 // Netz, ohne Kosten und ohne dass ein Satz das Gerät verlässt.
 
+import { isoDatum } from './util.js';
+
 // Muster statt fester Wortketten: "hat mir 20 Euro geliehen" hat Wörter
 // dazwischen, die eine einfache Textsuche nicht überspringt.
 const SCHULDE_ICH = [
@@ -77,7 +79,7 @@ function datumAus(klein) {
   const verschieben = tage => {
     const d = new Date(heute);
     d.setDate(d.getDate() - tage);
-    return d.toISOString().slice(0, 10);
+    return isoDatum(d);
   };
   if (/\bvorgestern\b/.test(klein)) return verschieben(2);
   if (/\bgestern\b/.test(klein)) return verschieben(1);
@@ -87,7 +89,7 @@ function datumAus(klein) {
     const jahr = m[3] ? (m[3].length === 2 ? `20${m[3]}` : m[3]) : String(heute.getFullYear());
     return `${jahr}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
   }
-  return heute.toISOString().slice(0, 10);
+  return isoDatum(heute);
 }
 
 function grundAus(text) {

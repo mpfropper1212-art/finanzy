@@ -1,7 +1,7 @@
 // Gruppenkasse: gemeinsame Ausgaben einer Reise oder WG und am Ende die
 // Frage, wer wem wie viel zurückzahlt - mit möglichst wenigen Zahlungen.
 
-import { el, clear, money, uid } from './util.js';
+import { el, clear, money, uid, isoDatum } from './util.js';
 
 export function createGruppe(name = 'Neue Gruppe') {
   const ich = { id: uid('p'), name: 'Ich' };
@@ -21,7 +21,7 @@ export function createAusgabe(gruppe, vorlage = {}) {
     betrag: 0,
     zahlerId: gruppe.ichId ?? gruppe.personen[0]?.id ?? '',
     beteiligte: gruppe.personen.map(p => p.id),
-    datum: new Date().toISOString().slice(0, 10),
+    datum: isoDatum(),
     ...vorlage,
   };
 }

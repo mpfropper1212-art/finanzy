@@ -2,6 +2,17 @@
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
+// Datum als YYYY-MM-DD in der Zeitzone des Nutzers.
+//
+// toISOString() rechnet nach UTC um. In deutscher Sommerzeit liegt
+// Mitternacht lokal schon zwei Stunden im Vortag - ein Haken um 0:30 Uhr
+// wäre also auf gestern gelandet und ein Kalendergitter um einen Tag
+// verschoben. Deshalb überall die lokalen Felder nehmen.
+export function isoDatum(d = new Date()) {
+  const zwei = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${zwei(d.getMonth() + 1)}-${zwei(d.getDate())}`;
+}
+
 export function uid(prefix) {
   return prefix + Math.random().toString(36).slice(2, 9);
 }

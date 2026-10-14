@@ -1,5 +1,7 @@
 // Download-Helfer: SVG, PNG, JSON.
 
+import { isoDatum } from './util.js';
+
 function saveBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -15,7 +17,7 @@ export function slugFilename(text, ext) {
   const base = String(text || 'diagramm').toLowerCase()
     .replace(/[äöüß]/g, c => ({ ä: 'ae', ö: 'oe', ü: 'ue', ß: 'ss' }[c]))
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'diagramm';
-  const d = new Date().toISOString().slice(0, 10);
+  const d = isoDatum();
   return `${base}-${d}.${ext}`;
 }
 

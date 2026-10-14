@@ -1,7 +1,7 @@
 // Startseite: der Nutzer entscheidet, was hier steht. Die Kacheln zeigen je
 // Bereich die eine Zahl, die dort zählt - alles Übrige hängt im Bereichsmenü.
 
-import { el, money, clear } from './util.js';
+import { el, money, clear, isoDatum } from './util.js';
 import { symbolSvg, wortmarke } from './logo.js';
 import { netWorth } from './accounts.js';
 import { berechne } from './immobilien.js';
@@ -14,7 +14,7 @@ import { salden, ausgleich } from './gruppen.js';
 import { HUB_ID } from './store.js';
 import { renderNachrichten } from './nachrichten.js';
 import { createMuenze } from './muenze.js';
-import { createHabitWidget } from './habits.js';
+import { createHabitWidget, serie } from './habits.js';
 import { BEREICHE, WIDGETS, bereichZu } from './bereiche.js';
 
 const dezimal = (v, stellen = 2) =>
@@ -82,6 +82,17 @@ function kennzahlen(data) {
         ? `${money(Math.round(sch.bekomme))} offen, ${money(Math.round(sch.schulde))} geschuldet`
         : 'nichts offen',
     },
+    habits: (() => {
+      const items = data.habits.items;
+      if (!items.length) return { wert: '–', zusatz: 'noch keine angelegt' };
+      const heute = isoDatum();
+      const offen = items.filter(h => !h.tage.includes(heute)).length;
+      const beste = Math.max(...items.map(h => serie(h)));
+      return {
+        wert: offen ? `${offen} offen` : 'alles erledigt',
+        zusatz: `${items.length} Gewohnheiten · längste Serie ${beste} Tage`,
+      };
+    })(),
     gym: {
       wert: gym.aktiv ? 'läuft gerade' : gym.anzahl ? `${gym.proMonat} in 4 Wochen` : 'noch keins',
       zusatz: gym.letztesVolumen === null
@@ -293,7 +304,9 @@ export function createDashboard({ host, store, onOeffne, onLayout }) {
     const zahlen = kennzahlen(store.data);
 
     for (const id of einstellung().widgets) {
-      if (id === 'habits') host.appendChild(createHabitWidget({ store }));
+      if (id === 'habits') {
+        host.appendChild(createHabitWidget({ store, onUebersicht: () => onOeffne('habits') }));
+      }
       else if (id === 'karten') host.appendChild(kartenBlock(zahlen));
       else if (id === 'nachrichten') {
         // Lädt nebenher; die Kacheln sollen nicht auf das Netz warten.

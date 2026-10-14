@@ -1,7 +1,7 @@
 // Schulden: wer schuldet mir was, und was schulde ich.
 // Erfassen geht per Satz - getippt oder diktiert.
 
-import { el, clear, money, uid } from './util.js';
+import { el, clear, money, uid, isoDatum } from './util.js';
 import { leseSatz } from './schulden-text.js';
 
 export function createSchuld(vorlage = {}) {
@@ -11,7 +11,7 @@ export function createSchuld(vorlage = {}) {
     betrag: 0,
     richtung: 'bekomme',
     grund: '',
-    datum: new Date().toISOString().slice(0, 10),
+    datum: isoDatum(),
     erledigt: false,
     ...vorlage,
   };

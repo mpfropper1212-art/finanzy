@@ -1,7 +1,7 @@
 // Tanktabelle: je Tankfüllung Datum, Liter, Preis und Tachostand. Alles
 // andere - gefahrene Kilometer, Verbrauch, Preis je Liter - ergibt sich daraus.
 
-import { el, svg, clear, money, uid } from './util.js';
+import { el, svg, clear, money, uid, isoDatum } from './util.js';
 
 const zahl = v => (Number.isFinite(Number(v)) ? Number(v) : 0);
 
@@ -10,7 +10,7 @@ export const TAG_VORSCHLAEGE = ['Urlaub', 'Autobahn', 'Stadt', 'Kurzstrecke', 'A
 export function createTankung(vorlage = {}) {
   return {
     id: uid('tk'),
-    datum: new Date().toISOString().slice(0, 10),
+    datum: isoDatum(),
     liter: 0,
     euro: 0,
     tacho: 0,
@@ -161,7 +161,7 @@ export function zeitfenster({ zeitraum, eigen } = {}) {
   const vorMonaten = n => {
     const d = new Date();
     d.setMonth(d.getMonth() - n);
-    return d.toISOString().slice(0, 10);
+    return isoDatum(d);
   };
 
   if (zeitraum === 'eigen') {

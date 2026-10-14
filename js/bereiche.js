@@ -53,6 +53,11 @@ export const BEREICHE = [
   },
 
   {
+    tab: 'habits', panel: 'panel-habits', symbol: 'habits', kennzahl: 'habits', gruppe: 'Gesundheit',
+    titel: 'Gewohnheiten',
+    text: 'Kalender und Statistik zu deinen täglichen Haken.',
+  },
+  {
     tab: 'gym', panel: 'panel-gym', symbol: 'gym', kennzahl: 'gym', gruppe: 'Gesundheit',
     titel: 'Training',
     text: 'Sätze loggen, das letzte Mal daneben sehen und das nächste Gewicht vorgeschlagen bekommen.',

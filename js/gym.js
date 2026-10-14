@@ -1,7 +1,7 @@
 // Trainingslogger: Sätze erfassen, das letzte Mal direkt daneben sehen und
 // einen Vorschlag fürs nächste Gewicht bekommen.
 
-import { el, clear, uid } from './util.js';
+import { el, clear, uid, isoDatum } from './util.js';
 import { MUSKELGRUPPEN, MUSKEL_FARBEN } from './gym-daten.js';
 import {
   auswerten, letztesMal, vorschlag, saetzeVon, saetzeText, workoutStats,
@@ -17,7 +17,7 @@ const datumKurz = iso => new Date(iso).toLocaleDateString('de-DE', {
   day: '2-digit', month: '2-digit',
 });
 
-const heute = () => new Date().toISOString().slice(0, 10);
+const heute = () => isoDatum();
 
 export function createWorkout(vorlage = {}) {
   return { id: uid('w'), datum: heute(), notiz: '', saetze: [], ...vorlage };

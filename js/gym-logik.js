@@ -1,6 +1,8 @@
 // Die Rechenregeln hinter dem Trainingslogger - bewusst ohne DOM, damit sie
 // für sich prüfbar bleiben.
 
+import { isoDatum } from './util.js';
+
 const zahl = v => (Number.isFinite(Number(v)) ? Number(v) : 0);
 
 // Gewichte kommen in 1,25er-Schritten vor; zwei Nachkommastellen reichen und
@@ -155,7 +157,7 @@ export function auswerten(gym) {
 
   const grenze = new Date();
   grenze.setDate(grenze.getDate() - 28);
-  const iso = grenze.toISOString().slice(0, 10);
+  const iso = isoDatum(grenze);
   const letzte4Wochen = fertige.filter(w => w.datum >= iso);
 
   const letztes = fertige[0] ?? null;

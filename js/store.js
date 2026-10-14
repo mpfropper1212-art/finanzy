@@ -2,7 +2,7 @@
 
 import * as cloud from './cloud.js';
 import { createImmobilie, BUNDESLAENDER } from './immobilien.js';
-import { uid } from './util.js';
+import { uid, isoDatum } from './util.js';
 import { SEED_GERAETE, SEED_UEBUNGEN, MUSKELGRUPPEN } from './gym-daten.js';
 import { BEREICH_IDS, WIDGET_IDS, START_VORGABE } from './bereiche.js';
 
@@ -81,7 +81,7 @@ export function montagVon(datum) {
   const d = new Date(datum);
   const tag = (d.getDay() + 6) % 7;
   d.setDate(d.getDate() - tag);
-  return d.toISOString().slice(0, 10);
+  return isoDatum(d);
 }
 
 function createImmobilienTeil() {
