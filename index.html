@@ -79,19 +79,9 @@
   <header class="topbar">
     <div class="topbar-left">
       <button type="button" class="brand" id="btn-brand" title="Zur Startseite"></button>
-      <nav class="tabs" role="tablist">
-        <button class="tab is-active" data-tab="start" role="tab">Start</button>
-        <button class="tab" data-tab="flow" role="tab">Geldfluss</button>
-        <button class="tab" data-tab="accounts" role="tab">Konten</button>
-        <button class="tab" data-tab="immo" role="tab">Immobilien</button>
-        <button class="tab" data-tab="gerichte" role="tab">Gerichte</button>
-        <button class="tab" data-tab="woche" role="tab">Wochenplan</button>
-        <button class="tab" data-tab="schulden" role="tab">Schulden</button>
-        <button class="tab" data-tab="gruppen" role="tab">Gruppenkasse</button>
-        <button class="tab" data-tab="tanken" role="tab">Tanken</button>
-        <button class="tab" data-tab="strom" role="tab">Strom</button>
-        <button class="tab" data-tab="gym" role="tab">Training</button>
-      </nav>
+      <nav class="tabs" role="tablist" id="tabs"></nav>
+      <button type="button" class="btn btn-ghost btn-sm bereiche-knopf" id="btn-bereiche"
+              aria-haspopup="true" aria-expanded="false">Bereiche &#9662;</button>
     </div>
     <div class="topbar-right">
       <span id="save-state" class="save-state" aria-live="polite"></span>
@@ -111,6 +101,10 @@
       <button class="btn btn-ghost" id="btn-logout">Abmelden</button>
     </div>
   </header>
+
+  <!-- Alle Bereiche, nach Thema gruppiert. Deckt die ganze Breite ab, damit
+       es auf dem Handy genauso funktioniert wie am Rechner. -->
+  <div id="bereiche-pop" class="bereiche-pop" hidden></div>
 
   <!-- Einmaliges Angebot, Daten aus der alten lokalen Version zu übernehmen -->
   <div id="migrate-bar" class="migrate" hidden>

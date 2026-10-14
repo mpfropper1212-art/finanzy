@@ -11,6 +11,7 @@ import { createGerichteView } from './gerichte.js';
 import { createTankenView } from './tanken.js';
 import { createStromView } from './strom.js';
 import { createGymView } from './gym.js';
+import { BEREICHE, GRUPPEN, bereichZu } from './bereiche.js';
 import { createSchuldenView } from './schulden.js';
 import { createWochenplanView } from './wochenplan.js';
 import { createGruppenView } from './gruppen.js';
@@ -242,6 +243,7 @@ function enterApp(data) {
     host: $('#panel-start'),
     store,
     onOeffne: setTab,
+    onLayout: renderTabs,
   });
 
   $('#sankey-title').value = data.sankey.title;
@@ -251,6 +253,7 @@ function enterApp(data) {
   flowEditor.renderAll();
   accountsEditor.renderAll();
   refreshFlowChart();
+  renderTabs();
   setTab('start');
 }
 
@@ -352,19 +355,8 @@ function rebuildAll() {
 
 function setTab(tab) {
   activeTab = tab;
-  for (const btn of document.querySelectorAll('.tab')) {
-    btn.classList.toggle('is-active', btn.dataset.tab === tab);
-  }
-  $('#panel-flow').hidden = tab !== 'flow';
-  $('#panel-accounts').hidden = tab !== 'accounts';
-  $('#panel-immo').hidden = tab !== 'immo';
-  $('#panel-gerichte').hidden = tab !== 'gerichte';
-  $('#panel-tanken').hidden = tab !== 'tanken';
-  $('#panel-strom').hidden = tab !== 'strom';
-  $('#panel-gym').hidden = tab !== 'gym';
-  $('#panel-schulden').hidden = tab !== 'schulden';
-  $('#panel-woche').hidden = tab !== 'woche';
-  $('#panel-gruppen').hidden = tab !== 'gruppen';
+  renderTabs();
+  for (const b of BEREICHE) $(`#${b.panel}`).hidden = tab !== b.tab;
   $('#panel-start').hidden = tab !== 'start';
   if (tab === 'flow') refreshFlowChart();
   else if (tab === 'accounts') refreshAccounts();
@@ -495,9 +487,90 @@ $('#btn-tidy').addEventListener('click', () => {
   refreshAccounts();
 });
 
-for (const btn of document.querySelectorAll('.tab')) {
-  btn.addEventListener('click', () => setTab(btn.dataset.tab));
+/* --------------------- Reiterleiste und Bereiche --------------------- */
+
+// Die Reiterzeile zeigt nur die Favoriten des Nutzers. Elf Reiter nebeneinander
+// waren schlicht nicht mehr zu überblicken - der Rest hängt im Bereichsmenü.
+function renderTabs() {
+  const leiste = $('#tabs');
+  leiste.textContent = '';
+
+  const machen = (tab, titel) => {
+    const btn = el('button', { class: 'tab', type: 'button', role: 'tab' }, titel);
+    btn.dataset.tab = tab;
+    if (tab === activeTab) btn.classList.add('is-active');
+    btn.addEventListener('click', () => setTab(tab));
+    leiste.appendChild(btn);
+  };
+
+  machen('start', 'Start');
+  for (const tab of store.data?.start?.favoriten ?? []) {
+    const b = bereichZu(tab);
+    if (b) machen(b.tab, b.titel);
+  }
+
+  // Ein Bereich, den man gerade offen hat, der aber kein Favorit ist, bekommt
+  // trotzdem einen Reiter - sonst sieht man nicht, wo man ist.
+  if (activeTab !== 'start' && !leiste.querySelector(`[data-tab="${activeTab}"]`)) {
+    const b = bereichZu(activeTab);
+    if (b) machen(b.tab, b.titel);
+  }
 }
+
+function renderBereichsmenue() {
+  const pop = $('#bereiche-pop');
+  pop.textContent = '';
+
+  for (const gruppe of GRUPPEN) {
+    const liste = BEREICHE.filter(b => b.gruppe === gruppe);
+    if (!liste.length) continue;
+
+    const block = el('div', { class: 'bereiche-gruppe' });
+    block.appendChild(el('h4', {}, gruppe));
+    const gitter = el('div', { class: 'bereiche-gitter' });
+
+    for (const b of liste) {
+      const knopf = el('button', { type: 'button', class: 'bereiche-knopf-eintrag' });
+      const symbol = el('span', { class: `dash-symbol dash-${b.tab}` });
+      symbol.appendChild(symbolSvg(b.symbol, { size: 20 }));
+      const text = el('span', { class: 'bereiche-text' });
+      text.append(el('strong', {}, b.titel), el('span', {}, b.text));
+      knopf.append(symbol, text);
+      knopf.addEventListener('click', () => { bereicheZu(); setTab(b.tab); });
+      gitter.appendChild(knopf);
+    }
+
+    block.appendChild(gitter);
+    pop.appendChild(block);
+  }
+}
+
+function bereicheAuf() {
+  renderBereichsmenue();
+  $('#bereiche-pop').hidden = false;
+  $('#btn-bereiche').setAttribute('aria-expanded', 'true');
+}
+
+function bereicheZu() {
+  $('#bereiche-pop').hidden = true;
+  $('#btn-bereiche').setAttribute('aria-expanded', 'false');
+}
+
+$('#btn-bereiche').addEventListener('click', ev => {
+  ev.stopPropagation();
+  if ($('#bereiche-pop').hidden) bereicheAuf();
+  else bereicheZu();
+});
+
+document.addEventListener('click', ev => {
+  if ($('#bereiche-pop').hidden) return;
+  if (ev.target.closest('#bereiche-pop') || ev.target.closest('#btn-bereiche')) return;
+  bereicheZu();
+});
+
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape') bereicheZu();
+});
 
 /* ------------------------- Immobilien ------------------------- */
 

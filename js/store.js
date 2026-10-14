@@ -4,6 +4,7 @@ import * as cloud from './cloud.js';
 import { createImmobilie, BUNDESLAENDER } from './immobilien.js';
 import { uid } from './util.js';
 import { SEED_GERAETE, SEED_UEBUNGEN, MUSKELGRUPPEN } from './gym-daten.js';
+import { BEREICH_IDS, WIDGET_IDS, START_VORGABE } from './bereiche.js';
 
 export const DATA_VERSION = 2;
 const SAVE_DEBOUNCE_MS = 400;
@@ -62,6 +63,8 @@ export function createDefaultData() {
     schulden: { eintraege: [] },
     gruppen: { items: [], activeId: null },
     wochenplan: { start: montagVon(new Date()), eintraege: [], abgehakt: [] },
+    start: { ...START_VORGABE, widgets: [...START_VORGABE.widgets], karten: [...START_VORGABE.karten], favoriten: [...START_VORGABE.favoriten] },
+    habits: { items: [] },
     gym: {
       geraete: SEED_GERAETE.map(g => ({ ...g })),
       uebungen: SEED_UEBUNGEN.map(u => ({ ...u })),
@@ -179,6 +182,8 @@ export function migrate(raw) {
         ? raw.wochenplan.abgehakt.filter(x => typeof x === 'string')
         : [],
     },
+    start: migrateStart(raw.start),
+    habits: migrateHabits(raw.habits),
     gym: migrateGym(raw.gym),
     strom: migrateStrom(raw.strom),
     tanken: {
@@ -199,6 +204,39 @@ export function migrate(raw) {
         sonstiges: Number(raw.tanken?.fixkosten?.sonstiges) || 0,
       },
     },
+  };
+}
+
+// Startseite und Reiterleiste. Eine leere Auswahl ist erlaubt - wer alles
+// abwählt, meint das auch. Nur ein fehlender Schlüssel bekommt die Vorgabe.
+function migrateStart(roh) {
+  const sauber = (liste, erlaubt, vorgabe, maximum = null) => {
+    if (!Array.isArray(liste)) return [...vorgabe];
+    const eindeutig = [...new Set(liste.filter(x => erlaubt.includes(x)))];
+    return maximum ? eindeutig.slice(0, maximum) : eindeutig;
+  };
+  const r = roh && typeof roh === 'object' ? roh : {};
+  return {
+    widgets: sauber(r.widgets, WIDGET_IDS, START_VORGABE.widgets),
+    karten: sauber(r.karten, BEREICH_IDS, START_VORGABE.karten),
+    favoriten: sauber(r.favoriten, BEREICH_IDS, START_VORGABE.favoriten, 5),
+    muenze: typeof r.muenze === 'boolean' ? r.muenze : START_VORGABE.muenze,
+  };
+}
+
+function migrateHabits(roh) {
+  return {
+    items: Array.isArray(roh?.items)
+      ? roh.items.filter(x => x && x.id).map(x => ({
+        id: String(x.id),
+        name: String(x.name ?? 'Gewohnheit'),
+        farbe: typeof x.farbe === 'string' ? x.farbe : '#2f6feb',
+        // Doppelte Tage würden die Serie verfälschen.
+        tage: Array.isArray(x.tage)
+          ? [...new Set(x.tage.filter(t => typeof t === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(t)))]
+          : [],
+      }))
+      : [],
   };
 }
 

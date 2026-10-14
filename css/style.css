@@ -1353,3 +1353,108 @@ button, input, select { font: inherit; color: inherit; }
   .gym-satz-davor { display: none; }
   .gym-satz-kopf span:nth-child(4) { display: none; }
 }
+
+
+/* --------------------- Bereichsmenü und Reiter --------------------- */
+
+.bereiche-knopf { white-space: nowrap; }
+
+/* Volle Breite statt schmalem Dropdown: nur so sind zehn Bereiche mit
+   Beschreibung auch auf dem Handy lesbar. */
+.bereiche-pop {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  padding: 14px 16px;
+  display: flex; flex-wrap: wrap; gap: 20px;
+}
+.bereiche-gruppe { flex: 1 1 280px; min-width: 0; }
+.bereiche-gruppe h4 {
+  margin: 0 0 8px; font-size: 11px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--muted);
+}
+.bereiche-gitter { display: flex; flex-direction: column; gap: 4px; }
+.bereiche-knopf-eintrag {
+  display: flex; align-items: flex-start; gap: 10px; text-align: left;
+  padding: 8px; border-radius: 9px; border: 1px solid transparent;
+  background: transparent; color: inherit; cursor: pointer; font: inherit;
+  width: 100%;
+}
+.bereiche-knopf-eintrag:hover { background: var(--surface-2); border-color: var(--border); }
+.bereiche-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.bereiche-text strong { font-size: 13.5px; }
+.bereiche-text span { font-size: 12px; color: var(--muted); }
+
+/* ------------------------- Gewohnheiten ------------------------- */
+
+.habits {
+  border: 1px solid var(--border); border-radius: 14px;
+  background: var(--surface); padding: 14px;
+  display: flex; flex-direction: column; gap: 7px;
+}
+.habits-kopf { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.habits-kopf h3 { margin: 0; font-size: 15px; }
+
+/* Ein gemeinsames Raster für Kopfzeile und Gewohnheiten, damit die Haken
+   genau unter ihren Wochentagen stehen. */
+.habits-tage, .habits-zeile, .habits-neu {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(7, 30px) 44px;
+  gap: 5px; align-items: center;
+}
+.habits-tag {
+  font-size: 10.5px; color: var(--muted); text-align: center;
+  text-transform: uppercase; letter-spacing: .03em;
+}
+.habits-tag.ist-heute { color: var(--text); font-weight: 650; }
+.habits-name { font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.habits-name-feld { font-size: 13.5px; }
+
+.habits-haken {
+  height: 30px; border-radius: 8px; cursor: pointer;
+  border: 1.5px solid var(--border); background: var(--surface-2);
+  color: #fff; font-size: 14px; line-height: 1; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.habits-haken.ist-heute { border-color: color-mix(in srgb, var(--habit) 45%, var(--border)); }
+.habits-haken.ist-an { background: var(--habit); border-color: var(--habit); }
+.habits-haken:hover { border-color: var(--habit); }
+
+.habits-serie {
+  font-size: 12.5px; color: var(--muted); text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.habits-serie.ist-aktiv { color: var(--habit); font-weight: 650; }
+.habits-neu { grid-template-columns: minmax(0, 1fr) auto; padding-top: 4px; }
+
+/* ------------------------ Startseite anpassen ------------------------ */
+
+.anpassen { display: flex; flex-direction: column; gap: 18px; }
+.anpassen-block {
+  border: 1px solid var(--border); border-radius: 14px;
+  background: var(--surface); padding: 14px;
+}
+.anpassen-block h4 { margin: 0 0 3px; font-size: 14px; }
+.anpassen-hinweis { margin: 0 0 10px; font-size: 12.5px; color: var(--muted); }
+.anpassen-liste { display: flex; flex-direction: column; gap: 2px; }
+.anpassen-zeile {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 9px; border-radius: 9px; border: 1px solid transparent;
+}
+.anpassen-zeile.ist-an { background: var(--surface-2); border-color: var(--border); }
+.anpassen-wahl { display: flex; align-items: center; gap: 9px; flex: 1; min-width: 0; cursor: pointer; }
+.anpassen-name { font-size: 13.5px; }
+.anpassen-text { font-size: 12px; color: var(--muted); }
+.anpassen-pfeile { display: flex; gap: 2px; }
+.anpassen-pfeile button:disabled { opacity: .3; cursor: default; }
+
+.dash-kopf-text { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+
+@media (max-width: 760px) {
+  /* Die Haken bleiben fingergroß, der Name weicht. */
+  .habits-tage, .habits-zeile {
+    grid-template-columns: minmax(0, 1fr) repeat(7, 28px) 34px;
+    gap: 3px;
+  }
+  .habits-name, .habits-name-feld { font-size: 12.5px; }
+  .bereiche-pop { padding: 12px; gap: 14px; }
+}

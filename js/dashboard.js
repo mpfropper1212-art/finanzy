@@ -1,5 +1,5 @@
-// Startseite: eine Kachel je Bereich, jeweils mit der Zahl, die dort zählt.
-// Soll die Frage beantworten "wo will ich gerade hin" statt nur zu verlinken.
+// Startseite: der Nutzer entscheidet, was hier steht. Die Kacheln zeigen je
+// Bereich die eine Zahl, die dort zählt - alles Übrige hängt im Bereichsmenü.
 
 import { el, money, clear } from './util.js';
 import { symbolSvg, wortmarke } from './logo.js';
@@ -14,6 +14,8 @@ import { salden, ausgleich } from './gruppen.js';
 import { HUB_ID } from './store.js';
 import { renderNachrichten } from './nachrichten.js';
 import { createMuenze } from './muenze.js';
+import { createHabitWidget } from './habits.js';
+import { BEREICHE, WIDGETS, bereichZu } from './bereiche.js';
 
 const dezimal = (v, stellen = 2) =>
   v === null || !Number.isFinite(v) ? '–' : v.toLocaleString('de-DE', {
@@ -101,34 +103,30 @@ function kennzahlen(data) {
   };
 }
 
-const BEREICHE = [
-  { tab: 'flow', symbol: 'flow', titel: 'Geldfluss', text: 'Wohin dein Geld jeden Monat fließt, als Sankey-Diagramm.', kennzahl: 'flow' },
-  { tab: 'accounts', symbol: 'konten', titel: 'Konten', text: 'Deine Konten, ihre Stände und die Umbuchungen dazwischen.', kennzahl: 'konten' },
-  { tab: 'immo', symbol: 'immobilien', titel: 'Immobilien', text: 'Rendite, Finanzierung und Cashflow einer Kapitalanlage.', kennzahl: 'immobilien' },
-  { tab: 'gerichte', symbol: 'gerichte', titel: 'Gerichte', text: 'Günstig und eiweißreich kochen, mit Preis und Aufwand je Portion.', kennzahl: 'gerichte' },
-  { tab: 'woche', symbol: 'woche', titel: 'Wochenplan', text: 'Essen für die Woche planen – die Einkaufsliste entsteht daraus.', kennzahl: 'woche' },
-  { tab: 'schulden', symbol: 'schulden', titel: 'Schulden', text: 'Wer dir was schuldet und was du schuldest – per Satz erfasst.', kennzahl: 'schulden' },
-  { tab: 'gruppen', symbol: 'gruppen', titel: 'Gruppenkasse', text: 'Gemeinsame Ausgaben einer Reise – und wer am Ende wem was zahlt.', kennzahl: 'gruppen' },
-  { tab: 'gym', symbol: 'gym', titel: 'Training', text: 'Sätze loggen, das letzte Mal daneben sehen und das nächste Gewicht vorgeschlagen bekommen.', kennzahl: 'gym' },
-  { tab: 'strom', symbol: 'strom', titel: 'Strom', text: 'Zählerstände eintragen – Verbrauch und Monatskosten ergeben sich daraus.', kennzahl: 'strom' },
-  { tab: 'tanken', symbol: 'tanken', titel: 'Tanken', text: 'Verbrauch und Spritkosten über alle Tankfüllungen.', kennzahl: 'tanken' },
-];
+export function createDashboard({ host, store, onOeffne, onLayout }) {
+  let anpassen = false;
 
-export function createDashboard({ host, store, onOeffne }) {
-  function renderAll() {
-    clear(host);
+  const einstellung = () => store.data.start;
 
-    const kopf = el('div', { class: 'dash-kopf' });
-    const text = el('div', { class: 'dash-kopf-text' });
-    text.appendChild(wortmarke({ size: 40 }));
-    text.appendChild(el('p', { class: 'dash-text' }, 'Such dir aus, womit du anfangen willst.'));
-    kopf.append(text, createMuenze());
-    host.appendChild(kopf);
+  function speichern() {
+    store.commit({ silent: true });
+    // Die Reiterleiste hängt an denselben Einstellungen und muss mit.
+    onLayout?.();
+    renderAll();
+  }
 
-    const zahlen = kennzahlen(store.data);
+  /* ---------------------------- Kacheln ---------------------------- */
+
+  function kartenBlock(zahlen) {
+    const gewaehlt = einstellung().karten.map(bereichZu).filter(Boolean);
+
+    if (!gewaehlt.length) {
+      return el('p', { class: 'empty' },
+        'Keine Kachel ausgewählt. Über „Startseite anpassen" kommen welche dazu.');
+    }
+
     const gitter = el('div', { class: 'dash-gitter' });
-
-    for (const b of BEREICHE) {
+    for (const b of gewaehlt) {
       const karte = el('button', { type: 'button', class: 'dash-karte' });
       const z = zahlen[b.kennzahl];
 
@@ -144,13 +142,171 @@ export function createDashboard({ host, store, onOeffne }) {
       karte.addEventListener('click', () => onOeffne(b.tab));
       gitter.appendChild(karte);
     }
+    return gitter;
+  }
 
-    host.appendChild(gitter);
+  /* -------------------------- Anpassen-Modus -------------------------- */
 
-    // Lädt nebenher; die Kacheln sollen nicht auf das Netz warten.
-    const news = el('section', { class: 'news' });
-    host.appendChild(news);
-    renderNachrichten(news);
+  // Haken und Pfeile. Dieselbe Mechanik für Startblöcke, Kacheln und Reiter -
+  // nur die Quelle und ein paar Regeln unterscheiden sich.
+  function auswahlListe({ alle, schluessel, titel, hinweis, sortierbar = false, maximum = null }) {
+    const gewaehlt = einstellung()[schluessel];
+    const block = el('div', { class: 'anpassen-block' });
+    block.appendChild(el('h4', {}, titel));
+    if (hinweis) block.appendChild(el('p', { class: 'anpassen-hinweis' }, hinweis));
+
+    const liste = el('div', { class: 'anpassen-liste' });
+
+    // Gewähltes zuerst in seiner Reihenfolge, der Rest danach - sonst springt
+    // ein Eintrag beim Anhaken quer durch die Liste.
+    const sortiert = [
+      ...gewaehlt.map(id => alle.find(x => x.id === id)).filter(Boolean),
+      ...alle.filter(x => !gewaehlt.includes(x.id)),
+    ];
+
+    for (const eintrag of sortiert) {
+      const an = gewaehlt.includes(eintrag.id);
+      const zeile = el('div', { class: 'anpassen-zeile' + (an ? ' ist-an' : '') });
+
+      const feld = el('label', { class: 'anpassen-wahl' });
+      const haken = el('input', { type: 'checkbox' });
+      haken.checked = an;
+      haken.addEventListener('change', () => {
+        const l = einstellung()[schluessel];
+        if (haken.checked) {
+          if (maximum && l.length >= maximum) {
+            haken.checked = false;
+            window.alert(`Hier passen höchstens ${maximum} Einträge rein. Nimm zuerst einen raus.`);
+            return;
+          }
+          l.push(eintrag.id);
+        } else {
+          einstellung()[schluessel] = l.filter(x => x !== eintrag.id);
+        }
+        speichern();
+      });
+
+      feld.append(haken, el('span', { class: 'anpassen-name' }, eintrag.titel));
+      if (eintrag.text) feld.appendChild(el('span', { class: 'anpassen-text' }, eintrag.text));
+      zeile.appendChild(feld);
+
+      if (sortierbar && an) {
+        const i = gewaehlt.indexOf(eintrag.id);
+        const schieben = richtung => {
+          const l = einstellung()[schluessel];
+          const j = i + richtung;
+          if (j < 0 || j >= l.length) return;
+          [l[i], l[j]] = [l[j], l[i]];
+          speichern();
+        };
+        const pfeile = el('span', { class: 'anpassen-pfeile' });
+        const hoch = el('button', { class: 'link-btn', type: 'button', title: 'Nach oben' }, '↑');
+        hoch.disabled = i === 0;
+        hoch.addEventListener('click', () => schieben(-1));
+        const runter = el('button', { class: 'link-btn', type: 'button', title: 'Nach unten' }, '↓');
+        runter.disabled = i === gewaehlt.length - 1;
+        runter.addEventListener('click', () => schieben(1));
+        pfeile.append(hoch, runter);
+        zeile.appendChild(pfeile);
+      }
+
+      liste.appendChild(zeile);
+    }
+
+    block.appendChild(liste);
+    return block;
+  }
+
+  function anpassenPanel() {
+    const panel = el('section', { class: 'anpassen' });
+    const bereichsListe = () => BEREICHE.map(b => ({ id: b.tab, titel: b.titel }));
+
+    panel.appendChild(auswahlListe({
+      alle: WIDGETS,
+      schluessel: 'widgets',
+      titel: 'Was auf der Startseite steht',
+      hinweis: 'Von oben nach unten, Reihenfolge über die Pfeile.',
+      sortierbar: true,
+    }));
+
+    panel.appendChild(auswahlListe({
+      alle: bereichsListe(),
+      schluessel: 'karten',
+      titel: 'Welche Bereiche als Kachel',
+      hinweis: 'Erscheinen in dieser Reihenfolge.',
+      sortierbar: true,
+    }));
+
+    panel.appendChild(auswahlListe({
+      alle: bereichsListe(),
+      schluessel: 'favoriten',
+      titel: 'Reiter oben in der Leiste',
+      hinweis: 'Höchstens fünf. Alles andere bleibt über „Bereiche" erreichbar.',
+      maximum: 5,
+    }));
+
+    const sonst = el('div', { class: 'anpassen-block' });
+    sonst.appendChild(el('h4', {}, 'Sonstiges'));
+    const zeile = el('div', { class: 'anpassen-zeile' + (einstellung().muenze ? ' ist-an' : '') });
+    const feld = el('label', { class: 'anpassen-wahl' });
+    const haken = el('input', { type: 'checkbox' });
+    haken.checked = einstellung().muenze;
+    haken.addEventListener('change', () => {
+      einstellung().muenze = haken.checked;
+      speichern();
+    });
+    feld.append(haken, el('span', { class: 'anpassen-name' }, 'Münze zum Werfen'));
+    zeile.appendChild(feld);
+    sonst.appendChild(zeile);
+    panel.appendChild(sonst);
+
+    return panel;
+  }
+
+  /* ----------------------------- Aufbau ----------------------------- */
+
+  function renderAll() {
+    clear(host);
+
+    const kopf = el('div', { class: 'dash-kopf' });
+    const text = el('div', { class: 'dash-kopf-text' });
+    text.appendChild(wortmarke({ size: 40 }));
+    text.appendChild(el('p', { class: 'dash-text' },
+      anpassen
+        ? 'Setz die Haken für das, was du hier sehen willst.'
+        : 'Such dir aus, womit du anfangen willst.'));
+
+    const knopf = el('button', { class: 'btn btn-ghost btn-sm', type: 'button' },
+      anpassen ? 'Fertig' : 'Startseite anpassen');
+    knopf.addEventListener('click', () => { anpassen = !anpassen; renderAll(); });
+    text.appendChild(knopf);
+
+    kopf.appendChild(text);
+    if (einstellung().muenze && !anpassen) kopf.appendChild(createMuenze());
+    host.appendChild(kopf);
+
+    if (anpassen) {
+      host.appendChild(anpassenPanel());
+      return;
+    }
+
+    const zahlen = kennzahlen(store.data);
+
+    for (const id of einstellung().widgets) {
+      if (id === 'habits') host.appendChild(createHabitWidget({ store }));
+      else if (id === 'karten') host.appendChild(kartenBlock(zahlen));
+      else if (id === 'nachrichten') {
+        // Lädt nebenher; die Kacheln sollen nicht auf das Netz warten.
+        const news = el('section', { class: 'news' });
+        host.appendChild(news);
+        renderNachrichten(news);
+      }
+    }
+
+    if (!einstellung().widgets.length) {
+      host.appendChild(el('p', { class: 'empty' },
+        'Die Startseite ist leer. Über „Startseite anpassen" wählst du, was hier stehen soll.'));
+    }
   }
 
   return { renderAll };
