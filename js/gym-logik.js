@@ -69,8 +69,10 @@ export function vorschlag(uebung, letzte) {
       wdh: ziel,
       steigt: true,
       neu: false,
-      text: `Letztes Mal alle ${arbeitssaetze.length} Sätze mit ${ziel} Wiederholungen – `
-        + `probier ${formatGewicht(runde(top + stufe))} kg.`,
+      text: arbeitssaetze.length === 1
+        ? `Letztes Mal ${ziel} Wiederholungen geschafft – probier ${formatGewicht(runde(top + stufe))} kg.`
+        : `Letztes Mal alle ${arbeitssaetze.length} Sätze mit ${ziel} Wiederholungen – `
+          + `probier ${formatGewicht(runde(top + stufe))} kg.`,
     };
   }
 
@@ -92,8 +94,11 @@ export function vorschlag(uebung, letzte) {
     wdh: ziel,
     steigt: false,
     neu: false,
-    text: `Letztes Mal ${geschafft} von ${arbeitssaetze.length} Sätzen auf ${ziel} Wiederholungen. `
-      + `Bleib bei ${formatGewicht(top)} kg, bis ${fehlend === 1 ? 'auch der letzte' : 'alle'} sitzt.`,
+    text: arbeitssaetze.length === 1
+      ? `Letztes Mal ${zahl(arbeitssaetze[0].wdh)} statt ${ziel} Wiederholungen. `
+        + `Bleib bei ${formatGewicht(top)} kg.`
+      : `Letztes Mal ${geschafft} von ${arbeitssaetze.length} Sätzen auf ${ziel} Wiederholungen. `
+        + `Bleib bei ${formatGewicht(top)} kg, bis ${fehlend === 1 ? 'auch der letzte sitzt' : 'alle sitzen'}.`,
   };
 }
 
@@ -111,7 +116,8 @@ export function saetzeText(saetze) {
   const gleich = gefuellt.every(s =>
     zahl(s.wdh) === zahl(gefuellt[0].wdh) && zahl(s.gewicht) === zahl(gefuellt[0].gewicht));
   if (gleich) {
-    return `${gefuellt.length} × ${zahl(gefuellt[0].wdh)} @ ${formatGewicht(gefuellt[0].gewicht)} kg`;
+    const einer = `${zahl(gefuellt[0].wdh)} @ ${formatGewicht(gefuellt[0].gewicht)} kg`;
+    return gefuellt.length === 1 ? einer : `${gefuellt.length} × ${einer}`;
   }
   return gefuellt
     .map(s => `${zahl(s.wdh)} @ ${formatGewicht(s.gewicht)}`)

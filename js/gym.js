@@ -144,7 +144,7 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
     aktivHost.appendChild(kopf);
 
     const ids = [...new Set(w.saetze.map(s => s.uebungId))].filter(uebungZu);
-    for (const id of ids) aktivHost.appendChild(uebungsBlock(w, uebungZu(id), a));
+    ids.forEach((id, i) => aktivHost.appendChild(uebungsBlock(w, uebungZu(id), i + 1)));
 
     if (!ids.length) {
       aktivHost.appendChild(el('p', { class: 'empty' },
@@ -189,16 +189,22 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
     return zeile;
   }
 
-  function uebungsBlock(w, u, a) {
-    const box = el('section', { class: 'gym-uebung' });
+  function uebungsBlock(w, u, nummer) {
+    // Die Muskelfarbe trägt den ganzen Block, nicht nur das Chip - die Kante
+    // links ist das, woran man beim Scrollen Anfang und Ende erkennt.
+    const farbe = MUSKEL_FARBEN[u.muskel] ?? '#64748b';
+    const box = el('section', { class: 'gym-uebung', style: `--muskel: ${farbe}` });
 
     const kopf = el('div', { class: 'gym-uebung-kopf' });
+    kopf.appendChild(el('span', { class: 'gym-nummer' }, String(nummer)));
+
     const titel = el('div', { class: 'gym-uebung-titel' });
     titel.appendChild(el('h3', {}, u.name));
-    const chip = muskelChip(u.muskel);
-    if (chip) titel.appendChild(chip);
+    const unten = el('div', { class: 'gym-uebung-unter' });
+    if (u.muskel) unten.appendChild(muskelChip(u.muskel));
     const geraet = geraetZu(u.geraetId);
-    if (geraet) titel.appendChild(el('span', { class: 'gym-geraet' }, geraet.name));
+    if (geraet) unten.appendChild(el('span', { class: 'gym-geraet' }, geraet.name));
+    if (unten.childNodes.length) titel.appendChild(unten);
     kopf.appendChild(titel);
 
     const raus = el('button', { class: 'link-btn', type: 'button', title: 'Übung aus dem Training nehmen' }, '✕');
@@ -208,6 +214,11 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
     });
     kopf.appendChild(raus);
     box.appendChild(kopf);
+
+    // Alles unterhalb des Kopfes liegt in einem eigenen Körper, damit der
+    // Kopf farblich abgesetzt werden kann.
+    const koerper = el('div', { class: 'gym-uebung-koerper' });
+    box.appendChild(koerper);
 
     const letzte = letztesMal(gym().workouts, u.id, w.id);
     const v = vorschlag(u, letzte);
@@ -221,7 +232,7 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
       vergleich.appendChild(el('span', { class: 'gym-vergleich-best' },
         `Bestwert ${kg(best.gewicht)} × ${best.wdh}`));
     }
-    box.appendChild(vergleich);
+    koerper.appendChild(vergleich);
 
     const hinweis = el('div', { class: 'gym-vorschlag' + (v.steigt ? ' ist-steigerung' : '') });
     hinweis.appendChild(el('span', {}, v.text));
@@ -240,7 +251,7 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
       });
       hinweis.appendChild(uebernehmen);
     }
-    box.appendChild(hinweis);
+    koerper.appendChild(hinweis);
 
     const tabelle = el('div', { class: 'gym-saetze' });
     const kopfZeile = el('div', { class: 'gym-satz gym-satz-kopf' });
@@ -290,11 +301,11 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
       tabelle.appendChild(zeile);
     });
 
-    box.appendChild(tabelle);
+    koerper.appendChild(tabelle);
 
     const plus = el('button', { class: 'btn btn-ghost btn-sm', type: 'button' }, '+ Satz');
     plus.addEventListener('click', () => { neuerSatz(w, u, v); aenderung(); });
-    box.appendChild(plus);
+    koerper.appendChild(plus);
 
     return box;
   }
