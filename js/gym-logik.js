@@ -195,3 +195,58 @@ export function bestleistung(workouts, uebungId) {
   }
   return beste;
 }
+
+
+/**
+ * Wo im Training stehe ich gerade?
+ *
+ * Der aktuelle Satz ist schlicht der erste noch leere - daraus ergibt sich
+ * alles andere. Kein zusätzlicher Zeiger, der mit den Daten aus dem Tritt
+ * geraten könnte, und nach einem Neuladen stimmt es von allein wieder.
+ */
+export function fortschritt(workout, uebungen) {
+  const nachId = new Map((uebungen ?? []).map(u => [u.id, u]));
+  const alle = (workout?.saetze ?? []).filter(s => nachId.has(s.uebungId));
+
+  // Reihenfolge der Übungen so, wie sie ins Training gekommen sind.
+  const reihenfolge = [...new Set(alle.map(s => s.uebungId))];
+
+  const bloecke = reihenfolge.map((id, i) => {
+    const saetze = alle.filter(s => s.uebungId === id);
+    return {
+      uebung: nachId.get(id),
+      nummer: i + 1,
+      saetze,
+      fertig: saetze.filter(istGefuellt).length,
+      gesamt: saetze.length,
+    };
+  });
+
+  const gesamt = alle.length;
+  const fertig = alle.filter(istGefuellt).length;
+
+  let aktuell = null;
+  for (const block of bloecke) {
+    const index = block.saetze.findIndex(s => !istGefuellt(s));
+    if (index === -1) continue;
+    aktuell = {
+      uebung: block.uebung,
+      satz: block.saetze[index],
+      satzNr: index + 1,
+      satzGesamt: block.saetze.length,
+      uebungNr: block.nummer,
+      uebungGesamt: bloecke.length,
+    };
+    break;
+  }
+
+  return {
+    bloecke,
+    aktuell,
+    fertig,
+    gesamt,
+    offen: gesamt - fertig,
+    prozent: gesamt ? Math.round((fertig / gesamt) * 100) : 0,
+    durch: gesamt > 0 && fertig === gesamt,
+  };
+}

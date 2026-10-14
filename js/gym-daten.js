@@ -89,3 +89,9 @@ export const SEED_UEBUNGEN = [
   { id: 'u-bauchmaschine', name: 'Bauchmaschine', geraetId: 'g-bauchmaschine', muskel: 'Bauch', zielWdh: 15, steigerung: 2.5 },
   { id: 'u-beinheben', name: 'Beinheben hängend', geraetId: 'g-dipmaschine', muskel: 'Bauch', zielWdh: 12, steigerung: 0 },
 ];
+
+
+// Frische Kopien der Startliste. Die Vorgaben für Satzzahl und Pause stehen
+// nur hier, damit sie nicht an zwei Stellen auseinanderlaufen.
+export const geraeteVorlage = () => SEED_GERAETE.map(g => ({ ...g }));
+export const uebungenVorlage = () => SEED_UEBUNGEN.map(u => ({ saetzeZiel: 3, pause: 90, ...u }));

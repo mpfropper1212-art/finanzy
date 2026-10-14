@@ -1380,6 +1380,8 @@ button, input, select { font: inherit; color: inherit; }
 .row-gym > select:nth-of-type(2) { grid-area: 2 / 2 / 3 / 4; }
 .row-gym > label:nth-of-type(1) { grid-area: 3 / 1 / 4 / 2; }
 .row-gym > label:nth-of-type(2) { grid-area: 3 / 2 / 4 / 4; }
+.row-gym > label:nth-of-type(3) { grid-area: 4 / 1 / 5 / 2; }
+.row-gym > label:nth-of-type(4) { grid-area: 4 / 2 / 5 / 4; }
 .row-gym select { min-width: 0; }
 .gym-mini {
   display: flex; align-items: center; gap: 5px;
@@ -1612,4 +1614,119 @@ button.kal-tag:disabled { cursor: default; }
 @media (max-width: 760px) {
   .dash-kopf-rechts { gap: 10px; }
   .dash-anpassen span { font-size: 13px; }
+}
+
+
+/* ----------------------- Geführtes Training ----------------------- */
+
+.gym-fortschritt { display: flex; flex-direction: column; gap: 6px; }
+.gym-fortschritt-text {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 12.5px; color: var(--muted);
+}
+.gym-fortschritt-text strong { color: var(--text); font-variant-numeric: tabular-nums; }
+.gym-schiene {
+  height: 7px; border-radius: 999px; background: var(--surface-2);
+  border: 1px solid var(--border); overflow: hidden;
+}
+.gym-schiene-fuellung {
+  height: 100%; background: var(--accent); border-radius: 999px;
+  transition: width .25s ease;
+}
+
+/* Die große Karte ist das, worauf man im Studio schaut - alles darin
+   fingergroß und von weitem lesbar. */
+.gym-fuehrung {
+  border: 1px solid var(--border); border-top: 5px solid var(--muskel);
+  border-radius: 14px; background: var(--surface);
+  padding: 16px; display: flex; flex-direction: column; gap: 13px;
+  box-shadow: 0 2px 10px rgb(0 0 0 / .07);
+}
+.gym-fuehrung-kopf { display: flex; flex-direction: column; gap: 5px; }
+.gym-fuehrung-kopf h2 { margin: 0; font-size: 22px; line-height: 1.15; }
+.gym-fuehrung-zaehler {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+}
+.gym-satz-marke {
+  align-self: flex-start;
+  font-size: 13px; font-weight: 650;
+  padding: 5px 12px; border-radius: 999px;
+  background: color-mix(in srgb, var(--muskel) 15%, transparent);
+  color: var(--muskel);
+}
+.gym-ziel {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  padding: 9px 11px; border-radius: 9px; background: var(--surface-2);
+}
+.gym-ziel-label {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted);
+}
+.gym-ziel strong { font-size: 17px; font-variant-numeric: tabular-nums; }
+.gym-ziel-letzte { font-size: 12.5px; color: var(--muted); }
+
+.gym-felder { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.gym-feld { display: flex; flex-direction: column; gap: 5px; }
+.gym-feld-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted);
+}
+.gym-stepper-wrap { display: flex; align-items: center; gap: 7px; }
+.gym-stepper {
+  display: flex; align-items: stretch; flex: 1; min-width: 0;
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  background: var(--surface);
+}
+.gym-stepper-knopf {
+  width: 42px; flex: none; border: 0; background: var(--surface-2);
+  font-size: 20px; line-height: 1; cursor: pointer; color: var(--text);
+}
+.gym-stepper-knopf:hover { background: var(--border); }
+.gym-stepper-feld {
+  flex: 1; min-width: 0; border: 0; border-radius: 0; text-align: center;
+  font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums;
+  padding: 9px 2px; background: transparent;
+}
+.gym-stepper-feld:focus { outline: 2px solid var(--accent); outline-offset: -2px; }
+.gym-stepper-einheit { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+
+.gym-fuehrung-knoepfe { display: flex; gap: 10px; align-items: stretch; }
+.gym-grossknopf { flex: 1; font-size: 16px; padding: 14px 18px; }
+
+.gym-pause {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 10px 11px; border-radius: 10px;
+  background: color-mix(in srgb, #d97706 10%, transparent);
+}
+.gym-pause.ist-vorbei { background: color-mix(in srgb, #16a34a 12%, transparent); }
+.gym-pause-kopf {
+  display: flex; align-items: baseline; gap: 10px;
+  font-size: 12.5px; color: var(--muted);
+}
+.gym-pause-zeit {
+  font-size: 19px; color: var(--text); font-variant-numeric: tabular-nums; flex: 1;
+}
+
+.gym-rest { display: flex; flex-direction: column; gap: 2px; }
+.gym-rest-zeile {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 10px; border-radius: 8px; font-size: 13px;
+  border: 1px solid transparent;
+}
+.gym-rest-zeile.ist-dran { background: var(--surface-2); border-color: var(--border); font-weight: 600; }
+.gym-rest-zeile.ist-fertig { opacity: .5; }
+.gym-rest-zeile.ist-fertig .gym-rest-name { text-decoration: line-through; }
+.gym-rest-punkt { width: 9px; height: 9px; border-radius: 50%; background: var(--muskel); flex: none; }
+.gym-rest-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gym-rest-zahl { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.gym-durch {
+  padding: 12px; border-radius: 10px; margin: 0;
+  background: color-mix(in srgb, #16a34a 12%, transparent);
+  font-size: 13.5px;
+}
+
+@media (max-width: 760px) {
+  .gym-felder { grid-template-columns: 1fr; }
+  .gym-fuehrung-kopf h2 { font-size: 19px; }
+  .gym-fuehrung-knoepfe { flex-direction: column; }
+  .gym-stepper-knopf { width: 52px; }
 }

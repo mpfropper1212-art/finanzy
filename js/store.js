@@ -3,7 +3,7 @@
 import * as cloud from './cloud.js';
 import { createImmobilie, BUNDESLAENDER } from './immobilien.js';
 import { uid, isoDatum } from './util.js';
-import { SEED_GERAETE, SEED_UEBUNGEN, MUSKELGRUPPEN } from './gym-daten.js';
+import { MUSKELGRUPPEN, geraeteVorlage, uebungenVorlage } from './gym-daten.js';
 import { BEREICH_IDS, WIDGET_IDS, START_VORGABE } from './bereiche.js';
 
 export const DATA_VERSION = 2;
@@ -66,8 +66,8 @@ export function createDefaultData() {
     start: { ...START_VORGABE, widgets: [...START_VORGABE.widgets], karten: [...START_VORGABE.karten], favoriten: [...START_VORGABE.favoriten] },
     habits: { items: [] },
     gym: {
-      geraete: SEED_GERAETE.map(g => ({ ...g })),
-      uebungen: SEED_UEBUNGEN.map(u => ({ ...u })),
+      geraete: geraeteVorlage(),
+      uebungen: uebungenVorlage(),
       workouts: [],
       aktivId: null,
     },
@@ -245,8 +245,8 @@ function migrateHabits(roh) {
 function migrateGym(roh) {
   if (!roh || typeof roh !== 'object') {
     return {
-      geraete: SEED_GERAETE.map(g => ({ ...g })),
-      uebungen: SEED_UEBUNGEN.map(u => ({ ...u })),
+      geraete: geraeteVorlage(),
+      uebungen: uebungenVorlage(),
       workouts: [],
       aktivId: null,
     };
@@ -265,6 +265,8 @@ function migrateGym(roh) {
       muskel: MUSKELGRUPPEN.includes(x.muskel) ? x.muskel : null,
       zielWdh: Math.min(50, Math.max(1, Number(x.zielWdh) || 10)),
       steigerung: Math.min(20, Math.max(0, Number(x.steigerung) || 0)),
+      saetzeZiel: Math.min(10, Math.max(1, Number(x.saetzeZiel) || 3)),
+      pause: Number.isFinite(Number(x.pause)) ? Math.min(600, Math.max(0, Number(x.pause))) : 90,
     }))
     : [];
   const uebungIds = new Set(uebungen.map(u => u.id));

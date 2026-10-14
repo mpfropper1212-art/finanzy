@@ -5,7 +5,7 @@ import { el, clear, uid, isoDatum } from './util.js';
 import { MUSKELGRUPPEN, MUSKEL_FARBEN } from './gym-daten.js';
 import {
   auswerten, letztesMal, vorschlag, saetzeVon, saetzeText, workoutStats,
-  bestleistung, formatGewicht, istGefuellt, runde,
+  bestleistung, formatGewicht, istGefuellt, runde, fortschritt,
 } from './gym-logik.js';
 
 const zahl = v => (Number.isFinite(Number(v)) ? Number(v) : 0);
@@ -26,7 +26,7 @@ export function createWorkout(vorlage = {}) {
 export function createUebung(vorlage = {}) {
   return {
     id: uid('u'), name: 'Neue Übung', geraetId: null, muskel: null,
-    zielWdh: 10, steigerung: 2.5, ...vorlage,
+    zielWdh: 10, steigerung: 2.5, saetzeZiel: 3, pause: 90, ...vorlage,
   };
 }
 
@@ -54,6 +54,16 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
   // Welche Übungen im Verlauf aufgeklappt sind - reine Anzeige, gehört
   // nicht in die gespeicherten Daten.
   const offen = new Set();
+
+  // Geführter Modus: einen Satz nach dem anderen, mit Pausenuhr.
+  let gefuehrt = true;
+  let pauseBis = null;
+  let uhr = null;
+
+  function uhrStoppen() {
+    if (uhr) clearInterval(uhr);
+    uhr = null;
+  }
 
   function aenderung() {
     store.commit({ silent: true });
@@ -139,9 +149,32 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
       gym().aktivId = null;
       aenderung();
     });
-    rechts.append(beenden, verwerfen);
+    const modus = el('button', { class: 'btn btn-ghost btn-sm', type: 'button' },
+      gefuehrt ? 'Alle Übungen zeigen' : 'Geführt trainieren');
+    modus.addEventListener('click', () => {
+      gefuehrt = !gefuehrt;
+      pauseBis = null;
+      uhrStoppen();
+      renderAll();
+    });
+    rechts.append(modus, beenden, verwerfen);
     kopf.appendChild(rechts);
     aktivHost.appendChild(kopf);
+
+    const fort = fortschritt(w, gym().uebungen);
+    aktivHost.appendChild(fortschrittsBalken(fort));
+
+    if (gefuehrt && fort.aktuell) {
+      aktivHost.appendChild(gefuehrteKarte(w, fort));
+      aktivHost.appendChild(restListe(fort));
+      aktivHost.appendChild(uebungHinzufuegen(w));
+      return;
+    }
+    if (gefuehrt && fort.durch) {
+      aktivHost.appendChild(el('p', { class: 'gym-durch' },
+        `Alle ${fort.gesamt} Sätze erledigt. Unten kannst du noch etwas anhängen `
+        + 'oder das Training beenden.'));
+    }
 
     const ids = [...new Set(w.saetze.map(s => s.uebungId))].filter(uebungZu);
     ids.forEach((id, i) => aktivHost.appendChild(uebungsBlock(w, uebungZu(id), i + 1)));
@@ -152,6 +185,189 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
     }
 
     aktivHost.appendChild(uebungHinzufuegen(w));
+  }
+
+
+  /* ------------------------ Geführter Modus ------------------------ */
+
+  function fortschrittsBalken(fort) {
+    const box = el('div', { class: 'gym-fortschritt' });
+    const zeile = el('div', { class: 'gym-fortschritt-text' });
+    zeile.append(
+      el('span', {}, fort.gesamt
+        ? `${fort.fertig} von ${fort.gesamt} Sätzen`
+        : 'Noch keine Übung im Training'),
+      el('strong', {}, `${fort.prozent} %`),
+    );
+    const schiene = el('div', { class: 'gym-schiene' });
+    schiene.appendChild(el('div', { class: 'gym-schiene-fuellung', style: `width: ${fort.prozent}%` }));
+    box.append(zeile, schiene);
+    return box;
+  }
+
+  // Ein Zahlenfeld mit Minus und Plus daneben. Im Studio will man keine
+  // Tastatur aufrufen müssen, um von 45 auf 47,5 zu kommen.
+  function stepper(wert, schritt, min, onAenderung, einheit) {
+    const box = el('div', { class: 'gym-stepper' });
+    const feld = el('input', {
+      type: 'number', value: wert, step: String(schritt), min: String(min),
+      inputmode: 'decimal', class: 'gym-stepper-feld',
+    });
+    const setze = v => {
+      const neu = Math.max(min, runde(v));
+      feld.value = neu;
+      onAenderung(neu);
+    };
+    const minus = el('button', { class: 'gym-stepper-knopf', type: 'button', 'aria-label': 'weniger' }, '−');
+    minus.addEventListener('click', () => setze(zahl(feld.value) - schritt));
+    const plus = el('button', { class: 'gym-stepper-knopf', type: 'button', 'aria-label': 'mehr' }, '+');
+    plus.addEventListener('click', () => setze(zahl(feld.value) + schritt));
+    feld.addEventListener('input', () => onAenderung(zahl(feld.value)));
+
+    box.append(minus, feld, plus);
+    const wrap = el('div', { class: 'gym-stepper-wrap' });
+    wrap.append(box, el('span', { class: 'gym-stepper-einheit' }, einheit));
+    return wrap;
+  }
+
+  function gefuehrteKarte(w, fort) {
+    const a = fort.aktuell;
+    const u = a.uebung;
+    const farbe = MUSKEL_FARBEN[u.muskel] ?? '#64748b';
+    const box = el('section', { class: 'gym-fuehrung', style: `--muskel: ${farbe}` });
+
+    const letzte = letztesMal(gym().workouts, u.id, w.id);
+    const v = vorschlag(u, letzte);
+
+    // Beim ersten Satz zählt der Vorschlag, danach das, was eben lag.
+    const vorheriger = [...saetzeVon(w, u.id)].reverse().find(istGefuellt);
+    const startGewicht = zahl(a.satz.gewicht) || zahl(vorheriger?.gewicht) || zahl(v.gewicht) || 0;
+    const startWdh = zahl(a.satz.wdh) || v.wdh || u.zielWdh;
+    let gewicht = startGewicht;
+    let wdh = startWdh;
+
+    const kopf = el('div', { class: 'gym-fuehrung-kopf' });
+    kopf.append(
+      el('span', { class: 'gym-fuehrung-zaehler' },
+        `Übung ${a.uebungNr} von ${a.uebungGesamt}`),
+      el('h2', {}, u.name),
+    );
+    const unter = el('div', { class: 'gym-uebung-unter' });
+    if (u.muskel) unter.appendChild(muskelChip(u.muskel));
+    const geraet = geraetZu(u.geraetId);
+    if (geraet) unter.appendChild(el('span', { class: 'gym-geraet' }, geraet.name));
+    if (unter.childNodes.length) kopf.appendChild(unter);
+    box.appendChild(kopf);
+
+    box.appendChild(el('div', { class: 'gym-satz-marke' },
+      `Satz ${a.satzNr} von ${a.satzGesamt}`));
+
+    const zielZeile = el('div', { class: 'gym-ziel' });
+    zielZeile.append(
+      el('span', { class: 'gym-ziel-label' }, 'Vorgabe'),
+      el('strong', {}, `${formatGewicht(startGewicht)} kg × ${startWdh}`),
+    );
+    if (letzte) {
+      zielZeile.appendChild(el('span', { class: 'gym-ziel-letzte' },
+        `letztes Mal ${saetzeText(letzte.saetze)}`));
+    }
+    box.appendChild(zielZeile);
+
+    const felder = el('div', { class: 'gym-felder' });
+    const spalteG = el('label', { class: 'gym-feld' });
+    spalteG.appendChild(el('span', { class: 'gym-feld-label' }, 'Gewicht'));
+    spalteG.appendChild(stepper(startGewicht, Math.max(0.5, u.steigerung || 2.5), 0,
+      v2 => { gewicht = v2; }, 'kg'));
+    const spalteW = el('label', { class: 'gym-feld' });
+    spalteW.appendChild(el('span', { class: 'gym-feld-label' }, 'Wiederholungen'));
+    spalteW.appendChild(stepper(startWdh, 1, 0, v2 => { wdh = v2; }, 'Wdh.'));
+    felder.append(spalteG, spalteW);
+    box.appendChild(felder);
+
+    const knoepfe = el('div', { class: 'gym-fuehrung-knoepfe' });
+    const fertig = el('button', { class: 'btn btn-primary gym-grossknopf', type: 'button' }, 'Satz geschafft');
+    fertig.addEventListener('click', () => {
+      if (wdh <= 0) {
+        window.alert('Trag erst ein, wie viele Wiederholungen du geschafft hast.');
+        return;
+      }
+      a.satz.gewicht = gewicht;
+      a.satz.wdh = wdh;
+      // Pause nur, wenn noch etwas kommt.
+      const rest = fortschritt(w, gym().uebungen);
+      pauseBis = rest.aktuell && u.pause > 0 ? Date.now() + u.pause * 1000 : null;
+      aenderung();
+    });
+    knoepfe.appendChild(fertig);
+
+    const weg = el('button', { class: 'btn btn-ghost', type: 'button' }, 'Satz streichen');
+    weg.addEventListener('click', () => {
+      w.saetze = w.saetze.filter(x => x.id !== a.satz.id);
+      aenderung();
+    });
+    knoepfe.appendChild(weg);
+    box.appendChild(knoepfe);
+
+    if (pauseBis) box.appendChild(pausenUhr(u));
+
+    return box;
+  }
+
+  function pausenUhr(u) {
+    const box = el('div', { class: 'gym-pause' });
+    const text = el('strong', { class: 'gym-pause-zeit' });
+    const schiene = el('div', { class: 'gym-schiene' });
+    const fuellung = el('div', { class: 'gym-schiene-fuellung' });
+    schiene.appendChild(fuellung);
+
+    const gesamt = Math.max(1, u.pause || 90);
+    const zeichne = () => {
+      const rest = Math.max(0, Math.ceil((pauseBis - Date.now()) / 1000));
+      text.textContent = `${Math.floor(rest / 60)}:${String(rest % 60).padStart(2, '0')}`;
+      fuellung.style.width = `${Math.min(100, ((gesamt - rest) / gesamt) * 100)}%`;
+      if (rest <= 0) {
+        uhrStoppen();
+        pauseBis = null;
+        box.classList.add('ist-vorbei');
+        text.textContent = 'Pause vorbei';
+      }
+    };
+
+    uhrStoppen();
+    zeichne();
+    uhr = setInterval(zeichne, 250);
+
+    const kopf = el('div', { class: 'gym-pause-kopf' });
+    const ueberspringen = el('button', { class: 'link-btn', type: 'button' }, 'Pause überspringen');
+    ueberspringen.addEventListener('click', () => {
+      uhrStoppen();
+      pauseBis = null;
+      renderAll();
+    });
+    kopf.append(el('span', {}, 'Pause'), text, ueberspringen);
+
+    box.append(kopf, schiene);
+    return box;
+  }
+
+  // Was noch kommt - knapp, damit die große Karte die Aufmerksamkeit behält.
+  function restListe(fort) {
+    const box = el('div', { class: 'gym-rest' });
+    for (const block of fort.bloecke) {
+      const zeile = el('div', {
+        class: 'gym-rest-zeile'
+          + (block.fertig === block.gesamt ? ' ist-fertig' : '')
+          + (block.uebung.id === fort.aktuell?.uebung.id ? ' ist-dran' : ''),
+        style: `--muskel: ${MUSKEL_FARBEN[block.uebung.muskel] ?? '#64748b'}`,
+      });
+      zeile.append(
+        el('span', { class: 'gym-rest-punkt' }),
+        el('span', { class: 'gym-rest-name' }, block.uebung.name),
+        el('span', { class: 'gym-rest-zahl' }, `${block.fertig}/${block.gesamt}`),
+      );
+      box.appendChild(zeile);
+    }
+    return box;
   }
 
   function uebungHinzufuegen(w) {
@@ -178,10 +394,14 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
       if (!auswahl.value) return;
       const u = uebungZu(auswahl.value);
       const v = vorschlag(u, letztesMal(gym().workouts, u.id, w.id));
-      w.saetze.push({
-        id: uid('s'), uebungId: u.id,
-        wdh: '', gewicht: v.gewicht === null ? '' : v.gewicht,
-      });
+      // Gleich alle geplanten Sätze anlegen - die geführte Ansicht braucht
+      // sie, und im Zweifel löscht man einen schneller, als man ihn anlegt.
+      for (let i = 0; i < Math.max(1, u.saetzeZiel ?? 3); i++) {
+        w.saetze.push({
+          id: uid('s'), uebungId: u.id,
+          wdh: '', gewicht: v.gewicht === null ? '' : v.gewicht,
+        });
+      }
       aenderung();
     });
 
@@ -492,6 +712,16 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
       title: 'Kleinste Gewichtsstufe an diesem Gerät; 0 heißt ohne Zusatzgewicht',
     }, 'kg', v => { u.steigerung = Math.max(0, runde(v)); aenderung(); });
 
+    mini('Sätze', {
+      type: 'number', min: '1', max: '10', step: '1', value: u.saetzeZiel ?? 3,
+      title: 'So viele Sätze legt die App beim Hinzufügen an',
+    }, 'je Übung', v => { u.saetzeZiel = Math.min(10, Math.max(1, zahl(v) || 3)); aenderung(); });
+
+    mini('Pause', {
+      type: 'number', min: '0', max: '600', step: '15', value: u.pause ?? 90,
+      title: 'Pausenuhr nach jedem Satz; 0 schaltet sie ab',
+    }, 'Sek.', v => { u.pause = Math.min(600, Math.max(0, zahl(v))); aenderung(); });
+
     return box;
   }
 
@@ -518,6 +748,7 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
   }
 
   function renderAll() {
+    uhrStoppen();
     const a = auswerten(gym());
     renderKpis(a);
     renderAktiv(a);
