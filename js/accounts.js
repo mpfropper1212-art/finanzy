@@ -3,8 +3,10 @@
 import { money, moneyShort, svg, el, clear, fitText, uid, isValidHex } from './util.js';
 
 const W = 214;
-const H_BASE = 72;
-const H_INFO = 92;
+const KOPF_H = 30;
+const KOPF_R = 11;
+const H_BASE = 30 + 52;
+const H_INFO = 30 + 72;
 const MARGIN = 28;
 
 // Nur Konten mit Notiz brauchen die zusätzliche Zeile.
@@ -475,28 +477,44 @@ export function createAccountsView({ host, store, requestEditor }) {
       const bank = String(n.bank || '').trim();
       const info = String(n.info || '').trim();
 
+      // Ein versetzter dunkler Klon unter der Karte wirkt wie ein Schlagschatten
+      // und hebt sie von der Fläche ab - billiger und zuverlässiger als ein
+      // SVG-Filter, der bei jedem Ziehen neu gerechnet werden müsste.
       g.appendChild(svg('rect', {
-        x: 0, y: 0, width: W, height: h, rx: 11,
+        x: 2, y: 3, width: W, height: h, rx: KOPF_R,
+        fill: '#000', opacity: 0.1,
+      }));
+
+      g.appendChild(svg('rect', {
+        x: 0, y: 0, width: W, height: h, rx: KOPF_R,
         fill: 'var(--surface)',
         stroke: connectFrom === n.id ? farbe : 'var(--border-strong)',
-        'stroke-width': connectFrom === n.id ? 2.5 : 1.2,
+        'stroke-width': connectFrom === n.id ? 2.5 : 1.4,
       }));
-      g.appendChild(svg('rect', { x: 0, y: 0, width: 5, height: h, rx: 2.5, fill: farbe }));
+
+      // Farbiger Kopfbalken statt schmalem Streifen links: der Name steht
+      // darin und jede Karte ist damit auf einen Blick abgegrenzt.
+      g.appendChild(svg('path', {
+        d: `M0,${KOPF_H} L0,${KOPF_R} Q0,0 ${KOPF_R},0 L${W - KOPF_R},0 `
+          + `Q${W},0 ${W},${KOPF_R} L${W},${KOPF_H} Z`,
+        fill: farbe,
+      }));
       g.appendChild(svg('text', {
-        x: 16, y: 25, 'font-size': 13.5, 'font-weight': 600, fill: 'currentColor',
-      }, fitText(n.name, W - 28, 7)));
+        x: 13, y: KOPF_H - 9, 'font-size': 13, 'font-weight': 650, fill: '#fff',
+      }, fitText(n.name, W - 26, 6.8)));
+
       g.appendChild(svg('text', {
-        x: 16, y: 45, 'font-size': 14, fill: 'currentColor',
+        x: 13, y: KOPF_H + 23, 'font-size': 16, 'font-weight': 600, fill: 'currentColor',
         'font-variant-numeric': 'tabular-nums',
       }, money(n.balance)));
       g.appendChild(svg('text', {
-        x: 16, y: 61, 'font-size': 10.5, fill: 'currentColor', opacity: 0.55,
+        x: 13, y: KOPF_H + 39, 'font-size': 10.5, fill: 'currentColor', opacity: 0.55,
         'letter-spacing': '.04em',
-      }, fitText(bank ? `${meta.label.toUpperCase()} · ${bank}` : meta.label.toUpperCase(), W - 28, 5.9)));
+      }, fitText(bank ? `${meta.label.toUpperCase()} · ${bank}` : meta.label.toUpperCase(), W - 26, 5.9)));
       if (info) {
         g.appendChild(svg('text', {
-          x: 16, y: 80, 'font-size': 11, fill: 'currentColor', opacity: 0.72,
-        }, fitText(info, W - 28, 5.5)));
+          x: 13, y: KOPF_H + 57, 'font-size': 11, fill: 'currentColor', opacity: 0.72,
+        }, fitText(info, W - 26, 5.5)));
       }
 
       g.appendChild(svg('title', {},

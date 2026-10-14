@@ -131,11 +131,6 @@ export function createDashboard({ host, store, onOeffne, onLayout }) {
   function kartenBlock(zahlen) {
     const gewaehlt = einstellung().karten.map(bereichZu).filter(Boolean);
 
-    if (!gewaehlt.length) {
-      return el('p', { class: 'empty' },
-        'Keine Kachel ausgewählt. Über „Startseite anpassen" kommen welche dazu.');
-    }
-
     const gitter = el('div', { class: 'dash-gitter' });
     for (const b of gewaehlt) {
       const karte = el('button', { type: 'button', class: 'dash-karte' });
@@ -152,6 +147,20 @@ export function createDashboard({ host, store, onOeffne, onLayout }) {
       karte.append(oben, el('p', { class: 'dash-karte-text' }, b.text), wert);
       karte.addEventListener('click', () => onOeffne(b.tab));
       gitter.appendChild(karte);
+    }
+
+    // Eine gestrichelte Kachel am Ende: so sieht man überhaupt erst, dass
+    // sich die Startseite zusammenstellen lässt.
+    if (gewaehlt.length < BEREICHE.length) {
+      const mehr = el('button', { type: 'button', class: 'dash-karte dash-karte-mehr' });
+      mehr.append(
+        el('span', { class: 'dash-plus' }, '+'),
+        el('strong', {}, 'Bereich hinzufügen'),
+        el('span', { class: 'dash-karte-text' },
+          `${BEREICHE.length - gewaehlt.length} weitere stehen zur Auswahl`),
+      );
+      mehr.addEventListener('click', () => { anpassen = true; renderAll(); });
+      gitter.appendChild(mehr);
     }
     return gitter;
   }
@@ -286,14 +295,22 @@ export function createDashboard({ host, store, onOeffne, onLayout }) {
       anpassen
         ? 'Setz die Haken für das, was du hier sehen willst.'
         : 'Such dir aus, womit du anfangen willst.'));
-
-    const knopf = el('button', { class: 'btn btn-ghost btn-sm', type: 'button' },
-      anpassen ? 'Fertig' : 'Startseite anpassen');
-    knopf.addEventListener('click', () => { anpassen = !anpassen; renderAll(); });
-    text.appendChild(knopf);
-
     kopf.appendChild(text);
-    if (einstellung().muenze && !anpassen) kopf.appendChild(createMuenze());
+
+    const rechts = el('div', { class: 'dash-kopf-rechts' });
+    // Deutlich sichtbarer Knopf statt grauem Text - der alte war so
+    // zurückhaltend, dass niemand ihn gefunden hat.
+    const knopf = el('button', {
+      class: 'btn ' + (anpassen ? 'btn-primary' : 'btn-ghost') + ' dash-anpassen',
+      type: 'button',
+    });
+    if (!anpassen) knopf.appendChild(symbolSvg('regler', { size: 17 }));
+    knopf.appendChild(el('span', {}, anpassen ? 'Fertig' : 'Startseite anpassen'));
+    knopf.addEventListener('click', () => { anpassen = !anpassen; renderAll(); });
+    rechts.appendChild(knopf);
+
+    if (einstellung().muenze && !anpassen) rechts.appendChild(createMuenze());
+    kopf.appendChild(rechts);
     host.appendChild(kopf);
 
     if (anpassen) {

@@ -1225,7 +1225,13 @@ button, input, select { font: inherit; color: inherit; }
 
 /* Alle Finger-Gesten werden selbst ausgewertet: ein Finger schiebt, zwei
    zoomen. Ohne das zoomt der Browser stattdessen die ganze Seite. */
-.acct-canvas { touch-action: none; cursor: grab; }
+.acct-canvas {
+  touch-action: none; cursor: grab;
+  /* Ein feines Punktraster macht die Fläche zur Arbeitsfläche - die Karten
+     liegen sichtbar darauf statt im Nichts zu schweben. */
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
 .acct-canvas:active { cursor: grabbing; }
 .acct-canvas .acct-node, .acct-canvas .acct-label { cursor: move; }
 
@@ -1582,4 +1588,28 @@ button.kal-tag:disabled { cursor: default; }
   .kal-titel { min-width: 0; flex: 1; }
   .row-habit { grid-template-columns: 1fr 24px; }
   .habit-farben { grid-column: 1 / -1; }
+}
+
+
+/* ------------------- Startseite: Anpassen sichtbar ------------------- */
+
+.dash-kopf-rechts { display: flex; align-items: center; gap: 16px; }
+.dash-anpassen { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+
+/* Gestrichelte Kachel am Ende des Rasters - der sichtbare Hinweis darauf,
+   dass sich die Startseite überhaupt zusammenstellen lässt. */
+.dash-karte-mehr {
+  border-style: dashed; border-width: 1.5px;
+  background: transparent;
+  align-items: center; justify-content: center; text-align: center;
+  gap: 4px; color: var(--muted);
+  min-height: 130px;
+}
+.dash-karte-mehr:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-2); }
+.dash-karte-mehr strong { font-size: 13.5px; }
+.dash-plus { font-size: 26px; line-height: 1; font-weight: 300; }
+
+@media (max-width: 760px) {
+  .dash-kopf-rechts { gap: 10px; }
+  .dash-anpassen span { font-size: 13px; }
 }
