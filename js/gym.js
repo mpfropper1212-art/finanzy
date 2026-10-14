@@ -3,6 +3,7 @@
 
 import { el, clear, uid, isoDatum } from './util.js';
 import { MUSKELGRUPPEN, MUSKEL_FARBEN } from './gym-daten.js';
+import { PLAENE, planZu, einheitZu } from './gym-plaene.js';
 import {
   auswerten, letztesMal, vorschlag, saetzeVon, saetzeText, workoutStats,
   bestleistung, formatGewicht, istGefuellt, runde, fortschritt,
@@ -57,6 +58,8 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
 
   // Geführter Modus: einen Satz nach dem anderen, mit Pausenuhr.
   let gefuehrt = true;
+  // Zeigt die Planauswahl statt der Startkarte.
+  let planWahl = false;
   let pauseBis = null;
   let uhr = null;
 
@@ -108,29 +111,16 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
     clear(aktivHost);
 
     if (!a.aktiv) {
-      const leer = el('div', { class: 'gym-start' });
-      leer.appendChild(el('h2', {}, 'Kein Training offen'));
-      leer.appendChild(el('p', { class: 'dash-karte-text' },
-        a.letztes
-          ? `Zuletzt am ${datumLang(a.letztes.datum)}. Beim Starten siehst du zu jeder Übung, `
-            + 'was du damals geschafft hast.'
-          : 'Starte dein erstes Training – ab dem zweiten vergleicht die App automatisch.'));
-
-      const knopf = el('button', { class: 'btn btn-primary', type: 'button' }, 'Training starten');
-      knopf.addEventListener('click', () => {
-        const w = createWorkout();
-        gym().workouts.push(w);
-        gym().aktivId = w.id;
-        aenderung();
-      });
-      leer.appendChild(knopf);
-      aktivHost.appendChild(leer);
+      aktivHost.appendChild(startAnsicht(a));
       return;
     }
 
     const w = a.aktiv;
     const kopf = el('div', { class: 'gym-kopf' });
-    kopf.appendChild(el('h2', {}, `Training am ${datumLang(w.datum)}`));
+    const titel = el('div', { class: 'gym-kopf-titel' });
+    titel.appendChild(el('h2', {}, `Training am ${datumLang(w.datum)}`));
+    if (w.plan?.name) titel.appendChild(el('span', { class: 'plan-marke' }, w.plan.name));
+    kopf.appendChild(titel);
 
     const rechts = el('div', { class: 'gym-kopf-knoepfe' });
     const beenden = el('button', { class: 'btn btn-primary btn-sm', type: 'button' }, 'Training beenden');
@@ -138,7 +128,15 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
       // Halb ausgefüllte Zeilen würden den Verlauf verfälschen.
       w.saetze = w.saetze.filter(istGefuellt);
       gym().aktivId = null;
-      if (!w.saetze.length) gym().workouts = gym().workouts.filter(x => x.id !== w.id);
+      if (!w.saetze.length) {
+        gym().workouts = gym().workouts.filter(x => x.id !== w.id);
+      } else if (w.plan?.id && w.plan.id === gym().plan.id) {
+        // Nur weiterrücken, wenn wirklich etwas geloggt wurde und der Plan
+        // zwischendurch nicht gewechselt hat.
+        gym().plan.position += 1;
+      }
+      pauseBis = null;
+      uhrStoppen();
       aenderung();
     });
     const verwerfen = el('button', { class: 'link-btn', type: 'button' }, 'Verwerfen');
@@ -187,6 +185,178 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
     aktivHost.appendChild(uebungHinzufuegen(w));
   }
 
+
+
+  /* --------------------------- Trainingsplan --------------------------- */
+
+  // Legt ein Training an und füllt es mit den Übungen der Einheit.
+  function trainingStarten({ plan = null, einheit = null } = {}) {
+    const w = createWorkout(plan && einheit
+      ? { plan: { id: plan.id, name: `${plan.name} · ${einheit.name}` } }
+      : {});
+
+    for (const id of einheit?.uebungen ?? []) {
+      const u = uebungZu(id);
+      // Gelöschte Übungen still überspringen - ein halb gefüllter Plan ist
+      // besser als eine Fehlermeldung vor dem Training.
+      if (!u) continue;
+      const v = vorschlag(u, letztesMal(gym().workouts, u.id, w.id));
+      for (let i = 0; i < Math.max(1, u.saetzeZiel ?? 3); i++) {
+        w.saetze.push({
+          id: uid('s'), uebungId: u.id,
+          wdh: '', gewicht: v.gewicht === null ? '' : v.gewicht,
+        });
+      }
+    }
+
+    gym().workouts.push(w);
+    gym().aktivId = w.id;
+    planWahl = false;
+    gefuehrt = true;
+    aenderung();
+  }
+
+  function startAnsicht(a) {
+    const box = el('div', { class: 'gym-start' });
+    const plan = planZu(gym().plan.id);
+
+    box.appendChild(el('h2', {}, 'Kein Training offen'));
+    box.appendChild(el('p', { class: 'dash-karte-text' },
+      a.letztes
+        ? `Zuletzt am ${datumLang(a.letztes.datum)}. Beim Starten siehst du zu jeder `
+          + 'Übung, was du damals geschafft hast.'
+        : 'Starte dein erstes Training – ab dem zweiten vergleicht die App automatisch.'));
+
+    if (planWahl || !plan) {
+      box.appendChild(planAuswahl(Boolean(plan)));
+      return box;
+    }
+
+    box.appendChild(naechsteEinheit(plan));
+    return box;
+  }
+
+  function naechsteEinheit(plan) {
+    const einheit = einheitZu(plan, gym().plan.position);
+    const kasten = el('div', { class: 'plan-karte ist-dran' });
+
+    const kopf = el('div', { class: 'plan-kopf' });
+    kopf.append(
+      el('span', { class: 'plan-marke' }, plan.name),
+      el('span', { class: 'plan-takt' }, plan.takt),
+    );
+    kasten.appendChild(kopf);
+
+    kasten.appendChild(el('h3', {}, `Als Nächstes: ${einheit.name}`));
+
+    const liste = el('div', { class: 'plan-uebungen' });
+    for (const id of einheit.uebungen) {
+      const u = uebungZu(id);
+      if (!u) continue;
+      const zeile = el('span', {
+        class: 'plan-uebung',
+        style: `--muskel: ${MUSKEL_FARBEN[u.muskel] ?? '#64748b'}`,
+      });
+      zeile.append(el('span', { class: 'plan-punkt' }), el('span', {}, u.name));
+      liste.appendChild(zeile);
+    }
+    kasten.appendChild(liste);
+
+    const knopf = el('button', { class: 'btn btn-primary gym-grossknopf', type: 'button' },
+      `${einheit.name} starten`);
+    knopf.addEventListener('click', () => trainingStarten({ plan, einheit }));
+    kasten.appendChild(knopf);
+
+    // Die anderen Einheiten, falls man abweichen will.
+    const andere = plan.einheiten
+      .map((e, i) => ({ ...e, index: i }))
+      .filter(e => e.index !== einheit.index);
+    if (andere.length) {
+      const zeile = el('div', { class: 'plan-andere' });
+      zeile.appendChild(el('span', {}, 'Stattdessen:'));
+      for (const e of andere) {
+        const b = el('button', { class: 'pill', type: 'button' }, e.name);
+        b.addEventListener('click', () => {
+          gym().plan.position = e.index;
+          trainingStarten({ plan, einheit: { ...e } });
+        });
+        zeile.appendChild(b);
+      }
+      kasten.appendChild(zeile);
+    }
+
+    const fuss = el('div', { class: 'plan-fuss' });
+    const wechseln = el('button', { class: 'link-btn', type: 'button' }, 'Plan wechseln');
+    wechseln.addEventListener('click', () => { planWahl = true; renderAll(); });
+    const frei = el('button', { class: 'link-btn', type: 'button' }, 'Freies Training');
+    frei.addEventListener('click', () => trainingStarten());
+    fuss.append(wechseln, frei);
+    kasten.appendChild(fuss);
+
+    return kasten;
+  }
+
+  function planAuswahl(hatPlan) {
+    const box = el('div', { class: 'plan-auswahl' });
+    box.appendChild(el('div', { class: 'immo-chart-head' }, 'Trainingspläne'));
+    box.appendChild(el('p', { class: 'feld-hinweis' },
+      'Such dir einen aus – die App füllt das Training dann mit den passenden '
+      + 'Übungen und schlägt von Mal zu Mal das nächste Gewicht vor. Ändern '
+      + 'kannst du jederzeit alles.'));
+
+    const gitter = el('div', { class: 'plan-gitter' });
+    for (const plan of PLAENE) {
+      const karte = el('article', { class: 'plan-karte' + (gym().plan.id === plan.id ? ' ist-gewaehlt' : '') });
+
+      const kopf = el('div', { class: 'plan-kopf' });
+      kopf.append(
+        el('span', { class: 'plan-marke' }, plan.name),
+        el('span', { class: 'plan-takt' }, plan.takt),
+      );
+      karte.appendChild(kopf);
+
+      karte.appendChild(el('p', { class: 'plan-fuer' }, `Für ${plan.fuer}.`));
+      karte.appendChild(el('p', { class: 'dash-karte-text' }, plan.text));
+
+      for (const e of plan.einheiten) {
+        const zeile = el('div', { class: 'plan-einheit' });
+        zeile.append(
+          el('strong', {}, e.name),
+          el('span', {}, e.uebungen
+            .map(id => uebungZu(id)?.name)
+            .filter(Boolean)
+            .join(' · ')),
+        );
+        karte.appendChild(zeile);
+      }
+
+      const knopf = el('button', { class: 'btn btn-primary btn-block', type: 'button' },
+        gym().plan.id === plan.id ? 'Plan behalten' : 'Diesen Plan nehmen');
+      knopf.addEventListener('click', () => {
+        if (gym().plan.id !== plan.id) {
+          gym().plan = { id: plan.id, position: 0 };
+        }
+        planWahl = false;
+        aenderung();
+      });
+      karte.appendChild(knopf);
+      gitter.appendChild(karte);
+    }
+    box.appendChild(gitter);
+
+    const fuss = el('div', { class: 'plan-fuss' });
+    if (hatPlan) {
+      const zurueck = el('button', { class: 'link-btn', type: 'button' }, 'Abbrechen');
+      zurueck.addEventListener('click', () => { planWahl = false; renderAll(); });
+      fuss.appendChild(zurueck);
+    }
+    const frei = el('button', { class: 'link-btn', type: 'button' }, 'Ohne Plan trainieren');
+    frei.addEventListener('click', () => trainingStarten());
+    fuss.appendChild(frei);
+    box.appendChild(fuss);
+
+    return box;
+  }
 
   /* ------------------------ Geführter Modus ------------------------ */
 
@@ -569,6 +739,7 @@ export function createGymView({ kpiHost, aktivHost, verlaufHost, seiteHost, stor
       const zusammen = el('summary');
       zusammen.append(
         el('strong', {}, datumLang(w.datum)),
+        ...(w.plan?.name ? [el('span', { class: 'plan-marke' }, w.plan.name)] : []),
         el('span', { class: 'gym-verlauf-zahl' },
           `${stats.uebungen} Übungen · ${stats.saetze} Sätze · ${formatGewicht(stats.volumen)} kg`),
       );

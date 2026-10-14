@@ -4,6 +4,7 @@ import * as cloud from './cloud.js';
 import { createImmobilie, BUNDESLAENDER } from './immobilien.js';
 import { uid, isoDatum } from './util.js';
 import { MUSKELGRUPPEN, geraeteVorlage, uebungenVorlage } from './gym-daten.js';
+import { PLAN_IDS } from './gym-plaene.js';
 import { BEREICH_IDS, WIDGET_IDS, START_VORGABE } from './bereiche.js';
 
 export const DATA_VERSION = 2;
@@ -70,6 +71,7 @@ export function createDefaultData() {
       uebungen: uebungenVorlage(),
       workouts: [],
       aktivId: null,
+      plan: { id: null, position: 0 },
     },
     strom: { staende: [], tarif: { arbeitspreis: 0.35, grundpreis: 12, abschlag: 0 } },
     tanken: { eintraege: [], zeitraum: 'alle', eigen: { monate: 1, von: '', bis: '' }, ausgeschlosseneTags: [], fixkosten: { versicherung: 0, steuer: 0, wartung: 0, sonstiges: 0 } },
@@ -249,6 +251,7 @@ function migrateGym(roh) {
       uebungen: uebungenVorlage(),
       workouts: [],
       aktivId: null,
+      plan: { id: null, position: 0 },
     };
   }
 
@@ -276,6 +279,10 @@ function migrateGym(roh) {
       id: String(x.id),
       datum: x.datum,
       notiz: String(x.notiz ?? ''),
+      // Aus welchem Plan das Training kam - nur fürs Etikett im Verlauf.
+      plan: x.plan && PLAN_IDS.includes(x.plan.id)
+        ? { id: x.plan.id, name: String(x.plan.name ?? '') }
+        : null,
       // Sätze zu längst gelöschten Übungen wären im Verlauf nicht mehr
       // zuzuordnen und fallen deshalb raus.
       saetze: Array.isArray(x.saetze)
@@ -294,6 +301,10 @@ function migrateGym(roh) {
     uebungen,
     workouts,
     aktivId: workouts.some(w => w.id === roh.aktivId) ? roh.aktivId : null,
+    plan: {
+      id: PLAN_IDS.includes(roh.plan?.id) ? roh.plan.id : null,
+      position: Math.max(0, Number(roh.plan?.position) || 0),
+    },
   };
 }
 
