@@ -1,53 +1,53 @@
 {
-  "stand": "2026-10-15T05:46:44+00:00",
+  "stand": "2026-10-16T05:45:54+00:00",
   "meldungen": [
     {
-      "titel": "Marktbericht: Börsen zwischen KI-Euphorie und Inflationssorgen",
+      "titel": "Commerzbank: Das ungewöhnliche Immobiliengeschäft mit ihrem Aufsichtsrat Harald Christ",
+      "link": "https://www.spiegel.de/wirtschaft/commerzbank-das-ungewoehnliche-immobiliengeschaeft-mit-ihrem-aufsichtsrat-harald-christ-a-1123a07f-c31c-4a51-9746-d34b2530c660#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-16T05:42:00+00:00"
+    },
+    {
+      "titel": "Marktbericht: Hoffnung auf Entlastung bei Öl- und Dieselpreisen",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-nikkei-oelpreis-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-10-16T05:40:56+00:00"
+    },
+    {
+      "titel": "Nvidia: Bundesregierung plant offenbar Millionen-Investition in KI-Kooperation",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/nvidia-bundesregierung-plant-offenbar-millionen-investition-in-ki-kooperation-a-67700d8c-516b-4772-954d-6b5d950398e0#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-16T05:37:00+00:00"
+    },
+    {
+      "titel": "UniCredit bekommt grünes Licht von EZB für Übernahme der Commerzbank",
+      "link": "https://www.tagesschau.de/wirtschaft/ezb-uebernahme-commerzbank-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-10-15T19:53:38+00:00"
+    },
+    {
+      "titel": "Wirtschaft vor acht vom 15.10.2026",
+      "link": "https://www.tagesschau.de/video/video-1666988.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-10-15T18:50:50+00:00"
+    },
+    {
+      "titel": "EZB erlaubt UniCredit offenbar Übernahme von Commerzbank",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/ezb-erlaubt-unicredit-offenbar-uebernahme-von-commerzbank-anteilen-a-4fdb9120-ecc0-4431-ac6c-3d5340d5bb4a#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-15T18:17:00+00:00"
+    },
+    {
+      "titel": "Verbrenner-Aus: Merz und Macron planen Aufweichung des EU-Verbots",
+      "link": "https://www.spiegel.de/wirtschaft/friedrich-merz-und-emmanuel-macron-einigen-sich-auf-aufweichung-von-verbrenner-aus-a-d250ef0f-8188-4c66-8964-7883011ddbaa#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-15T17:07:00+00:00"
+    },
+    {
+      "titel": "Marktbericht: DAX vom Tech-Ausverkauf kaum betroffen",
       "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-asml-tsmc-berichtssaison-102.html",
       "quelle": "tagesschau",
-      "zeit": "2026-10-15T05:45:57+00:00"
-    },
-    {
-      "titel": "Wohnungsmarkt: Mieten in deutschen Großstädten ziehen deutlich an",
-      "link": "https://www.spiegel.de/wirtschaft/soziales/wohnungsmarkt-mieten-in-deutschen-grossstaedten-ziehen-deutlich-an-a-69f106e6-9f09-4420-93e1-73f2808c5e7e#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-15T05:26:00+00:00"
-    },
-    {
-      "titel": "Frankfurt Airport: Lufthansa reagiert wegen möglichen Kerosin-Engpässen",
-      "link": "https://www.spiegel.de/wirtschaft/frankfurt-airport-lufthansa-reagiert-wegen-moeglichen-kerosin-engpaessen-a-3e3e5829-e3d8-4b55-8386-756b92b44937#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-14T23:18:00+00:00"
-    },
-    {
-      "titel": "Wirtschaft vor acht vom 14.10.2026",
-      "link": "https://www.tagesschau.de/video/video-1666304.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-10-14T18:34:44+00:00"
-    },
-    {
-      "titel": "Krankenversicherung: Zusatzbeitrag kann 2027 stabil bleiben",
-      "link": "https://www.spiegel.de/wirtschaft/soziales/krankenversicherung-zusatzbeitrag-kann-2027-stabil-bleiben-a-20efc3bb-48e7-469d-8357-16d70bbb12fd#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-14T18:26:00+00:00"
-    },
-    {
-      "titel": "Netflix streicht rund tausend Jobs",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/netflix-streicht-rund-1000-jobs-a-acf7ff59-dfe8-4892-8031-c826a62f40b4#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-14T18:26:00+00:00"
-    },
-    {
-      "titel": "Marktbericht: DAX bleibt im Seitwärtstrend",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-nasdaq-berichtssaison-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-10-14T16:24:05+00:00"
-    },
-    {
-      "titel": "Block-Prozess - »Zeit«-Autorin Anne Kunze: »Klara hat gesagt, sie wolle Teil des Podcasts sein«",
-      "link": "https://www.spiegel.de/wirtschaft/block-prozess-zeit-autorin-anne-kunze-klara-hat-gesagt-sie-wolle-teil-des-podcasts-sein-a-af31d068-4703-4599-8c04-008b271b82cd#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-14T15:01:00+00:00"
+      "zeit": "2026-10-15T16:32:51+00:00"
     }
   ]
 }
