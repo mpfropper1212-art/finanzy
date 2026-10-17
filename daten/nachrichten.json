@@ -1,53 +1,53 @@
 {
-  "stand": "2026-10-16T05:45:54+00:00",
+  "stand": "2026-10-17T05:44:07+00:00",
   "meldungen": [
     {
-      "titel": "Commerzbank: Das ungewöhnliche Immobiliengeschäft mit ihrem Aufsichtsrat Harald Christ",
-      "link": "https://www.spiegel.de/wirtschaft/commerzbank-das-ungewoehnliche-immobiliengeschaeft-mit-ihrem-aufsichtsrat-harald-christ-a-1123a07f-c31c-4a51-9746-d34b2530c660#ref=rss",
+      "titel": "GKV-Chef: Krankenkassen plädieren für Terminvergabe nach medizinischem Bedarf",
+      "link": "https://www.spiegel.de/wirtschaft/gkv-chef-krankenkassen-plaedieren-fuer-terminvergabe-nach-medizinischem-bedarf-a-e9f09231-3665-4659-b014-b1c82aaacbf6#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-10-16T05:42:00+00:00"
+      "zeit": "2026-10-17T05:25:00+00:00"
     },
     {
-      "titel": "Marktbericht: Hoffnung auf Entlastung bei Öl- und Dieselpreisen",
+      "titel": "Wirtschaft vor acht vom 16102026",
+      "link": "https://www.tagesschau.de/video/video-1667576.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-10-16T18:20:58+00:00"
+    },
+    {
+      "titel": "Tabakindustrie: Wie Konzerne um Macht und Marktanteile ringen",
+      "link": "https://www.spiegel.de/wirtschaft/tabakindustrie-wie-konzerne-um-macht-und-marktanteile-ringen-a-f58b5a59-5787-4f14-a6dc-d71b00262abe#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-16T17:35:00+00:00"
+    },
+    {
+      "titel": "Eurowings streicht Flüge und prüft Kurzarbeit",
+      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/eurowings-kurzarbeit-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-10-16T16:52:09+00:00"
+    },
+    {
+      "titel": "Marktbericht: DAX schüttelt KI- und Zinssorgen vorerst ab",
       "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-nikkei-oelpreis-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-10-16T05:40:56+00:00"
+      "zeit": "2026-10-16T16:22:56+00:00"
     },
     {
-      "titel": "Nvidia: Bundesregierung plant offenbar Millionen-Investition in KI-Kooperation",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/nvidia-bundesregierung-plant-offenbar-millionen-investition-in-ki-kooperation-a-67700d8c-516b-4772-954d-6b5d950398e0#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-16T05:37:00+00:00"
-    },
-    {
-      "titel": "UniCredit bekommt grünes Licht von EZB für Übernahme der Commerzbank",
-      "link": "https://www.tagesschau.de/wirtschaft/ezb-uebernahme-commerzbank-100.html",
+      "titel": "Wie es mit der Commerzbank nun weitergeht",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/unicredit-commerzbank-uebernahme-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-10-15T19:53:38+00:00"
+      "zeit": "2026-10-16T14:25:09+00:00"
     },
     {
-      "titel": "Wirtschaft vor acht vom 15.10.2026",
-      "link": "https://www.tagesschau.de/video/video-1666988.html",
+      "titel": "KI: Bundesregierung plant Kooperation mit US-Chiphersteller Nvidia",
+      "link": "https://www.tagesschau.de/wirtschaft/technologie/nvidia-bundesregierung-ki-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-10-15T18:50:50+00:00"
+      "zeit": "2026-10-16T13:13:40+00:00"
     },
     {
-      "titel": "EZB erlaubt UniCredit offenbar Übernahme von Commerzbank",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/ezb-erlaubt-unicredit-offenbar-uebernahme-von-commerzbank-anteilen-a-4fdb9120-ecc0-4431-ac6c-3d5340d5bb4a#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-15T18:17:00+00:00"
-    },
-    {
-      "titel": "Verbrenner-Aus: Merz und Macron planen Aufweichung des EU-Verbots",
-      "link": "https://www.spiegel.de/wirtschaft/friedrich-merz-und-emmanuel-macron-einigen-sich-auf-aufweichung-von-verbrenner-aus-a-d250ef0f-8188-4c66-8964-7883011ddbaa#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-15T17:07:00+00:00"
-    },
-    {
-      "titel": "Marktbericht: DAX vom Tech-Ausverkauf kaum betroffen",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-asml-tsmc-berichtssaison-102.html",
+      "titel": "Noch mehr Eigentum westlicher Firmen unter Kreml-Kontrolle",
+      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/russland-vermoegen-deutscher-firmen-staatliche-kontrolle-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-10-15T16:32:51+00:00"
+      "zeit": "2026-10-16T12:38:24+00:00"
     }
   ]
 }
