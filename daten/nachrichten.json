@@ -1,6 +1,36 @@
 {
-  "stand": "2026-10-17T05:44:07+00:00",
+  "stand": "2026-10-18T05:43:59+00:00",
   "meldungen": [
+    {
+      "titel": "Ökonom Georg Cremer über Gerechtigkeit: »Wir sind doch nicht die Kunden eines Lieferando-Staats«",
+      "link": "https://www.spiegel.de/wirtschaft/oekonom-georg-cremer-ueber-gerechtigkeit-wir-sind-doch-nicht-die-kunden-eines-lieferando-staats-a-7a33129b-6166-440b-a3cf-cd1c5d13d497#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-17T18:11:00+00:00"
+    },
+    {
+      "titel": "Paketversand und Retouren durch Onlinehandel auf Rekordniveau",
+      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/online-retouren-rekord-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-10-17T16:14:36+00:00"
+    },
+    {
+      "titel": "Immobilien: Wie Emanuel Heisenberg die Sanierung von Wohnhäusern revolutionieren will",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/immobilien-wie-emanuel-heisenberg-die-sanierung-von-wohnhaeusern-revolutionieren-will-a-c8c3e116-a18d-462d-a4c5-72db5239d574#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-17T14:27:00+00:00"
+    },
+    {
+      "titel": "Steigende Preise für Benzin, Heizöl, Gas - wie teuer wird der Winter?",
+      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/energie-heizen-winter-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-10-17T10:05:01+00:00"
+    },
+    {
+      "titel": "Künstliche Intelligenz: Nobelpreisträger Daron Acemoglu warnt vor Gefahr für Demokratie",
+      "link": "https://www.spiegel.de/wirtschaft/kuenstliche-intelligenz-nobelpreistraeger-daron-acemoglu-warnt-vor-gefahr-fuer-demokratie-a-60b67427-f38e-42b4-90b2-b88583daa276#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-17T07:19:00+00:00"
+    },
     {
       "titel": "GKV-Chef: Krankenkassen plädieren für Terminvergabe nach medizinischem Bedarf",
       "link": "https://www.spiegel.de/wirtschaft/gkv-chef-krankenkassen-plaedieren-fuer-terminvergabe-nach-medizinischem-bedarf-a-e9f09231-3665-4659-b014-b1c82aaacbf6#ref=rss",
@@ -18,36 +48,6 @@
       "link": "https://www.spiegel.de/wirtschaft/tabakindustrie-wie-konzerne-um-macht-und-marktanteile-ringen-a-f58b5a59-5787-4f14-a6dc-d71b00262abe#ref=rss",
       "quelle": "Spiegel",
       "zeit": "2026-10-16T17:35:00+00:00"
-    },
-    {
-      "titel": "Eurowings streicht Flüge und prüft Kurzarbeit",
-      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/eurowings-kurzarbeit-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-10-16T16:52:09+00:00"
-    },
-    {
-      "titel": "Marktbericht: DAX schüttelt KI- und Zinssorgen vorerst ab",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-nikkei-oelpreis-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-10-16T16:22:56+00:00"
-    },
-    {
-      "titel": "Wie es mit der Commerzbank nun weitergeht",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/unicredit-commerzbank-uebernahme-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-10-16T14:25:09+00:00"
-    },
-    {
-      "titel": "KI: Bundesregierung plant Kooperation mit US-Chiphersteller Nvidia",
-      "link": "https://www.tagesschau.de/wirtschaft/technologie/nvidia-bundesregierung-ki-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-10-16T13:13:40+00:00"
-    },
-    {
-      "titel": "Noch mehr Eigentum westlicher Firmen unter Kreml-Kontrolle",
-      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/russland-vermoegen-deutscher-firmen-staatliche-kontrolle-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-10-16T12:38:24+00:00"
     }
   ]
 }
