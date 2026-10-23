@@ -1785,3 +1785,92 @@ button.kal-tag:disabled { cursor: default; }
 @media (max-width: 760px) {
   .plan-gitter { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* -------------------------- Projektplanung -------------------------- */
+
+.dash-projekte { background: color-mix(in srgb, #0f766e 14%, transparent); color: #0f766e; }
+
+.projekt-leiste { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+
+/* Der Zeitplan ist breiter als das Fenster - er scrollt für sich, die
+   Seite bleibt stehen. */
+.gantt { display: block; }
+.gantt .ist-klickbar { cursor: pointer; }
+.gantt .gantt-zeile:hover rect:first-child { opacity: .07; }
+
+.planner {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;
+}
+.planner-spalte {
+  border: 1px solid var(--border); border-top: 3px solid var(--status);
+  border-radius: 11px; background: var(--surface);
+  padding: 10px; display: flex; flex-direction: column; gap: 6px;
+}
+.planner-kopf {
+  display: flex; align-items: baseline; justify-content: space-between;
+  font-size: 12.5px;
+}
+.planner-kopf span { color: var(--muted); font-variant-numeric: tabular-nums; }
+.planner-karte {
+  display: flex; flex-direction: column; gap: 2px; text-align: left;
+  border: 1px solid var(--border); border-radius: 9px;
+  background: var(--surface-2); padding: 8px 9px;
+  font: inherit; color: inherit; cursor: pointer; width: 100%;
+}
+.planner-karte:hover { border-color: var(--status); }
+.planner-karte.ist-markiert { border-color: var(--status); border-width: 1.5px; }
+.planner-karte strong { font-size: 13px; }
+.planner-zeit { font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.planner-person { font-size: 11.5px; color: var(--muted); }
+.planner-spaet { font-size: 11px; color: #dc2626; font-weight: 600; }
+.planner-leer { margin: 0; color: var(--muted); font-size: 12px; text-align: center; padding: 6px 0; }
+
+/* Eine Aufgabe braucht fünf Angaben - nebeneinander wäre keine davon
+   lesbar, also drei Reihen mit festen Plätzen. */
+.row-aufgabe {
+  display: grid; grid-template-columns: 1fr 1fr 24px;
+  gap: 6px; align-items: center;
+  border-left: 3px solid var(--status); padding-left: 8px;
+}
+.row-aufgabe.ist-markiert { background: var(--surface-2); border-radius: 7px; }
+.row-aufgabe > input.aufgabe-name { grid-area: 1 / 1 / 2 / 3; }
+.row-aufgabe > button { grid-area: 1 / 3 / 2 / 4; justify-self: center; }
+.row-aufgabe > label:nth-of-type(1) { grid-area: 2 / 1 / 3 / 2; }
+.row-aufgabe > label:nth-of-type(2) { grid-area: 2 / 2 / 3 / 4; }
+.row-aufgabe > select { grid-area: 3 / 1 / 4 / 4; min-width: 0; }
+.row-aufgabe > input[type="text"]:not(.aufgabe-name) { grid-area: 4 / 1 / 5 / 4; }
+.row-aufgabe > .aufgabe-termin { grid-area: 5 / 1 / 6 / 4; }
+.aufgabe-termin {
+  font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.aufgabe-termin.ist-fehler { color: #dc2626; }
+
+.projekt-schalter { flex-direction: row; align-items: center; gap: 9px; cursor: pointer; }
+.projekt-schalter span { font-size: 13px; }
+
+@media (max-width: 760px) {
+  .planner { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Namen stehen fest, der Zeitplan scrollt daneben. */
+.gantt-wrap { display: flex; align-items: flex-start; min-width: 0; }
+.gantt-namen {
+  flex: none; width: 176px;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+.gantt-namen-kopf {
+  display: flex; align-items: flex-end; padding: 0 8px 6px;
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--muted); border-bottom: 1px solid var(--border);
+}
+.gantt-name {
+  display: flex; align-items: center; gap: 7px; padding: 0 8px;
+  font-size: 12px; overflow: hidden;
+}
+.gantt-name > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gantt-name.ist-grau { background: color-mix(in srgb, currentColor 2.5%, transparent); }
+.gantt-name.ist-klickbar { cursor: pointer; }
+.gantt-name.ist-klickbar:hover { background: var(--surface-2); }
+.gantt-name-punkt { width: 7px; height: 7px; border-radius: 50%; background: var(--status); flex: none; }
+.gantt-scroll { overflow-x: auto; min-width: 0; flex: 1; }

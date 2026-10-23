@@ -5,6 +5,7 @@ import { createImmobilie, BUNDESLAENDER } from './immobilien.js';
 import { uid, isoDatum } from './util.js';
 import { MUSKELGRUPPEN, geraeteVorlage, uebungenVorlage } from './gym-daten.js';
 import { PLAN_IDS } from './gym-plaene.js';
+import { createProjekt } from './projekte-logik.js';
 import { BEREICH_IDS, WIDGET_IDS, START_VORGABE } from './bereiche.js';
 
 export const DATA_VERSION = 2;
@@ -73,6 +74,7 @@ export function createDefaultData() {
       aktivId: null,
       plan: { id: null, position: 0 },
     },
+    projekte: (() => { const p = createProjekt('Beispielprojekt'); return { items: [p], activeId: p.id }; })(),
     strom: { staende: [], tarif: { arbeitspreis: 0.35, grundpreis: 12, abschlag: 0 } },
     tanken: { eintraege: [], zeitraum: 'alle', eigen: { monate: 1, von: '', bis: '' }, ausgeschlosseneTags: [], fixkosten: { versicherung: 0, steuer: 0, wartung: 0, sonstiges: 0 } },
   };
@@ -184,6 +186,7 @@ export function migrate(raw) {
         ? raw.wochenplan.abgehakt.filter(x => typeof x === 'string')
         : [],
     },
+    projekte: migrateProjekte(raw.projekte),
     start: migrateStart(raw.start),
     habits: migrateHabits(raw.habits),
     gym: migrateGym(raw.gym),
@@ -206,6 +209,51 @@ export function migrate(raw) {
         sonstiges: Number(raw.tanken?.fixkosten?.sonstiges) || 0,
       },
     },
+  };
+}
+
+// Projektplanung. Start- und Enddaten der Aufgaben werden nie gespeichert,
+// sie ergeben sich aus Dauer und Reihenfolge - hier steht deshalb nur, was
+// der Nutzer wirklich eingegeben hat.
+function migrateProjekte(roh) {
+  const items = Array.isArray(roh?.items)
+    ? roh.items.filter(x => x && x.id).map(x => {
+      const aufgaben = Array.isArray(x.aufgaben)
+        ? x.aufgaben.filter(a => a && a.id).map(a => ({
+          id: String(a.id),
+          name: String(a.name ?? 'Aufgabe'),
+          dauer: Math.min(365, Math.max(1, Math.round(Number(a.dauer)) || 1)),
+          nach: a.nach ? String(a.nach) : null,
+          fest: typeof a.fest === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(a.fest) ? a.fest : null,
+          fortschritt: Math.min(100, Math.max(0, Math.round(Number(a.fortschritt)) || 0)),
+          person: String(a.person ?? ''),
+        }))
+        : [];
+      const bekannt = new Set(aufgaben.map(a => a.id));
+      // Ein Vorgänger, den es nicht mehr gibt, oder einer auf sich selbst
+      // würde die Planung blockieren.
+      for (const a of aufgaben) {
+        if (a.nach && (!bekannt.has(a.nach) || a.nach === a.id)) a.nach = null;
+      }
+      return {
+        id: String(x.id),
+        name: String(x.name ?? 'Projekt'),
+        start: typeof x.start === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.start)
+          ? x.start : isoDatum(),
+        nurWerktage: x.nurWerktage !== false,
+        notiz: String(x.notiz ?? ''),
+        aufgaben,
+      };
+    })
+    : [];
+
+  if (!items.length) {
+    const p = createProjekt('Beispielprojekt');
+    return { items: [p], activeId: p.id };
+  }
+  return {
+    items,
+    activeId: items.some(x => x.id === roh?.activeId) ? roh.activeId : items[0].id,
   };
 }
 

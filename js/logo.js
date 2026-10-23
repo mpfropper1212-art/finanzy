@@ -60,6 +60,7 @@ const PFADE = {
   // die Sonne des Hell-Modus und wäre damit zweideutig.
   regler: ['M4,7 h16', 'M4,12 h16', 'M4,17 h16',
     'M9,5 a2,2 0 1 0 0.01,0', 'M15,10 a2,2 0 1 0 0.01,0', 'M7,15 a2,2 0 1 0 0.01,0'],
+  projekte: ['M3,5 h8 v4 h-8 Z', 'M9,11 h10 v4 h-10 Z', 'M6,17 h13 v4 h-13 Z'],
   habits: ['M4,6 h16 v14 h-16 Z', 'M4,10 h16', 'M8,4 v4', 'M16,4 v4', 'M8.5,14.5 l2,2 l4,-4'],
   gym: ['M3,9 h2 v6 h-2 Z', 'M19,9 h2 v6 h-2 Z', 'M6,7 h3 v10 h-3 Z', 'M15,7 h3 v10 h-3 Z', 'M9,12 h6'],
   strom: ['M13,2 L5,14 h6 l-2,8 l9,-12 h-6 Z'],

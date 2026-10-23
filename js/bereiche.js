@@ -2,7 +2,7 @@
 // Umschalten der Panels lesen alle hier - sonst vergisst man beim nächsten
 // neuen Tab garantiert eine der vier Stellen.
 
-export const GRUPPEN = ['Geld', 'Alltag', 'Gesundheit'];
+export const GRUPPEN = ['Geld', 'Alltag', 'Gesundheit', 'Arbeit'];
 
 export const BEREICHE = [
   {
@@ -61,6 +61,11 @@ export const BEREICHE = [
     tab: 'gym', panel: 'panel-gym', symbol: 'gym', kennzahl: 'gym', gruppe: 'Gesundheit',
     titel: 'Training',
     text: 'Sätze loggen, das letzte Mal daneben sehen und das nächste Gewicht vorgeschlagen bekommen.',
+  },
+  {
+    tab: 'projekte', panel: 'panel-projekte', symbol: 'projekte', kennzahl: 'projekte', gruppe: 'Arbeit',
+    titel: 'Projektplanung',
+    text: 'Aufgaben mit Dauer und Reihenfolge – daraus entsteht der Terminplan.',
   },
 ];
 

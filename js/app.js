@@ -13,6 +13,7 @@ import { createStromView } from './strom.js';
 import { createGymView } from './gym.js';
 import { BEREICHE, GRUPPEN, bereichZu } from './bereiche.js';
 import { createHabitsView } from './habits.js';
+import { createProjekteView } from './projekte.js';
 import { VERSION } from './version.js';
 import { createSchuldenView } from './schulden.js';
 import { createWochenplanView } from './wochenplan.js';
@@ -35,6 +36,7 @@ let tankenView = null;
 let stromView = null;
 let gymView = null;
 let habitsView = null;
+let projekteView = null;
 let schuldenView = null;
 let wochenView = null;
 let gruppenView = null;
@@ -228,6 +230,14 @@ function enterApp(data) {
     store,
   });
 
+  projekteView = createProjekteView({
+    kpiHost: $('#projekt-kpis'),
+    chartHost: $('#projekt-chart'),
+    listeHost: $('#projekt-liste'),
+    seiteHost: $('#projekt-seite'),
+    store,
+  });
+
   wochenView = createWochenplanView({
     planHost: $('#woche-plan'),
     listeHost: $('#woche-liste'),
@@ -270,7 +280,7 @@ function enterApp(data) {
 function leaveApp() {
   store.detach();
   cloud.signOut();
-  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = stromView = gymView = habitsView = schuldenView = wochenView = gruppenView = dashboard = null;
+  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = stromView = gymView = habitsView = projekteView = schuldenView = wochenView = gruppenView = dashboard = null;
   $('#app-view').hidden = true;
   $('#login-view').hidden = false;
   $('#accounts-host').replaceChildren();
@@ -356,6 +366,7 @@ function rebuildAll() {
   stromView.renderAll();
   gymView.renderAll();
   habitsView.renderAll();
+  projekteView.renderAll();
   schuldenView.renderAll();
   wochenView.renderAll();
   gruppenView.renderAll();
@@ -377,6 +388,7 @@ function setTab(tab) {
   else if (tab === 'strom') stromView?.renderAll();
   else if (tab === 'gym') gymView?.renderAll();
   else if (tab === 'habits') habitsView?.renderAll();
+  else if (tab === 'projekte') projekteView?.renderAll();
   else if (tab === 'schulden') schuldenView?.renderAll();
   else if (tab === 'woche') wochenView?.renderAll();
   else if (tab === 'gruppen') gruppenView?.renderAll();
@@ -612,6 +624,7 @@ document.addEventListener('click', ev => {
 function activeSvg() {
   if (activeTab === 'flow') return $('#sankey-host svg');
   if (activeTab === 'accounts') return $('#accounts-host svg');
+  if (activeTab === 'projekte') return $('#projekt-chart svg');
   if (activeTab === 'strom') return $('#strom-chart svg');
   if (activeTab === 'tanken') return $('#tank-chart svg');
   return $('#immo-chart svg');
@@ -620,6 +633,7 @@ function activeSvg() {
 function activeName() {
   if (activeTab === 'flow') return store.data.sankey.title || 'geldfluss';
   if (activeTab === 'accounts') return 'kontomodell';
+  if (activeTab === 'projekte') return 'zeitplan';
   if (activeTab === 'strom') return 'stromverbrauch';
   if (activeTab === 'tanken') return 'verbrauch';
   return `${immoView?.aktiv()?.name || 'immobilie'}-restschuld`;
@@ -731,6 +745,7 @@ $('#btn-theme').addEventListener('click', () => {
   else if (activeTab === 'strom') stromView?.renderAll();
   else if (activeTab === 'gym') gymView?.renderAll();
   else if (activeTab === 'habits') habitsView?.renderAll();
+  else if (activeTab === 'projekte') projekteView?.renderAll();
 });
 
 theme.anwenden();

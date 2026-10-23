@@ -16,6 +16,7 @@ import { renderNachrichten } from './nachrichten.js';
 import { createMuenze } from './muenze.js';
 import { createHabitWidget, serie } from './habits.js';
 import { BEREICHE, WIDGETS, bereichZu } from './bereiche.js';
+import { planen } from './projekte-logik.js';
 
 const dezimal = (v, stellen = 2) =>
   v === null || !Number.isFinite(v) ? '–' : v.toLocaleString('de-DE', {
@@ -82,6 +83,18 @@ function kennzahlen(data) {
         ? `${money(Math.round(sch.bekomme))} offen, ${money(Math.round(sch.schulde))} geschuldet`
         : 'nichts offen',
     },
+    projekte: (() => {
+      const liste = data.projekte.items;
+      const p = liste.find(x => x.id === data.projekte.activeId) ?? liste[0];
+      if (!p) return { wert: '–', zusatz: 'kein Projekt angelegt' };
+      const plan = planen(p);
+      return {
+        wert: `${plan.fortschritt} %`,
+        zusatz: plan.aufgaben.length
+          ? `${p.name} · fertig am ${new Date(`${plan.ende}T12:00:00`).toLocaleDateString('de-DE')}`
+          : `${p.name} · noch keine Aufgabe`,
+      };
+    })(),
     habits: (() => {
       const items = data.habits.items;
       if (!items.length) return { wert: '–', zusatz: 'noch keine angelegt' };
