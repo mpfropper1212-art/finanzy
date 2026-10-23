@@ -1,53 +1,53 @@
 {
-  "stand": "2026-10-14T05:46:10+00:00",
+  "stand": "2026-10-23T05:46:31+00:00",
   "meldungen": [
     {
-      "titel": "Marktbericht: DAX leicht höher gesehen",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-nasdaq-berichtssaison-100.html",
+      "titel": "Marktbericht: Tech-Ausverkauf drückt auf die Anlegerstimmung",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-dow-ki-boom-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-10-14T05:35:03+00:00"
+      "zeit": "2026-10-23T05:34:12+00:00"
     },
     {
-      "titel": "Klima: Insider warnen, dass Immobilienversicherungen unbezahlbar werden könnten",
-      "link": "https://www.spiegel.de/wirtschaft/soziales/klima-insider-warnen-dass-immobilienversicherungen-unbezahlbar-werden-koennten-a-5d27d4a0-3200-458b-9c9d-3220af26ef38#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-14T05:31:00+00:00"
-    },
-    {
-      "titel": "Rente: Kontenklärung bringt oft mehr Rente – ohne zusätzliche Kosten",
-      "link": "https://www.spiegel.de/wirtschaft/service/rente-kontenklaerung-bringt-oft-mehr-rente-ohne-zusaetzliche-kosten-a-158e9cea-bc36-4462-8d67-15b0ebffec45#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-14T03:30:00+00:00"
-    },
-    {
-      "titel": "Rentenpunkte kaufen: So können Sie früher in Rente – ohne Abschläge",
-      "link": "https://www.spiegel.de/wirtschaft/rentenpunkte-kaufen-so-koennen-sie-frueher-in-rente-ohne-abschlaege-a-ead29a48-c042-4254-abae-0cceeb009788#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-14T03:30:00+00:00"
-    },
-    {
-      "titel": "Bank of America: Finanzministerium ahndet laxe Geldwäschekontrollen mit Milliardenstrafe",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/bank-of-america-finanzministerium-ahndet-laxe-geldwaeschekontrollen-mit-milliardenstrafe-a-9b3ffe37-9558-422b-9fe6-9292926f4632#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-14T02:01:00+00:00"
-    },
-    {
-      "titel": "Wirtschaft vor acht vom 13.10.2026",
-      "link": "https://www.tagesschau.de/video/video-1665754.html",
+      "titel": "Wirtschaft vor acht vom 22.10.2026",
+      "link": "https://www.tagesschau.de/video/video-1670896.html",
       "quelle": "tagesschau",
-      "zeit": "2026-10-13T19:49:10+00:00"
+      "zeit": "2026-10-22T17:47:07+00:00"
     },
     {
-      "titel": "Zuckersteuer: Koalition legt Streit bei",
-      "link": "https://www.spiegel.de/wirtschaft/service/zuckersteuer-koalition-legt-streit-bei-a-30edbf41-9e59-46e1-9e06-6d0accbe7ed2#ref=rss",
+      "titel": "Steuerschätzung: Lars Klingbeil verteidigt Verzicht auf weitere Steuersenkungen",
+      "link": "https://www.spiegel.de/wirtschaft/soziales/steuerschaetzung-lars-klingbeil-verteidigt-verzicht-auf-weitere-steuersenkungen-a-dcf78c7e-cc43-4d8d-a7e3-b849bf94cdb2#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-10-13T19:19:00+00:00"
+      "zeit": "2026-10-22T17:47:00+00:00"
     },
     {
-      "titel": "EU bremst Hybrid-Importe: Können deutsche Autobauer profitieren?",
-      "link": "https://www.tagesschau.de/wirtschaft/autobranche-hybride-eu-china-100.html",
+      "titel": "Marktbericht: DAX fällt wieder zurück",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-dow-tesla-meta-sap-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-10-13T18:03:27+00:00"
+      "zeit": "2026-10-22T16:36:57+00:00"
+    },
+    {
+      "titel": "Wirecard-Prozess: SPIEGEL-Reporter besucht Markus Braun im Gefängnis",
+      "link": "https://www.spiegel.de/wirtschaft/wirecard-prozess-spiegel-reporter-besucht-markus-braun-im-gefaengnis-a-d797a901-c952-4646-97df-eb4bf10714dd#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-22T16:34:00+00:00"
+    },
+    {
+      "titel": "Deutsche Bahn: Direktverbindung Berlin – Paris kehrt zurück",
+      "link": "https://www.spiegel.de/wirtschaft/deutsche-bahn-direktverbindung-berlin-paris-kehrt-zurueck-a-88e90b1b-d5cd-497c-b784-6b2bf100f131#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-22T14:19:00+00:00"
+    },
+    {
+      "titel": "Agrarsubventionen: Wirtschaftsliberaler Kronberger Kreis fordert Abschaffung",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/agrarsubventionen-wirtschaftsliberaler-kronberger-kreis-fordert-abschaffung-a-c460c327-0d43-4d23-ac7e-8cc0e9e076d8#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-22T14:14:00+00:00"
+    },
+    {
+      "titel": "Lkw-Sonntagsfahrverbot bleibt bis kurz vor Weihnachten ausgesetzt",
+      "link": "https://www.spiegel.de/wirtschaft/lkw-sonntagsfahrverbot-bleibt-bis-kurz-vor-weihnachten-ausgesetzt-a-4fb87e12-5e5f-419c-ab87-d48efea5c00e#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-22T13:52:00+00:00"
     }
   ]
 }
