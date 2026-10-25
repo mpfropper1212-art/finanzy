@@ -1,53 +1,53 @@
 {
-  "stand": "2026-10-24T05:46:36+00:00",
+  "stand": "2026-10-25T05:45:00+00:00",
   "meldungen": [
+    {
+      "titel": "Wie Erdwärme die Wärmeversorgung verändern soll",
+      "link": "https://www.tagesschau.de/wirtschaft/technologie/erdwaerme-waermeversorgung-heizen-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-10-25T04:10:34+00:00"
+    },
+    {
+      "titel": "Audi baut für vier Milliarden Dollar eigenes Werk in den USA",
+      "link": "https://www.spiegel.de/wirtschaft/audi-baut-fuer-vier-milliarden-dollar-eigenes-werk-in-den-usa-a-a6807fc7-f806-4c09-b692-90bfdd32e174#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-25T03:47:00+00:00"
+    },
+    {
+      "titel": "Mietmarkt: Warum Wohnungstausch die Wohnungsnot nicht lindert",
+      "link": "https://www.spiegel.de/wirtschaft/mietmarkt-warum-wohnungstausch-die-wohnungsnot-nicht-lindert-a-ad8e2a86-01a6-4453-8ade-1076fae7f246#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-24T15:39:00+00:00"
+    },
+    {
+      "titel": "Nach der Elternzeit: Wenn die Rückkehr in den Job schwierig wird",
+      "link": "https://www.tagesschau.de/wirtschaft/arbeitsmarkt/elternzeit-rueckkehr-job-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-10-24T14:26:17+00:00"
+    },
+    {
+      "titel": "Volkswagen: VW will weitere 12.000 Stellen abbauen",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/volkswagen-vw-will-weitere-12-000-stellen-abbauen-a-ff3dbc88-1f93-4109-b777-fcc141802bba#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-24T11:04:00+00:00"
+    },
+    {
+      "titel": "Deutschlandticket für Gelegenheitsfahrer: Bilger findet Idee gut",
+      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/bahn-nahverkehr-deutschlandticket-light-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-10-24T10:46:34+00:00"
+    },
+    {
+      "titel": "Energie-Entkoppelung: So abhängig ist Europa noch von Russland",
+      "link": "https://www.tagesschau.de/wirtschaft/weltwirtschaft/abhaengigkeit-russische-energie-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-10-24T08:27:08+00:00"
+    },
     {
       "titel": "Wirtschaft vor acht vom 23.10.2026",
       "link": "https://www.tagesschau.de/video/video-1671518.html",
       "quelle": "tagesschau",
       "zeit": "2026-10-23T18:01:52+00:00"
-    },
-    {
-      "titel": "Marktbericht: DAX-Anleger meiden das Risiko",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-dow-ki-boom-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-10-23T16:38:57+00:00"
-    },
-    {
-      "titel": "Iran-Krieg: Lufthansa verschiebt Neustart der Flüge nach Dubai",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/iran-krieg-lufthansa-verschiebt-neustart-der-fluege-nach-dubai-a-26af5a21-cc45-4247-a043-83122be0a8c4#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-23T14:15:00+00:00"
-    },
-    {
-      "titel": "Ver.di ruft zu bundesweitem Warnstreik bei Privatbanken auf",
-      "link": "https://www.spiegel.de/wirtschaft/ver-di-ruft-zu-bundesweitem-warnstreik-bei-privatbanken-auf-a-a4bd0799-26ba-4909-b0d4-46b0768f28ff#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-23T13:38:00+00:00"
-    },
-    {
-      "titel": "Dänemark: Regierung stoppt die Zucht von Nerzen",
-      "link": "https://www.spiegel.de/wirtschaft/daenemark-regierung-stoppt-die-zucht-von-nerzen-a-27a05ed1-f968-4acb-ad93-d7b30a5e8fb7#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-23T13:36:00+00:00"
-    },
-    {
-      "titel": "Wirecard-Prozess: Verfahren gegen Ex-Chef Markus Braun vor dem Finale",
-      "link": "https://www.spiegel.de/wirtschaft/wirecard-prozess-verfahren-gegen-ex-chef-markus-braun-steht-vor-dem-finale-a-52580abd-70d5-40a7-9d6e-7b31c1de8f55#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-23T12:41:00+00:00"
-    },
-    {
-      "titel": "Stromsteuer: Länder und Opposition drängen auf Senkung für alle",
-      "link": "https://www.spiegel.de/wirtschaft/stromsteuer-laender-und-opposition-draengen-auf-senkung-fuer-alle-a-e7624965-060f-4b85-8d01-4fdf57dc9816#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-23T12:38:00+00:00"
-    },
-    {
-      "titel": "Deutsche Baubranche verzeichnet Rekordanstieg bei Großaufträgen",
-      "link": "https://www.tagesschau.de/wirtschaft/konjunktur/baugewerbe-grossauftraege-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-10-23T11:53:21+00:00"
     }
   ]
 }
