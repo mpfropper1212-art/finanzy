@@ -1874,3 +1874,22 @@ button.kal-tag:disabled { cursor: default; }
 .gantt-name.ist-klickbar:hover { background: var(--surface-2); }
 .gantt-name-punkt { width: 7px; height: 7px; border-radius: 50%; background: var(--status); flex: none; }
 .gantt-scroll { overflow-x: auto; min-width: 0; flex: 1; }
+
+/* In der Tabelle direkt ändern: die Felder sehen aus wie Text, bis man sie
+   anfasst - sonst wirkt die Tabelle wie ein Formular und ist nicht mehr
+   zu lesen. */
+.tabellen-feld {
+  width: 100%; min-width: 0; padding: 3px 5px;
+  border: 1px solid transparent; border-radius: 6px;
+  background: transparent; color: inherit;
+  font: inherit; font-size: 13px;
+}
+.tank-tabelle .num .tabellen-feld { text-align: right; font-variant-numeric: tabular-nums; }
+.tabellen-feld:hover { border-color: var(--border); background: var(--surface-2); }
+.tabellen-feld:focus {
+  border-color: var(--accent); background: var(--surface);
+  outline: none;
+}
+/* Datumsfelder brauchen Mindestbreite, sonst kürzt Safari sie auf das Symbol. */
+.tank-tabelle td:first-child .tabellen-feld { min-width: 118px; }
+.tank-tabelle td:has(.tabellen-feld) { padding: 2px 4px; }

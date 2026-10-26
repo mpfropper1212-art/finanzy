@@ -507,12 +507,35 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
       // Wegen einer Markierung ausgenommene Zeilen bleiben sichtbar, werden
       // aber abgesetzt - sonst wäre unklar, warum die Summe nicht aufgeht.
       const tr = el('tr', a.istAusgenommen(z) ? { class: 'is-ausgenommen' } : {});
+      const original = eintraege().find(x => x.id === z.id);
+
+      // Direkt in der Tabelle ändern. Beim Tippen nur speichern, erst beim
+      // Verlassen neu zeichnen - sonst springt der Fokus aus dem Feld, sobald
+      // sich Kilometer und Verbrauch neu berechnen.
+      const zelle = (attrs, wert, uebernehmen) => {
+        const td = el('td', { class: attrs.class ?? '' });
+        const input = el('input', {
+          ...attrs, class: 'tabellen-feld', value: wert,
+        });
+        input.addEventListener('input', () => {
+          uebernehmen(input.value);
+          store.commit({ silent: true });
+        });
+        input.addEventListener('change', () => { uebernehmen(input.value); valueChange(); });
+        td.appendChild(input);
+        return td;
+      };
+
       tr.append(
-        el('td', {}, z.datum ? datumKurz(z.datum) : '–'),
-        el('td', { class: 'num' }, dezimal(z.liter, 2)),
-        el('td', { class: 'num' }, money(z.euro)),
+        zelle({ type: 'date', 'aria-label': 'Datum' }, z.datum ?? '',
+          v => { original.datum = v; }),
+        zelle({ type: 'number', min: '0', step: '0.01', class: 'num', 'aria-label': 'Liter' },
+          z.liter || '', v => { original.liter = zahl(v); }),
+        zelle({ type: 'number', min: '0', step: '0.01', class: 'num', 'aria-label': 'Preis' },
+          z.euro || '', v => { original.euro = zahl(v); }),
         el('td', { class: 'num' }, dezimal(z.preisProLiter, 3)),
-        el('td', { class: 'num' }, z.tacho.toLocaleString('de-DE')),
+        zelle({ type: 'number', min: '0', step: '1', class: 'num', 'aria-label': 'Tachostand' },
+          z.tacho || '', v => { original.tacho = zahl(v); }),
         el('td', { class: 'num' }, z.km === null ? '–' : z.km.toLocaleString('de-DE')),
         el('td', { class: 'num stark' }, dezimal(z.verbrauch)),
       );
@@ -626,17 +649,37 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
       if (attrs['data-einheit']) wrap.appendChild(el('span', { class: 'feld-einheit' }, attrs['data-einheit']));
       row.appendChild(wrap);
       formHost.appendChild(row);
+      return input;
     };
 
     feld('datum', 'Datum', { type: 'date' });
     feld('liter', 'Getankt', { type: 'number', min: '0', step: '0.01', 'data-einheit': 'l' });
     feld('euro', 'Bezahlt', { type: 'number', min: '0', step: '0.01', 'data-einheit': '€' });
-    feld('tacho', 'Tachostand', { type: 'number', min: '0', step: '1', 'data-einheit': 'km' });
+    const tachoFeld = feld('tacho', 'Tachostand', { type: 'number', min: '0', step: '1', 'data-einheit': 'km' });
 
-    if (letzte) {
-      formHost.appendChild(el('p', { class: 'feld-hinweis' },
-        `Letzter Tachostand: ${zahl(letzte.tacho).toLocaleString('de-DE')} km`));
-    }
+    const einsortiert = el('p', { class: 'feld-hinweis' });
+    const zeigeEinordnung = () => {
+      const tacho = zahl(entwurf.tacho);
+      const stand = letzte ? `Letzter Tachostand: ${zahl(letzte.tacho).toLocaleString('de-DE')} km. ` : '';
+      if (tacho <= 0) {
+        einsortiert.textContent = `${stand}Ältere Füllungen kannst du nachtragen – `
+          + 'sie werden nach Tachostand einsortiert.';
+        return;
+      }
+      const davor = [...eintraege()].map(x => zahl(x.tacho)).filter(t => t < tacho).sort((x, y) => y - x)[0];
+      const danach = [...eintraege()].map(x => zahl(x.tacho)).filter(t => t > tacho).sort((x, y) => x - y)[0];
+      if (danach === undefined) {
+        einsortiert.textContent = `${stand}Kommt als neueste Füllung ans Ende.`;
+      } else {
+        einsortiert.textContent = davor === undefined
+          ? `Wird vor ${danach.toLocaleString('de-DE')} km einsortiert, also ganz an den Anfang.`
+          : `Wird zwischen ${davor.toLocaleString('de-DE')} und `
+            + `${danach.toLocaleString('de-DE')} km einsortiert.`;
+      }
+    };
+    zeigeEinordnung();
+    tachoFeld.addEventListener('input', zeigeEinordnung);
+    formHost.appendChild(einsortiert);
 
     const notizRow = el('label', { class: 'feld feld-breit' });
     notizRow.appendChild(el('span', { class: 'feld-label' }, 'Notiz (optional)'));
@@ -669,8 +712,11 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
       let text = '';
       if (liter <= 0) text = 'Bitte die getankte Menge eintragen.';
       else if (tacho <= 0) text = 'Bitte den Tachostand eintragen.';
-      else if (letzte && tacho <= zahl(letzte.tacho)) {
-        text = `Der Tachostand muss über dem letzten liegen (${zahl(letzte.tacho).toLocaleString('de-DE')} km).`;
+      // Nachtragen ist ausdrücklich erlaubt - die Auswertung sortiert nach
+      // Tachostand, eine ältere Füllung rutscht also an ihren Platz. Nur ein
+      // doppelter Stand bleibt verboten: dann wäre die Reihenfolge beliebig.
+      else if (eintraege().some(x => zahl(x.tacho) === tacho)) {
+        text = `Zu ${tacho.toLocaleString('de-DE')} km gibt es schon eine Tankfüllung.`;
       }
       if (text) {
         fehler.textContent = text;
