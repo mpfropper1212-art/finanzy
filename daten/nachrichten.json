@@ -1,53 +1,53 @@
 {
-  "stand": "2026-10-23T05:46:31+00:00",
+  "stand": "2026-10-26T05:50:22+00:00",
   "meldungen": [
     {
-      "titel": "Marktbericht: Tech-Ausverkauf drückt auf die Anlegerstimmung",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-dow-ki-boom-100.html",
+      "titel": "Donald Trump: »Mr Audi« macht US-Präsident ein milliardenschweres Wahlkampfgeschenk",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/donald-trump-audi-chef-doellner-stellt-neues-werk-in-georgia-an-trumps-seite-vor-a-a93e3d40-e162-4bfb-abfe-76e6fcac71e6#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-25T16:21:00+00:00"
+    },
+    {
+      "titel": "Pflegeversicherung: Pflegereform geht zulasten der Angehörigen",
+      "link": "https://www.spiegel.de/wirtschaft/sozialverband-vdk-pflegereform-geht-zulasten-der-angehoerigen-a-fbb828fd-67fb-4ba1-96d7-2196affb343c#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-25T14:41:00+00:00"
+    },
+    {
+      "titel": "Wie ein Dorf in Brandenburg seinen Gasthof retten will",
+      "link": "https://www.tagesschau.de/wirtschaft/dorfkneipe-rettung-brandenburg-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-10-23T05:34:12+00:00"
+      "zeit": "2026-10-25T12:06:21+00:00"
     },
     {
-      "titel": "Wirtschaft vor acht vom 22.10.2026",
-      "link": "https://www.tagesschau.de/video/video-1670896.html",
+      "titel": "Florian Schroeder: Neue ZDF-Sendung »Journal Deluxe« sorgt für Debatte",
+      "link": "https://www.spiegel.de/wirtschaft/florian-schroeder-neue-zdf-sendung-journal-deluxe-sorgt-fuer-debatte-a-904b6949-446b-4014-9330-b9542dfb11e4#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-25T12:05:00+00:00"
+    },
+    {
+      "titel": "Elektroauto kaufen: Hohe Spritpreise treiben Nachfrage nach E-Autos an",
+      "link": "https://www.spiegel.de/wirtschaft/elektroautos-ueberwinden-ihr-image-als-ladenhueter-a-cace86c9-12db-477d-b80b-a363847a00c9#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-25T08:18:00+00:00"
+    },
+    {
+      "titel": "Wie Erdwärme die Wärmeversorgung verändern soll",
+      "link": "https://www.tagesschau.de/wirtschaft/technologie/erdwaerme-waermeversorgung-heizen-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-10-22T17:47:07+00:00"
+      "zeit": "2026-10-25T04:10:34+00:00"
     },
     {
-      "titel": "Steuerschätzung: Lars Klingbeil verteidigt Verzicht auf weitere Steuersenkungen",
-      "link": "https://www.spiegel.de/wirtschaft/soziales/steuerschaetzung-lars-klingbeil-verteidigt-verzicht-auf-weitere-steuersenkungen-a-dcf78c7e-cc43-4d8d-a7e3-b849bf94cdb2#ref=rss",
+      "titel": "USA: Audi baut für vier Milliarden Dollar eigenes Werk in Georgia",
+      "link": "https://www.spiegel.de/wirtschaft/usa-audi-baut-fuer-vier-milliarden-dollar-eigenes-werk-in-georgia-a-a6807fc7-f806-4c09-b692-90bfdd32e174#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-10-22T17:47:00+00:00"
+      "zeit": "2026-10-25T03:47:00+00:00"
     },
     {
-      "titel": "Marktbericht: DAX fällt wieder zurück",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-dow-tesla-meta-sap-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-10-22T16:36:57+00:00"
-    },
-    {
-      "titel": "Wirecard-Prozess: SPIEGEL-Reporter besucht Markus Braun im Gefängnis",
-      "link": "https://www.spiegel.de/wirtschaft/wirecard-prozess-spiegel-reporter-besucht-markus-braun-im-gefaengnis-a-d797a901-c952-4646-97df-eb4bf10714dd#ref=rss",
+      "titel": "Mietmarkt: Warum Wohnungstausch die Wohnungsnot nicht lindert",
+      "link": "https://www.spiegel.de/wirtschaft/mietmarkt-warum-wohnungstausch-die-wohnungsnot-nicht-lindert-a-ad8e2a86-01a6-4453-8ade-1076fae7f246#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-10-22T16:34:00+00:00"
-    },
-    {
-      "titel": "Deutsche Bahn: Direktverbindung Berlin – Paris kehrt zurück",
-      "link": "https://www.spiegel.de/wirtschaft/deutsche-bahn-direktverbindung-berlin-paris-kehrt-zurueck-a-88e90b1b-d5cd-497c-b784-6b2bf100f131#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-22T14:19:00+00:00"
-    },
-    {
-      "titel": "Agrarsubventionen: Wirtschaftsliberaler Kronberger Kreis fordert Abschaffung",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/agrarsubventionen-wirtschaftsliberaler-kronberger-kreis-fordert-abschaffung-a-c460c327-0d43-4d23-ac7e-8cc0e9e076d8#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-22T14:14:00+00:00"
-    },
-    {
-      "titel": "Lkw-Sonntagsfahrverbot bleibt bis kurz vor Weihnachten ausgesetzt",
-      "link": "https://www.spiegel.de/wirtschaft/lkw-sonntagsfahrverbot-bleibt-bis-kurz-vor-weihnachten-ausgesetzt-a-4fb87e12-5e5f-419c-ab87-d48efea5c00e#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-22T13:52:00+00:00"
+      "zeit": "2026-10-24T15:39:00+00:00"
     }
   ]
 }
