@@ -428,8 +428,13 @@ export function createTankenView({ kpiHost, chartHost, tabelleHost, formHost, fi
     box.append(
       kachel('Verbrauch', a.verbrauch === null ? '–' : `${dezimal(a.verbrauch)} l`, 'je 100 km'),
       kachel('Preis je Liter', a.preisProLiter === null ? '–' : `${dezimal(a.preisProLiter, 3)} €`, 'Schnitt im Zeitraum'),
+      kachel('Kilometer je Monat',
+        a.kmProMonat === null ? '–' : `${Math.round(a.kmProMonat).toLocaleString('de-DE')} km`,
+        a.kmProJahr === null
+          ? 'ab der zweiten Tankfüllung'
+          : `${Math.round(a.kmProJahr).toLocaleString('de-DE')} km im Jahr`),
       kachel('Sprit je Monat', euro(a.spritProMonat),
-        a.kmProMonat === null ? '' : `${Math.round(a.kmProMonat).toLocaleString('de-DE')} km im Monat`),
+        a.spritProMonat === null ? '' : `${money(Math.round(a.spritProMonat * 12))} im Jahr`),
       kachel('Fixkosten je Monat', euro(a.fixProMonat),
         a.fixProJahr ? `${money(Math.round(a.fixProJahr))} im Jahr` : 'rechts eintragen'),
       kachel('Alles zusammen', euro(a.gesamtProMonat),
