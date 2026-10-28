@@ -83,6 +83,7 @@ function kennzahlen(data) {
         ? `${money(Math.round(sch.bekomme))} offen, ${money(Math.round(sch.schulde))} geschuldet`
         : 'nichts offen',
     },
+    pdf: { wert: 'Werkzeug', zusatz: 'läuft ganz in deinem Browser' },
     projekte: (() => {
       const liste = data.projekte.items;
       const p = liste.find(x => x.id === data.projekte.activeId) ?? liste[0];

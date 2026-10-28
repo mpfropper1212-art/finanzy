@@ -74,6 +74,7 @@ export function createDefaultData() {
       aktivId: null,
       plan: { id: null, position: 0 },
     },
+    pdf: { stufe: 'mittel' },
     projekte: (() => { const p = createProjekt('Beispielprojekt'); return { items: [p], activeId: p.id }; })(),
     strom: { staende: [], tarif: { arbeitspreis: 0.35, grundpreis: 12, abschlag: 0 } },
     tanken: { eintraege: [], zeitraum: 'alle', eigen: { monate: 1, von: '', bis: '' }, ausgeschlosseneTags: [], fixkosten: { versicherung: 0, steuer: 0, wartung: 0, sonstiges: 0 } },
@@ -186,6 +187,7 @@ export function migrate(raw) {
         ? raw.wochenplan.abgehakt.filter(x => typeof x === 'string')
         : [],
     },
+    pdf: { stufe: ['stark', 'mittel', 'schonend'].includes(raw.pdf?.stufe) ? raw.pdf.stufe : 'mittel' },
     projekte: migrateProjekte(raw.projekte),
     start: migrateStart(raw.start),
     habits: migrateHabits(raw.habits),

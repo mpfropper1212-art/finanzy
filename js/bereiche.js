@@ -67,6 +67,11 @@ export const BEREICHE = [
     titel: 'Projektplanung',
     text: 'Aufgaben mit Dauer und Reihenfolge – daraus entsteht der Terminplan.',
   },
+  {
+    tab: 'pdf', panel: 'panel-pdf', symbol: 'pdf', kennzahl: 'pdf', gruppe: 'Arbeit',
+    titel: 'PDF verkleinern',
+    text: 'Große PDFs kleiner machen – die Datei bleibt dabei auf deinem Gerät.',
+  },
 ];
 
 export const BEREICH_IDS = BEREICHE.map(b => b.tab);

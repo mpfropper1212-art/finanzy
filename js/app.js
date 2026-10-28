@@ -14,6 +14,7 @@ import { createGymView } from './gym.js';
 import { BEREICHE, GRUPPEN, bereichZu } from './bereiche.js';
 import { createHabitsView } from './habits.js';
 import { createProjekteView } from './projekte.js';
+import { createPdfView } from './pdf-werkzeug.js';
 import { VERSION } from './version.js';
 import { createSchuldenView } from './schulden.js';
 import { createWochenplanView } from './wochenplan.js';
@@ -37,6 +38,7 @@ let stromView = null;
 let gymView = null;
 let habitsView = null;
 let projekteView = null;
+let pdfView = null;
 let schuldenView = null;
 let wochenView = null;
 let gruppenView = null;
@@ -238,6 +240,8 @@ function enterApp(data) {
     store,
   });
 
+  pdfView = createPdfView({ host: $('#pdf-host'), store });
+
   wochenView = createWochenplanView({
     planHost: $('#woche-plan'),
     listeHost: $('#woche-liste'),
@@ -280,7 +284,7 @@ function enterApp(data) {
 function leaveApp() {
   store.detach();
   cloud.signOut();
-  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = stromView = gymView = habitsView = projekteView = schuldenView = wochenView = gruppenView = dashboard = null;
+  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = stromView = gymView = habitsView = projekteView = pdfView = schuldenView = wochenView = gruppenView = dashboard = null;
   $('#app-view').hidden = true;
   $('#login-view').hidden = false;
   $('#accounts-host').replaceChildren();
@@ -367,6 +371,7 @@ function rebuildAll() {
   gymView.renderAll();
   habitsView.renderAll();
   projekteView.renderAll();
+  pdfView.renderAll();
   schuldenView.renderAll();
   wochenView.renderAll();
   gruppenView.renderAll();
@@ -389,6 +394,7 @@ function setTab(tab) {
   else if (tab === 'gym') gymView?.renderAll();
   else if (tab === 'habits') habitsView?.renderAll();
   else if (tab === 'projekte') projekteView?.renderAll();
+  else if (tab === 'pdf') pdfView?.renderAll();
   else if (tab === 'schulden') schuldenView?.renderAll();
   else if (tab === 'woche') wochenView?.renderAll();
   else if (tab === 'gruppen') gruppenView?.renderAll();
