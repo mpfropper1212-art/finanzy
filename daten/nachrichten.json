@@ -1,6 +1,36 @@
 {
-  "stand": "2026-10-31T05:52:58+00:00",
+  "stand": "2026-11-01T05:56:40+00:00",
   "meldungen": [
+    {
+      "titel": "Warnstreiks der IG Metall kurz nach Mitternacht angelaufen",
+      "link": "https://www.tagesschau.de/wirtschaft/arbeitsmarkt/ig-metall-warnstreiks-108.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-01T03:48:45+00:00"
+    },
+    {
+      "titel": "Bildungsökonom Ludger Wößmann: »Bessere Schulbildung könnte Deutschland 20 Billionen Euro einbringen«",
+      "link": "https://www.spiegel.de/wirtschaft/soziales/bildungsoekonom-ludger-woessmann-bessere-schulbildung-koennte-deutschland-20-billionen-euro-einbringen-a-ee40144a-48f4-4a35-a0a2-5b6b5edb8fd9#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-31T19:31:00+00:00"
+    },
+    {
+      "titel": "Was Salz aus 1.000 Metern Tiefe so wertvoll macht",
+      "link": "https://www.tagesschau.de/wirtschaft/technologie/salz-142.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-10-31T16:21:31+00:00"
+    },
+    {
+      "titel": "Hamburg: Warum in einem Prachtbau gleich vier Mietverträge gekündigt wurden",
+      "link": "https://www.spiegel.de/wirtschaft/soziales/hamburg-warum-in-einem-prachtbau-gleich-vier-mietvertraege-gekuendigt-wurden-a-8a22dfff-4452-4a6d-ad9f-92395a83592e#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-10-31T10:20:00+00:00"
+    },
+    {
+      "titel": "KI bei der Geldanlage: Wie sicher sind ChatGPT-Anlagetipps?",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/ki-geldanlage-chatgpt-anlagetipps-risiken-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-10-31T07:45:19+00:00"
+    },
     {
       "titel": "Halloween: Handel rechnet mit mehr als 500 Millionen Euro Umsatz",
       "link": "https://www.spiegel.de/wirtschaft/halloween-handel-rechnet-mit-mehr-als-500-millionen-euro-umsatz-a-725cb760-a953-4400-bf50-9392c8fb49d7#ref=rss",
@@ -18,36 +48,6 @@
       "link": "https://www.tagesschau.de/wirtschaft/technologie/usa-binance-hackerangriff-verluste-100.html",
       "quelle": "tagesschau",
       "zeit": "2026-10-30T20:21:33+00:00"
-    },
-    {
-      "titel": "Glyphosat: Bayer siegt erneut vor US-Gericht",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/streit-ueber-pestizid-glyphosat-bayer-siegt-erneut-vor-us-gericht-a-bf6f80e4-d0a9-449a-bc00-ca46ba189e4b#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-30T17:52:00+00:00"
-    },
-    {
-      "titel": "Marktbericht: Schwaches Ende einer starken Börsenwoche",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-dow-jones-geldanlage-amazon-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-10-30T17:22:12+00:00"
-    },
-    {
-      "titel": "Tankrabatt dämpft Inflation",
-      "link": "https://www.spiegel.de/wirtschaft/tankrabatt-inflation-im-oktober-gesunken-a-1334be70-9cd6-4182-a5a9-d58c29f0571d#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-10-30T14:34:00+00:00"
-    },
-    {
-      "titel": "Inflationsrate geht im Oktober auf 2,8 Prozent zurück",
-      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/inflationsrate-deutschland-oktober-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-10-30T14:08:37+00:00"
-    },
-    {
-      "titel": "Wie der VW-Vorstand die Laune bei den Skoda-Mitarbeitern drückt",
-      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/skoda-144.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-10-30T13:51:43+00:00"
     }
   ]
 }
