@@ -1,53 +1,53 @@
 {
-  "stand": "2026-11-06T06:13:34+00:00",
+  "stand": "2026-11-07T05:58:31+00:00",
   "meldungen": [
     {
-      "titel": "Koalition verschiebt staatliches Tierhaltungslogo erneut",
-      "link": "https://www.spiegel.de/wirtschaft/koalition-verschiebt-staatliches-tierhaltungslogo-erneut-a-c8dfe463-defa-4c73-80e8-60e1e76ff0db#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-06T05:58:00+00:00"
-    },
-    {
-      "titel": "Deutsche Bahn: SPD plant Eisenbahn-Fonds wie in Österreich",
-      "link": "https://www.spiegel.de/wirtschaft/service/deutsche-bahn-spd-plant-eisenbahn-fonds-wie-in-oesterreich-a-31e85ae9-3305-4023-a9dc-84671fd009b2#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-06T05:00:00+00:00"
-    },
-    {
-      "titel": "Audi will geplantes US-Werk in Georgia offenbar noch vergrößern",
-      "link": "https://www.spiegel.de/wirtschaft/audi-will-geplantes-us-werk-in-georgia-offenbar-noch-vergroessern-a-c0397e01-6083-4731-91a4-be07bd6714ce#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-06T01:02:00+00:00"
-    },
-    {
-      "titel": "Midterms-Siege der Demokraten: Furcht vor KI-Regulierung lässt US-Tech-Aktien einbrechen",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/midterms-siege-der-demokraten-furcht-vor-ki-regulierung-laesst-us-tech-aktien-einbrechen-a-c9e7a367-2287-429f-95d3-b3651ecdbb04#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-05T21:55:00+00:00"
-    },
-    {
-      "titel": "Bakterielle Belastung: Pinienkern- und Rindfleischsalami-Produkte werden zurückgerufen",
-      "link": "https://www.spiegel.de/wirtschaft/bakterielle-belastung-pinienkern-und-rindfleischsalami-produkte-werden-zurueckgerufen-a-19f1653d-9206-49a5-af76-da26d85f3bca#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-05T19:42:00+00:00"
-    },
-    {
-      "titel": "Supermärkte: Warum Kühlregale leicht zu hacken sind",
-      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/hacker-kuehlsysteme-supermaerkte-100.html",
+      "titel": "Sanierung der Bahnstrecke Berlin-Hannover: Massive Probleme für Pendler",
+      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/bahn-berlin-hannover-bauarbeiten-pendler-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-05T19:11:03+00:00"
+      "zeit": "2026-11-07T02:54:24+00:00"
     },
     {
-      "titel": "Bundestags-Votum: Mehr Vorteile für E-Autos im Stadtverkehr möglich",
-      "link": "https://www.tagesschau.de/wirtschaft/energie/elektromobilitaetsgesetz-100.html",
+      "titel": "Wirtschaft vor acht vom 06.11.2026",
+      "link": "https://www.tagesschau.de/video/video-1679460.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-05T17:27:08+00:00"
+      "zeit": "2026-11-06T18:51:48+00:00"
     },
     {
-      "titel": "Marktbericht: DAX springt auf Rekordhoch",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-dow-zwischenwahlen-100.html",
+      "titel": "Weltweiter KI-Ausverkauf: DAX rutscht nach Rekordhoch ab",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-dow-ki-nasdaq-wall-street-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-05T17:16:27+00:00"
+      "zeit": "2026-11-06T17:30:36+00:00"
+    },
+    {
+      "titel": "EZB: Welche Chancen Deutschland bei der Nachfolge von Christine Lagarde hat",
+      "link": "https://www.spiegel.de/wirtschaft/ezb-welche-chancen-deutschland-bei-der-nachfolge-von-christine-lagarde-hat-a-ddb505b8-589a-42ba-b36a-41a19ce63a68#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-06T17:27:00+00:00"
+    },
+    {
+      "titel": "Braunschweig: VW muss Ex-Manager rund 300.000 Euro nachzahlen",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/braunschweig-vw-muss-ex-manager-rund-300-000-euro-nachzahlen-a-dc3eb412-a0e6-46c0-9f23-38516e88ccb1#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-06T15:16:00+00:00"
+    },
+    {
+      "titel": "Lars Klingbeil: Wie das Finanzministerium unter ihm zum Pannenressort wurde",
+      "link": "https://www.spiegel.de/wirtschaft/lars-klingbeil-wie-das-finanzministerium-unter-ihm-zum-pannenressort-wurde-a-35513b47-45e7-4bf2-98ed-d962abaac09e#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-06T13:28:00+00:00"
+    },
+    {
+      "titel": "Marktbericht: Zweifel am KI-Geschäft belasten die Branche",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/ki-boom-unter-druck-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-06T13:22:11+00:00"
+    },
+    {
+      "titel": "Tesla will Cybertruck-Produktion in Texas einstellen",
+      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/tesla-produktion-cybertruck-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-06T13:09:10+00:00"
     }
   ]
 }
