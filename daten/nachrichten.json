@@ -1,6 +1,36 @@
 {
-  "stand": "2026-11-07T05:58:31+00:00",
+  "stand": "2026-11-08T05:59:37+00:00",
   "meldungen": [
+    {
+      "titel": "Online-Betrug: Jeder Neunte betroffen – ein Fall zeigt die neue Dimension",
+      "link": "https://www.spiegel.de/wirtschaft/service/online-betrug-jeder-neunte-betroffen-ein-fall-zeigt-die-neue-dimension-a-43ec84c1-0400-4864-9027-4d18cfb7f594#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-07T19:43:00+00:00"
+    },
+    {
+      "titel": "Millionen junge Menschen ohne Berufsausbildung in Deutschland",
+      "link": "https://www.tagesschau.de/wirtschaft/arbeitsmarkt/junge-menschen-keine-berufsausbildung-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-07T15:59:36+00:00"
+    },
+    {
+      "titel": "Nvidia: Jen-Hsun Huang soll Affäre mit chinesischer Agentin gehabt haben",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/nvidia-jen-hsun-huang-soll-affaere-mit-chinesischer-agentin-gehabt-haben-a-8b6c5163-b475-4478-a335-3aeaeccdca48#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-07T15:02:00+00:00"
+    },
+    {
+      "titel": "Starökonomin Mariana Mazzucato: »Die Techbranche ist nichts anderes als die Mafia«",
+      "link": "https://www.spiegel.de/wirtschaft/staroekonomin-mariana-mazzucato-die-techbranche-ist-nichts-anderes-als-die-mafia-a-385ed8b4-1e39-48d4-adc1-bd129b76f28e#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-07T11:44:00+00:00"
+    },
+    {
+      "titel": "Donald Trump und die Wirtschaft: Wo die Demokraten seinen Kurs korrigieren könnten",
+      "link": "https://www.spiegel.de/wirtschaft/donald-trump-und-die-wirtschaft-wo-die-demokraten-seinen-kurs-korrigieren-koennten-a-ad25686b-5dca-498e-9239-e1e7a131cf4a#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-07T09:19:00+00:00"
+    },
     {
       "titel": "Sanierung der Bahnstrecke Berlin-Hannover: Massive Probleme für Pendler",
       "link": "https://www.tagesschau.de/wirtschaft/verbraucher/bahn-berlin-hannover-bauarbeiten-pendler-100.html",
@@ -18,36 +48,6 @@
       "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-dow-ki-nasdaq-wall-street-100.html",
       "quelle": "tagesschau",
       "zeit": "2026-11-06T17:30:36+00:00"
-    },
-    {
-      "titel": "EZB: Welche Chancen Deutschland bei der Nachfolge von Christine Lagarde hat",
-      "link": "https://www.spiegel.de/wirtschaft/ezb-welche-chancen-deutschland-bei-der-nachfolge-von-christine-lagarde-hat-a-ddb505b8-589a-42ba-b36a-41a19ce63a68#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-06T17:27:00+00:00"
-    },
-    {
-      "titel": "Braunschweig: VW muss Ex-Manager rund 300.000 Euro nachzahlen",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/braunschweig-vw-muss-ex-manager-rund-300-000-euro-nachzahlen-a-dc3eb412-a0e6-46c0-9f23-38516e88ccb1#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-06T15:16:00+00:00"
-    },
-    {
-      "titel": "Lars Klingbeil: Wie das Finanzministerium unter ihm zum Pannenressort wurde",
-      "link": "https://www.spiegel.de/wirtschaft/lars-klingbeil-wie-das-finanzministerium-unter-ihm-zum-pannenressort-wurde-a-35513b47-45e7-4bf2-98ed-d962abaac09e#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-06T13:28:00+00:00"
-    },
-    {
-      "titel": "Marktbericht: Zweifel am KI-Geschäft belasten die Branche",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/ki-boom-unter-druck-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-06T13:22:11+00:00"
-    },
-    {
-      "titel": "Tesla will Cybertruck-Produktion in Texas einstellen",
-      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/tesla-produktion-cybertruck-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-06T13:09:10+00:00"
     }
   ]
 }
