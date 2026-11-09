@@ -1,6 +1,42 @@
 {
-  "stand": "2026-11-08T05:59:37+00:00",
+  "stand": "2026-11-09T06:21:19+00:00",
   "meldungen": [
+    {
+      "titel": "Rauchen: EU will Freimenge für Zigaretten deutlich senken",
+      "link": "https://www.spiegel.de/wirtschaft/service/rauchen-eu-will-freimenge-fuer-zigaretten-deutlich-senken-a-a440bf00-987f-4d1c-b522-8eb62af4dbd5#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-09T06:11:00+00:00"
+    },
+    {
+      "titel": "Nvidia: Jensen Huang gesteht Affäre mit mutmaßlicher China-Spionin - was folgt daraus?",
+      "link": "https://www.spiegel.de/wirtschaft/nvidia-jensen-huang-gesteht-affaere-mit-mutmasslicher-china-spionin-was-folgt-daraus-a-20a5fe38-a7c9-4985-8673-30a91902ee6e#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-09T05:17:00+00:00"
+    },
+    {
+      "titel": "Lars Klingbeil stopft Haushaltslücken mit Milliarden aus Bundesimmobilienanstalt",
+      "link": "https://www.spiegel.de/wirtschaft/soziales/lars-klingbeil-stopft-haushaltsluecken-mit-milliarden-aus-bundesimmobilienanstalt-a-503663b6-346a-40d2-a22b-e80f2023e5ce#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-09T05:12:00+00:00"
+    },
+    {
+      "titel": "Viele Gebäude weiterhin ohne Elementarschadenversicherung",
+      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/klimaschaeden-versicherungen-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-08T15:28:00+00:00"
+    },
+    {
+      "titel": "Argentinien: Javier Milei will Patagonien zum KI-Hotspot machen",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/argentinien-javier-milei-will-patagonien-zum-ki-hotspot-machen-a-c9f433be-f67d-43da-aed7-cf7bb5587d6b#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-08T09:59:00+00:00"
+    },
+    {
+      "titel": "Wie der Aktienkauf rund um die Uhr funktionieren soll",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/aktien-kauf-nachts-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-08T07:35:33+00:00"
+    },
     {
       "titel": "Online-Betrug: Jeder Neunte betroffen – ein Fall zeigt die neue Dimension",
       "link": "https://www.spiegel.de/wirtschaft/service/online-betrug-jeder-neunte-betroffen-ein-fall-zeigt-die-neue-dimension-a-43ec84c1-0400-4864-9027-4d18cfb7f594#ref=rss",
@@ -12,42 +48,6 @@
       "link": "https://www.tagesschau.de/wirtschaft/arbeitsmarkt/junge-menschen-keine-berufsausbildung-100.html",
       "quelle": "tagesschau",
       "zeit": "2026-11-07T15:59:36+00:00"
-    },
-    {
-      "titel": "Nvidia: Jen-Hsun Huang soll Affäre mit chinesischer Agentin gehabt haben",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/nvidia-jen-hsun-huang-soll-affaere-mit-chinesischer-agentin-gehabt-haben-a-8b6c5163-b475-4478-a335-3aeaeccdca48#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-07T15:02:00+00:00"
-    },
-    {
-      "titel": "Starökonomin Mariana Mazzucato: »Die Techbranche ist nichts anderes als die Mafia«",
-      "link": "https://www.spiegel.de/wirtschaft/staroekonomin-mariana-mazzucato-die-techbranche-ist-nichts-anderes-als-die-mafia-a-385ed8b4-1e39-48d4-adc1-bd129b76f28e#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-07T11:44:00+00:00"
-    },
-    {
-      "titel": "Donald Trump und die Wirtschaft: Wo die Demokraten seinen Kurs korrigieren könnten",
-      "link": "https://www.spiegel.de/wirtschaft/donald-trump-und-die-wirtschaft-wo-die-demokraten-seinen-kurs-korrigieren-koennten-a-ad25686b-5dca-498e-9239-e1e7a131cf4a#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-07T09:19:00+00:00"
-    },
-    {
-      "titel": "Sanierung der Bahnstrecke Berlin-Hannover: Massive Probleme für Pendler",
-      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/bahn-berlin-hannover-bauarbeiten-pendler-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-07T02:54:24+00:00"
-    },
-    {
-      "titel": "Wirtschaft vor acht vom 06.11.2026",
-      "link": "https://www.tagesschau.de/video/video-1679460.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-06T18:51:48+00:00"
-    },
-    {
-      "titel": "Weltweiter KI-Ausverkauf: DAX rutscht nach Rekordhoch ab",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-dow-ki-nasdaq-wall-street-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-06T17:30:36+00:00"
     }
   ]
 }
