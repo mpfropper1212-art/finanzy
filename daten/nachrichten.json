@@ -1,53 +1,53 @@
 {
-  "stand": "2026-11-09T06:21:19+00:00",
+  "stand": "2026-11-10T06:06:00+00:00",
   "meldungen": [
     {
-      "titel": "Rauchen: EU will Freimenge für Zigaretten deutlich senken",
-      "link": "https://www.spiegel.de/wirtschaft/service/rauchen-eu-will-freimenge-fuer-zigaretten-deutlich-senken-a-a440bf00-987f-4d1c-b522-8eb62af4dbd5#ref=rss",
+      "titel": "Bundesregierung meldet milliardenschwere Mehrausgaben für den Haushalt 2027",
+      "link": "https://www.spiegel.de/wirtschaft/soziales/bundesregierung-meldet-milliardenschwere-mehrausgaben-fuer-den-haushalt-2027-a-b3c6d481-3700-4ddb-886c-2d0adeb6e46b#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-11-09T06:11:00+00:00"
+      "zeit": "2026-11-10T00:32:00+00:00"
     },
     {
-      "titel": "Nvidia: Jensen Huang gesteht Affäre mit mutmaßlicher China-Spionin - was folgt daraus?",
-      "link": "https://www.spiegel.de/wirtschaft/nvidia-jensen-huang-gesteht-affaere-mit-mutmasslicher-china-spionin-was-folgt-daraus-a-20a5fe38-a7c9-4985-8673-30a91902ee6e#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-09T05:17:00+00:00"
-    },
-    {
-      "titel": "Lars Klingbeil stopft Haushaltslücken mit Milliarden aus Bundesimmobilienanstalt",
-      "link": "https://www.spiegel.de/wirtschaft/soziales/lars-klingbeil-stopft-haushaltsluecken-mit-milliarden-aus-bundesimmobilienanstalt-a-503663b6-346a-40d2-a22b-e80f2023e5ce#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-09T05:12:00+00:00"
-    },
-    {
-      "titel": "Viele Gebäude weiterhin ohne Elementarschadenversicherung",
-      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/klimaschaeden-versicherungen-100.html",
+      "titel": "Wirtschaft vor acht vom 09.11.2026",
+      "link": "https://www.tagesschau.de/video/video-1680998.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-08T15:28:00+00:00"
+      "zeit": "2026-11-09T18:54:48+00:00"
     },
     {
-      "titel": "Argentinien: Javier Milei will Patagonien zum KI-Hotspot machen",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/argentinien-javier-milei-will-patagonien-zum-ki-hotspot-machen-a-c9f433be-f67d-43da-aed7-cf7bb5587d6b#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-08T09:59:00+00:00"
-    },
-    {
-      "titel": "Wie der Aktienkauf rund um die Uhr funktionieren soll",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/aktien-kauf-nachts-100.html",
+      "titel": "Marktbericht: DAX erholt sich kräftig",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-dow-geldanlage-170.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-08T07:35:33+00:00"
+      "zeit": "2026-11-09T17:18:50+00:00"
     },
     {
-      "titel": "Online-Betrug: Jeder Neunte betroffen – ein Fall zeigt die neue Dimension",
-      "link": "https://www.spiegel.de/wirtschaft/service/online-betrug-jeder-neunte-betroffen-ein-fall-zeigt-die-neue-dimension-a-43ec84c1-0400-4864-9027-4d18cfb7f594#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-07T19:43:00+00:00"
-    },
-    {
-      "titel": "Millionen junge Menschen ohne Berufsausbildung in Deutschland",
-      "link": "https://www.tagesschau.de/wirtschaft/arbeitsmarkt/junge-menschen-keine-berufsausbildung-100.html",
+      "titel": "Mobilfunkunternehmen Vodafone plant Abbau von 2.300 Stellen",
+      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/vodafone-stellenabbau-102.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-07T15:59:36+00:00"
+      "zeit": "2026-11-09T16:09:03+00:00"
+    },
+    {
+      "titel": "Nvidia-Aktien verlieren auch zum Handelsstart in New York deutlich",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/nvidia-aktien-verlieren-auch-zum-handelsstart-in-new-york-deutlich-a-4c20ed90-2b37-48b9-8f13-6230f8a0459d#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-09T15:43:00+00:00"
+    },
+    {
+      "titel": "Spritpreise: Sinkender Ölpreis sorgt für Erholung bei E10, Benzin und Diesel",
+      "link": "https://www.spiegel.de/wirtschaft/spritpreise-sinkender-oelpreis-sorgt-fuer-erholung-bei-e10-benzin-und-diesel-a-29f929ff-3e9a-4239-8c85-07942e5402ad#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-09T14:16:00+00:00"
+    },
+    {
+      "titel": "Affäre von Nvidia-Chef Huang: Darum geht es beim Spionage-Verdacht",
+      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/faq-nvidia-spionage-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-09T13:58:03+00:00"
+    },
+    {
+      "titel": "Nvidia-Affäre lässt Aktie einbrechen",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktbericht-nvidia-ki-huang-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-09T13:44:48+00:00"
     }
   ]
 }
