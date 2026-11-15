@@ -1,53 +1,53 @@
 {
-  "stand": "2026-11-14T12:14:10+00:00",
+  "stand": "2026-11-15T12:46:22+00:00",
   "meldungen": [
+    {
+      "titel": "Krise im Handwerk: \"Stilles Sterben der Betriebe\"",
+      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/handwerk-krise-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-15T11:15:26+00:00"
+    },
+    {
+      "titel": "Energiewende: Solarförderung für kleine Anlagen soll offenbar doch bleiben",
+      "link": "https://www.spiegel.de/wirtschaft/service/solarfoerderung-fuer-kleine-anlagen-soll-offenbar-doch-bleiben-a-6b026b8d-e1f0-4e89-83f5-cc7d948a60c1#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-15T10:46:00+00:00"
+    },
+    {
+      "titel": "Wirtschaftskrise in Deutschland: Handwerk warnt vor »stillem Sterben der Betriebe«",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/handwerk-warnt-vor-stillem-sterben-der-betriebe-a-8ae8249b-be4e-467e-b6c8-dce66525f1e0#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-15T08:52:00+00:00"
+    },
+    {
+      "titel": "Meta: Italien verhängt 805-Millionen-Euro-Strafe wegen ausgelesener Fotogalerien",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/meta-facebook-muss-wegen-ausgelesener-fotogalerien-805-millionen-euro-zahlen-a-3347008b-5b9a-4955-82be-f7aa6f7e20ef#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-15T08:32:00+00:00"
+    },
+    {
+      "titel": "Warum Azubis in der Autoindustrie anfangen - trotz Krisenstimmung",
+      "link": "https://www.tagesschau.de/wirtschaft/arbeitsmarkt/ausbildung-volkswagen-trotz-krise-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-15T07:41:03+00:00"
+    },
+    {
+      "titel": "Grüne und Patientenschützer warnen vor Bezahlschranke für Arzttermine",
+      "link": "https://www.spiegel.de/wirtschaft/gruene-und-patientenschuetzer-warnen-vor-bezahlschranke-fuer-arzttermine-a-c1c3b771-a1ec-41f4-9818-034799ca96e5#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-15T04:53:00+00:00"
+    },
+    {
+      "titel": "Eurowings-Interna: Was in der Luft gesagt werden darf – und was nicht",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/eurowings-interna-was-in-der-luft-gesagt-werden-darf-und-was-nicht-a-952d23fb-e5d6-4be6-bb4b-3443a07d188f#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-14T17:25:00+00:00"
+    },
     {
       "titel": "CSU will Abschläge für Frührentner erhöhen",
       "link": "https://www.spiegel.de/wirtschaft/soziales/csu-will-abschlaege-fuer-fruehrentner-erhoehen-a-e30254e8-833b-4ad1-ab30-a6114735d64b#ref=rss",
       "quelle": "Spiegel",
       "zeit": "2026-11-14T11:44:00+00:00"
-    },
-    {
-      "titel": "Microsoft: Systeme nach Störung komplett wiederhergestellt",
-      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/microsoft-stoerung-behoben-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-14T10:17:44+00:00"
-    },
-    {
-      "titel": "Reederei MSC steht vor Kauf der Meyer Werft",
-      "link": "https://www.spiegel.de/wirtschaft/reederei-msc-steht-vor-kauf-der-meyer-werft-a-16726211-4815-4015-b4de-1f2db396e978#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-14T09:56:00+00:00"
-    },
-    {
-      "titel": "Was über den Ausfall von Microsoft-Diensten bekannt ist",
-      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/faq-ausfall-microsoft-dienste-weltweit-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-14T09:55:34+00:00"
-    },
-    {
-      "titel": "Tesla verkauft Robotaxis für 29.990 Dollar, plus 299 Dollar Gebühr pro Monat. Doch nicht an alle Kunden. Aber es fährt (nur nicht überall)",
-      "link": "https://www.spiegel.de/wirtschaft/tesla-verkauft-robotaxis-fuer-29-990-dollar-plus-299-dollar-gebuehr-pro-monat-doch-nicht-an-alle-kunden-aber-es-faehrt-nur-nicht-ueberall-a-a09f25f3-2f82-4fab-b61e-1b97cb340006#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-14T08:41:00+00:00"
-    },
-    {
-      "titel": "Straße von Hormus: Iran meldet drei brennende Öltanker in Meerenge",
-      "link": "https://www.spiegel.de/wirtschaft/service/iran-meldet-zwei-brennende-oel-tanker-in-der-strasse-von-hormus-a-872ff571-83d5-4520-9cd2-bdbdf570b95e#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-14T07:49:00+00:00"
-    },
-    {
-      "titel": "Warum in Polen schneller gebaut wird als in Deutschland",
-      "link": "https://www.tagesschau.de/wirtschaft/weltwirtschaft/bauen-polen-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-14T07:24:30+00:00"
-    },
-    {
-      "titel": "Kassenärzte schlagen Selbstzahler-Termine für Kassenpatienten vor",
-      "link": "https://www.spiegel.de/wirtschaft/soziales/kassenaerzte-schlagen-selbstzahler-termine-fuer-kassenpatienten-vor-a-4282bfbb-79a4-447b-b77b-812ed98bfc04#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-14T07:17:00+00:00"
     }
   ]
 }
