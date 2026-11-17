@@ -1,53 +1,53 @@
 {
-  "stand": "2026-11-16T13:42:26+00:00",
+  "stand": "2026-11-17T14:29:37+00:00",
   "meldungen": [
     {
-      "titel": "EU gibt UniCredit grünes Licht für Commerzbank-Übernahme",
-      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/commerzbank-unicredit-eu-genehmigung-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-16T11:50:50+00:00"
-    },
-    {
-      "titel": "Energieverbrauch der Industrie sinkt wegen hoher Preise",
-      "link": "https://www.tagesschau.de/wirtschaft/energie/energieverbrauch-deutsche-industrie-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-16T11:49:07+00:00"
-    },
-    {
-      "titel": "Zinsängste belasten Edelmetalle und Krypto-Währungen",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/gold-und-bitcoin-fallen-zinssorgen-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-16T11:22:36+00:00"
-    },
-    {
-      "titel": "Offshore-Windparks: Bundesregierung macht millionenschweres Angebot",
-      "link": "https://www.tagesschau.de/investigativ/ndr/offshore-bundesregierung-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-16T11:08:19+00:00"
-    },
-    {
-      "titel": "Maldon Salt: Nobelsalz-Hersteller muss sich für K+S-Beimischung rechtfertigen",
-      "link": "https://www.spiegel.de/wirtschaft/noble-speisesalze-maldon-salt-muss-sich-fuer-k-s-beimischung-rechtferitgen-a-e7a7603b-ba2b-44e9-9b26-d37ba3236ec9#ref=rss",
+      "titel": "Deutsche Bank: Aufsichtsratschef stellt sich nach Datenleak hinter Vorstandschef Christian Sewing",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/deutsche-bank-aufsichtsratschef-stellt-sich-nach-datenleak-hinter-vorstandschef-christian-sewing-a-ad3b2d2d-db1f-43ac-84a1-655f6ebdea19#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-11-16T11:04:00+00:00"
+      "zeit": "2026-11-17T13:29:00+00:00"
     },
     {
-      "titel": "EU genehmigt Übernahme der Commerzbank durch Unicredit",
-      "link": "https://www.spiegel.de/wirtschaft/eu-genehmigt-uebernahme-der-commerzbank-durch-unicredit-a-d345f44c-486c-43ed-968c-6d33229c6372#ref=rss",
+      "titel": "EU wirft Temu mangelnden Einsatz gegen illegale Produkte vor",
+      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/eu-temu-illegale-produkte-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-17T13:24:48+00:00"
+    },
+    {
+      "titel": "Marktbericht: Deutsche-Bank-Aktien nach neuen Vorwürfen unter Druck",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/deutschebank-226.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-17T13:08:30+00:00"
+    },
+    {
+      "titel": "EU-Kommission verdoppelt Prognose für Deutschland",
+      "link": "https://www.tagesschau.de/wirtschaft/konjunktur/eu-kommission-wachstumsprognose-deutschland-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-17T12:42:17+00:00"
+    },
+    {
+      "titel": "Kinderarzt: Ambulante Kinderärzte in Deutschland versorgen im Schnitt weniger Kinder",
+      "link": "https://www.spiegel.de/wirtschaft/kinderarzt-ambulante-kinderaerzte-in-deutschland-versorgen-im-schnitt-weniger-kinder-a-3ba93353-aed9-4d21-91e1-c118974019be#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-11-16T10:57:00+00:00"
+      "zeit": "2026-11-17T12:01:00+00:00"
     },
     {
-      "titel": "Update Wirtschaft vom 16.11.2026",
-      "link": "https://www.tagesschau.de/multimedia/sendung/tagesschau24/boerselive/video-1684508.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-16T08:54:49+00:00"
+      "titel": "Konjunktur: EU-Kommission verdoppelt Wachstumsprognose für Deutschland",
+      "link": "https://www.spiegel.de/wirtschaft/konjunktur-eu-kommission-verdoppelt-wachstumsprognose-fuer-deutschland-a-d32ff774-16e0-40fe-b4ea-727065af583a#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-17T10:46:00+00:00"
     },
     {
-      "titel": "Ex-Nvidia-Chef Huang arbeitet offenbar bereits an seinem Comeback",
-      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/nvidia-huang-chefposten-100.html",
+      "titel": "Gesundheit: Früherer Arzttermin gegen Bezahlung – ist das überhaupt legal?",
+      "link": "https://www.spiegel.de/wirtschaft/soziales/gesundheit-frueherer-arzttermin-gegen-bezahlung-ist-das-ueberhaupt-legal-a-2258c04f-51c0-43ea-9a20-07331e9175a7#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-17T10:36:00+00:00"
+    },
+    {
+      "titel": "Marktbericht: DAX-Rückschlag vor Nvidia-Zahlen",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-ki-dow-nvidia-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-16T08:07:28+00:00"
+      "zeit": "2026-11-17T09:57:57+00:00"
     }
   ]
 }
