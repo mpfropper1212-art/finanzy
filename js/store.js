@@ -243,7 +243,9 @@ function migrateAuto(roh) {
     kmQuelle: roh.kmQuelle === 'tanken' ? 'tanken' : 'manuell',
     aktuellKm: Math.max(0, Math.round(Number(roh.aktuellKm) || 0)),
     kaufpreisMitrechnen: roh.kaufpreisMitrechnen !== false,
-    kosten: Array.isArray(roh.kosten)
+    kosten: roh.kosten === undefined
+      ? SEED_KOSTEN.map(k => ({ ...k, id: uid('ak') }))
+      : Array.isArray(roh.kosten)
       ? roh.kosten.filter(x => x && x.id).map(x => ({
         id: String(x.id),
         datum: istDatum(x.datum) ? x.datum : isoDatum(),
@@ -252,16 +254,23 @@ function migrateAuto(roh) {
         kategorie: KATEGORIE_IDS.includes(x.kategorie) ? x.kategorie : 'sonstiges',
       }))
       : [],
-    laufend: Array.isArray(roh.laufend)
-      ? roh.laufend.filter(x => x && x.id).map(x => ({
-        id: String(x.id),
-        art: String(x.art ?? ''),
-        betrag: Math.round((Number(x.betrag) || 0) * 100) / 100,
-        rhythmus: RHYTHMUS_IDS.includes(x.rhythmus) ? x.rhythmus : 'monatlich',
-        kategorie: KATEGORIE_IDS.includes(x.kategorie) ? x.kategorie : 'fix',
-      }))
-      : [],
-    wartung: Array.isArray(roh.wartung)
+    // Fehlender Schlüssel und leere Liste sind zweierlei: wer alles gelöscht
+    // hat, soll die Vorlage nicht zurückbekommen - wer das Feld aber noch nie
+    // hatte, weil es damals nicht existierte, schon.
+    laufend: roh.laufend === undefined
+      ? SEED_LAUFEND.map(l => ({ ...l, id: uid('al') }))
+      : (Array.isArray(roh.laufend)
+        ? roh.laufend.filter(x => x && x.id).map(x => ({
+          id: String(x.id),
+          art: String(x.art ?? ''),
+          betrag: Math.round((Number(x.betrag) || 0) * 100) / 100,
+          rhythmus: RHYTHMUS_IDS.includes(x.rhythmus) ? x.rhythmus : 'monatlich',
+          kategorie: KATEGORIE_IDS.includes(x.kategorie) ? x.kategorie : 'fix',
+        }))
+        : []),
+    wartung: roh.wartung === undefined
+      ? SEED_WARTUNG.map(w => ({ ...w, id: uid('aw') }))
+      : Array.isArray(roh.wartung)
       ? roh.wartung.filter(x => x && x.id).map(x => ({
         id: String(x.id),
         teil: String(x.teil ?? 'Position'),

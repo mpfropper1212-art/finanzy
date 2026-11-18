@@ -1845,7 +1845,14 @@ button.kal-tag:disabled { cursor: default; }
 }
 .aufgabe-termin.ist-fehler { color: #dc2626; }
 
-.projekt-schalter { flex-direction: row; align-items: center; gap: 9px; cursor: pointer; }
+/* .feld ist ein zweispaltiges Raster - flex-direction greift daran nicht.
+   Deshalb hier wirklich auf flex umstellen, sonst steht der Haken ueber
+   seiner Beschriftung statt daneben. */
+.projekt-schalter {
+  display: flex; flex-direction: row; align-items: center;
+  gap: 9px; cursor: pointer;
+}
+.projekt-schalter input[type="checkbox"] { flex: none; margin: 0; }
 .projekt-schalter span { font-size: 13px; }
 
 @media (max-width: 760px) {
