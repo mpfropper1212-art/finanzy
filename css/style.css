@@ -2109,3 +2109,77 @@ button.kal-tag:disabled { cursor: default; }
   flex-basis: 100%; margin: 4px 0 0;
   font-size: 11.5px; line-height: 1.5; color: var(--muted);
 }
+
+/* ---------------- Vollkostenrechnung und Kilometerstände ---------------- */
+
+.auf-warnung {
+  margin: 0; padding: 9px 11px; border-radius: 9px;
+  font-size: 12.5px; line-height: 1.5;
+  background: color-mix(in srgb, #d97706 12%, transparent);
+  color: color-mix(in srgb, #b45309 90%, var(--text));
+}
+
+.auf-bloecke { display: flex; flex-direction: column; gap: 3px; }
+.auf-block {
+  display: grid; grid-template-columns: 10px minmax(0, 1fr) 48px 96px;
+  gap: 9px; align-items: center;
+  padding: 7px 8px; border-radius: 8px;
+}
+.auf-block:hover { background: var(--surface-2); }
+.auf-block-name { font-size: 13.5px; }
+.auf-block-anteil {
+  font-size: 11.5px; color: var(--muted); text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.auf-jahr-zeile {
+  font-size: 12.5px; color: var(--muted);
+  padding-top: 2px; border-top: 1px solid var(--border);
+}
+
+/* Die geschätzten Posten sind die unsicheren - deshalb steht offen, woher
+   sie kommen, statt eine Zahl ohne Herkunft hinzustellen. */
+.auf-regler {
+  border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface-2); padding: 10px 12px;
+}
+.auf-regler summary { cursor: pointer; font-size: 13px; font-weight: 600; }
+.auf-regler-zeile {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 8px 0; border-top: 1px solid var(--border); margin-top: 8px;
+}
+.auf-regler summary + .auf-regler-zeile { border-top: 0; }
+.auf-regler-haken { cursor: pointer; }
+.auf-regler-name { font-size: 13px; min-width: 190px; }
+.auf-regler-folge {
+  flex: 1 1 100%; font-size: 11.5px; color: var(--muted); line-height: 1.5;
+}
+
+.kmlog { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.kmlog .feld-hinweis { margin: 0; }
+.kmlog-liste { display: flex; flex-direction: column; gap: 2px; }
+.kmlog-zeile {
+  display: grid; grid-template-columns: 96px 108px minmax(0, 1fr) 82px;
+  gap: 10px; align-items: baseline;
+  padding: 6px 8px; border-radius: 8px; font-size: 13px;
+}
+.kmlog-zeile:nth-child(odd) { background: var(--surface-2); }
+.kmlog-datum { color: var(--muted); font-variant-numeric: tabular-nums; }
+.kmlog-km { font-variant-numeric: tabular-nums; }
+.kmlog-delta { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.kmlog-quelle {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--muted); text-align: right;
+}
+/* Eigene Ablesungen heben sich von den nebenbei erfassten Tachoständen ab. */
+.kmlog-zeile.ist-eigen .kmlog-quelle { color: var(--accent); font-weight: 650; }
+
+.row-km { display: grid; grid-template-columns: 1fr 96px auto 24px; gap: 7px; align-items: center; }
+
+@media (max-width: 760px) {
+  .auf-block { grid-template-columns: 10px minmax(0, 1fr) 42px 86px; gap: 7px; }
+  .auf-regler-name { min-width: 0; flex: 1 1 100%; }
+  .kmlog-zeile { grid-template-columns: 84px 1fr; gap: 4px 8px; }
+  .kmlog-delta { grid-column: 1 / 3; }
+  .kmlog-quelle { display: none; }
+  .row-km { grid-template-columns: 1fr 80px auto 24px; }
+}

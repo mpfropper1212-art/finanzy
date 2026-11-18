@@ -1,10 +1,11 @@
 // Auto: Stammdaten, Kostenliste und Wartungsplan.
 
 import { el, clear, money } from './util.js';
-import { KATEGORIEN, KATEGORIE_IDS, RHYTHMEN, RHYTHMUS_IDS } from './auto-daten.js';
+import { KATEGORIEN, KATEGORIE_IDS, RHYTHMEN, RHYTHMUS_IDS,
+  ADAC_PAUSCHALEN } from './auto-daten.js';
 import {
-  auswerten, laufendAuswerten, createKosten, createWartung, createLaufend,
-  WARTUNG_STATUS, runde,
+  auswerten, laufendAuswerten, vollkosten, createKosten, createWartung,
+  createLaufend, createKmStand, WARTUNG_STATUS, runde,
 } from './auto-logik.js';
 import { auswerten as tankAuswerten } from './tanken.js';
 
@@ -58,6 +59,11 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
         auto().kmQuelle === 'tanken' ? 'aus den Tankfüllungen' : 'von Hand gepflegt'),
       kachel('Selbst gefahren', km(k.gefahren),
         `seit ${km(auto().startKm)} beim Kauf`),
+      kachel('Kilometer je Monat',
+        a.verlauf.proMonat === null ? '–' : km(Math.round(a.verlauf.proMonat)),
+        a.verlauf.proJahr === null
+          ? 'zwei Ablesungen nötig'
+          : `${km(a.verlauf.proJahr)} im Jahr`),
       kachel('Kosten gesamt', money(k.gesamt),
         auto().kaufpreisMitrechnen === false
           ? `ohne Kaufpreis gerechnet: ${money(k.laufend)}`
@@ -76,10 +82,12 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
       'aria-expanded': String(offen),
     });
     laufendKachel.append(
-      el('span', { class: 'kpi-label' }, 'Läuft je Monat'),
-      el('strong', { class: 'kpi-value' }, money(Math.round(a.laufend.gesamtProMonat))),
+      el('span', { class: 'kpi-label' }, 'Kostet im Monat'),
+      el('strong', { class: 'kpi-value' }, money(Math.round(a.voll.gesamt))),
       el('span', { class: 'kpi-hint' },
-        offen ? 'Zum Zuklappen tippen' : 'Antippen: woraus sich das zusammensetzt'),
+        a.voll.fehlt.includes('restwert')
+          ? 'Ohne Wertverlust – antippen und ergänzen'
+          : (offen ? 'Zum Zuklappen tippen' : 'Antippen: woraus sich das zusammensetzt')),
       el('span', { class: 'kpi-pfeil' }, offen ? '▴' : '▾'),
     );
     laufendKachel.addEventListener('click', () => { offen = !offen; renderAll(); });
@@ -181,47 +189,158 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
 
   /* ----------------------- Monatskosten aufklappen ----------------------- */
 
-  const SPRIT_FARBE = '#d97706';
-
   function aufschluesselung(a) {
-    const l = a.laufend;
+    const v = a.voll;
     const box = el('section', { class: 'auf' });
 
     const kopf = el('div', { class: 'auf-kopf' });
     kopf.append(
-      el('h3', {}, 'Woraus sich das zusammensetzt'),
-      el('strong', { class: 'auf-summe' }, `${money(l.gesamtProMonat)} / Monat`),
+      el('h3', {}, 'Was dein Auto im Monat kostet'),
+      el('strong', { class: 'auf-summe' }, `${money(v.gesamt)} / Monat`),
     );
     box.appendChild(kopf);
 
-    // Anteilsbalken: zeigt vor dem Lesen schon, was am schwersten wiegt.
-    const anteile = [
-      ...l.posten.map(x => ({
-        id: x.id, label: x.art, wert: x.proMonat,
-        farbe: KATEGORIEN[x.kategorie]?.farbe ?? KATEGORIEN.fix.farbe,
-      })),
-      ...(l.sprit !== null && l.sprit > 0
-        ? [{ id: 'sprit', label: 'Sprit', wert: l.sprit, farbe: SPRIT_FARBE }]
-        : []),
-    ].filter(x => x.wert > 0);
-
-    if (anteile.length) {
+    if (v.bloecke.length) {
       const balken = el('div', { class: 'auf-balken' });
-      for (const x of anteile) {
+      for (const b of v.bloecke) {
         balken.appendChild(el('span', {
           class: 'auf-anteil',
-          style: `width: ${(x.wert / l.gesamtProMonat) * 100}%; background: ${x.farbe}`,
-          title: `${x.label}: ${money(x.wert)} je Monat`,
+          style: `width: ${(b.wert / v.gesamt) * 100}%; background: ${b.farbe}`,
+          title: `${b.label}: ${money(b.wert)} je Monat`,
         }));
       }
       box.appendChild(balken);
     }
 
-    const liste = el('div', { class: 'auf-liste' });
+    // Fehlt der Restwert, fehlt meist der größte Posten überhaupt.
+    if (v.fehlt.includes('restwert')) {
+      box.appendChild(el('p', { class: 'auf-warnung' },
+        'Der Wertverlust fehlt noch. Schätz unten, was dein Auto heute noch wert '
+        + 'wäre – bei den meisten Autos ist das der größte Einzelposten.'));
+    }
 
-    // Alle Beträge, die sich live mitändern sollen, hier merken - so lässt
-    // sich beim Tippen rechnen, ohne die Liste neu zu bauen und damit den
-    // Fokus aus dem Feld zu werfen.
+    const liste = el('div', { class: 'auf-bloecke' });
+    for (const b of v.bloecke) {
+      const zeile = el('div', { class: 'auf-block', style: `--farbe: ${b.farbe}` });
+      zeile.append(
+        el('span', { class: 'auf-punkt' }),
+        el('span', { class: 'auf-block-name' }, b.label),
+        el('span', { class: 'auf-block-anteil' }, `${Math.round((b.wert / v.gesamt) * 100)} %`),
+        el('strong', { class: 'auf-monat' }, money(b.wert)),
+      );
+      liste.appendChild(zeile);
+    }
+    box.appendChild(liste);
+
+    box.appendChild(el('div', { class: 'auf-jahr-zeile' },
+      `Macht ${money(Math.round(v.proJahr))} im Jahr`));
+
+    box.appendChild(stellschrauben(a));
+    box.appendChild(festePosten(a));
+
+    box.appendChild(el('p', { class: 'feld-hinweis' },
+      'Die Kostenarten folgen der ADAC-Autokostenberechnung (Grundlagen 10/2026). '
+      + 'Wertverlust und Werkstattrücklage rechnet die App aber aus deinen eigenen '
+      + 'Zahlen – die ADAC-Werte gelten für Neuwagen über fünf Jahre.'));
+
+    return box;
+  }
+
+  /* --------------------------- Stellschrauben --------------------------- */
+
+  function stellschrauben(a) {
+    const v = a.voll;
+    const vk = () => auto().vollkosten;
+    const box = el('details', { class: 'auf-regler' });
+    box.open = true;
+    box.appendChild(el('summary', {}, 'Woraus die geschätzten Posten kommen'));
+
+    /* Wertverlust */
+    const wert = el('div', { class: 'auf-regler-zeile' });
+    wert.appendChild(el('span', { class: 'auf-regler-name' }, 'Was wäre es heute noch wert?'));
+    const restwert = el('input', {
+      type: 'number', min: '0', step: '50', class: 'auf-betrag',
+      value: v.restwert ?? '', placeholder: 'schätzen',
+      'aria-label': 'Geschätzter heutiger Wert',
+    });
+    restwert.addEventListener('change', () => {
+      vk().restwert = restwert.value === '' ? null : runde(restwert.value);
+      aenderung();
+    });
+    wert.append(restwert, el('span', { class: 'auf-einheit' }, '€'));
+    wert.appendChild(el('span', { class: 'auf-regler-folge' },
+      v.wertverlust === null
+        ? `Kaufpreis war ${money(v.kaufpreis)}`
+        : `${money(v.verlustGesamt)} Verlust in ${Math.round(v.monate)} Monaten`));
+    box.appendChild(wert);
+
+    /* Werkstattrücklage */
+    const werk = el('div', { class: 'auf-regler-zeile' });
+    werk.appendChild(el('span', { class: 'auf-regler-name' }, 'Werkstattrücklage'));
+    const quelle = el('select', { class: 'auf-rhythmus', 'aria-label': 'Grundlage' });
+    for (const [id, label] of [['historie', 'aus deiner Historie'], ['manuell', 'selbst festlegen']]) {
+      const opt = el('option', { value: id }, label);
+      if (vk().werkstattQuelle === id) opt.selected = true;
+      quelle.appendChild(opt);
+    }
+    quelle.addEventListener('change', () => { vk().werkstattQuelle = quelle.value; aenderung(); });
+    werk.appendChild(quelle);
+
+    if (vk().werkstattQuelle === 'manuell') {
+      const betrag = el('input', {
+        type: 'number', min: '0', step: '5', class: 'auf-betrag',
+        value: vk().werkstattProMonat || '', 'aria-label': 'Rücklage je Monat',
+      });
+      betrag.addEventListener('change', () => {
+        vk().werkstattProMonat = runde(betrag.value);
+        aenderung();
+      });
+      werk.append(betrag, el('span', { class: 'auf-einheit' }, '€'));
+    } else {
+      werk.appendChild(el('span', { class: 'auf-regler-folge' },
+        v.werkstattVorschlag === null
+          ? 'noch zu wenig Historie'
+          : `${money(v.werkstattHistorie)} für Wartung und Reparatur bisher`));
+    }
+    box.appendChild(werk);
+
+    /* Pauschalen */
+    const pausch = el('label', { class: 'auf-regler-zeile auf-regler-haken' });
+    const haken = el('input', { type: 'checkbox' });
+    haken.checked = vk().pauschalenAn !== false;
+    haken.addEventListener('change', () => { vk().pauschalenAn = haken.checked; aenderung(); });
+    pausch.append(haken, el('span', { class: 'auf-regler-name' },
+      'Pauschalen für Pflege und Kleinkram'));
+    pausch.appendChild(el('span', { class: 'auf-regler-folge' },
+      `${money(ADAC_PAUSCHALEN.allgemein.proJahr)} ${ADAC_PAUSCHALEN.allgemein.text}, `
+      + `${money(ADAC_PAUSCHALEN.pflege.proJahr)} ${ADAC_PAUSCHALEN.pflege.text} – je Jahr, nach ADAC`));
+    box.appendChild(pausch);
+
+    /* Zinsen */
+    const zins = el('div', { class: 'auf-regler-zeile' });
+    zins.appendChild(el('span', { class: 'auf-regler-name' }, 'Entgangene Zinsen'));
+    const satz = el('input', {
+      type: 'number', min: '0', max: '20', step: '0.5', class: 'auf-betrag',
+      value: vk().zinssatz || '', placeholder: '0',
+      'aria-label': 'Zinssatz in Prozent',
+    });
+    satz.addEventListener('change', () => { vk().zinssatz = runde(satz.value); aenderung(); });
+    zins.append(satz, el('span', { class: 'auf-einheit' }, '%'));
+    zins.appendChild(el('span', { class: 'auf-regler-folge' },
+      'Der ADAC lässt das weg, empfiehlt es aber, wenn das Geld aus Erspartem kam. 0 schaltet es ab.'));
+    box.appendChild(zins);
+
+    return box;
+  }
+
+  /* ------------------------- Feste laufende Posten ------------------------- */
+
+  function festePosten(a) {
+    const l = a.laufend;
+    const box = el('details', { class: 'auf-regler' });
+    box.appendChild(el('summary', {},
+      `Versicherung, Steuer & Co. im Einzelnen (${money(l.proMonat)} je Monat)`));
+
     const anzeigen = [];
     const neuRechnen = () => {
       const frisch = laufendAuswerten(auto(), l.sprit);
@@ -229,12 +348,18 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
         const posten = frisch.posten.find(x => x.id === id);
         if (posten) knoten.textContent = money(posten.proMonat);
       }
-      kopf.querySelector('.auf-summe').textContent = `${money(frisch.gesamtProMonat)} / Monat`;
-      jahr.textContent = `${money(Math.round(frisch.gesamtProMonat * 12))} im Jahr`;
-      // Die Kachel darüber zeigt dieselbe Zahl - sie muss mitlaufen, sonst
-      // stehen zwei verschiedene Summen übereinander.
+      box.querySelector('summary').textContent =
+        `Versicherung, Steuer & Co. im Einzelnen (${money(frisch.proMonat)} je Monat)`;
+
+      // Kachel und Gesamtsumme haengen mit dran - sonst stehen drei
+      // verschiedene Zahlen auf einer Seite.
+      const neuVoll = vollkosten(auto(), { spritProMonat: l.sprit, monate: a.kosten.monate });
+      const summe = kpiHost.querySelector('.auf-summe');
+      if (summe) summe.textContent = `${money(neuVoll.gesamt)} / Monat`;
+      const jahr = kpiHost.querySelector('.auf-jahr-zeile');
+      if (jahr) jahr.textContent = `Macht ${money(Math.round(neuVoll.proJahr))} im Jahr`;
       const kachelWert = kpiHost.querySelector('.kpi-klappe .kpi-value');
-      if (kachelWert) kachelWert.textContent = money(Math.round(frisch.gesamtProMonat));
+      if (kachelWert) kachelWert.textContent = money(Math.round(neuVoll.gesamt));
     };
 
     for (const p2 of l.posten) {
@@ -244,9 +369,7 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
 
       zeile.appendChild(el('span', { class: 'auf-punkt' }));
 
-      const name = el('input', {
-        type: 'text', value: p2.art, class: 'auf-name', 'aria-label': 'Bezeichnung',
-      });
+      const name = el('input', { type: 'text', value: p2.art, class: 'auf-name', 'aria-label': 'Bezeichnung' });
       name.addEventListener('input', () => { original.art = name.value; store.commit({ silent: true }); });
       name.addEventListener('change', aenderung);
       zeile.appendChild(name);
@@ -272,15 +395,6 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
       rhythmus.addEventListener('change', () => { original.rhythmus = rhythmus.value; aenderung(); });
       zeile.appendChild(rhythmus);
 
-      const kategorie = el('select', { class: 'auf-kategorie', 'aria-label': 'Kategorie' });
-      for (const id of KATEGORIE_IDS) {
-        const opt = el('option', { value: id }, KATEGORIEN[id].label);
-        if (p2.kategorie === id) opt.selected = true;
-        kategorie.appendChild(opt);
-      }
-      kategorie.addEventListener('change', () => { original.kategorie = kategorie.value; aenderung(); });
-      zeile.appendChild(kategorie);
-
       const proMonat = el('strong', { class: 'auf-monat' }, money(p2.proMonat));
       anzeigen.push({ id: p2.id, knoten: proMonat });
       zeile.appendChild(proMonat);
@@ -292,36 +406,59 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
       });
       zeile.appendChild(weg);
 
-      liste.appendChild(zeile);
+      box.appendChild(zeile);
     }
 
-    // Sprit kommt aus dem Tanken-Tab und wird hier nur ausgewiesen.
-    if (l.sprit !== null) {
-      const zeile = el('div', { class: 'auf-zeile ist-geerbt', style: `--farbe: ${SPRIT_FARBE}` });
+    const neuKnopf = el('button', { class: 'btn btn-ghost btn-sm', type: 'button' }, '+ Posten');
+    neuKnopf.addEventListener('click', () => { auto().laufend.push(createLaufend()); aenderung(); });
+    box.appendChild(neuKnopf);
+
+    return box;
+  }
+
+  /* --------------------------- Kilometerstände --------------------------- */
+
+  function renderKm(a) {
+    const v = a.verlauf;
+    const box = el('section', { class: 'kmlog' });
+    box.appendChild(el('div', { class: 'immo-chart-head' }, 'Kilometerstände'));
+
+    if (!v.liste.length) {
+      box.appendChild(el('p', { class: 'empty' },
+        'Noch keine Ablesung. Rechts eintragen – Tachostände aus dem Tanken-Tab '
+        + 'zählen automatisch mit.'));
+      return box;
+    }
+
+    box.appendChild(el('p', { class: 'feld-hinweis' },
+      v.proMonat === null
+        ? 'Ab der zweiten Ablesung rechnet die App, wie viel du im Monat fährst.'
+        : `${km(Math.round(v.proMonat))} im Monat über ${v.gesamtTage} Tage. `
+          + (v.letzteProMonat !== null && Math.abs(v.letzteProMonat - v.proMonat) > 20
+            ? `Im letzten Jahr waren es ${km(Math.round(v.letzteProMonat))}.`
+            : '')));
+
+    const liste = el('div', { class: 'kmlog-liste' });
+    // Neueste zuerst - danach schaut man.
+    for (const p2 of [...v.liste].reverse().slice(0, 14)) {
+      const zeile = el('div', { class: 'kmlog-zeile' + (p2.quelle === 'eigen' ? ' ist-eigen' : '') });
+      const abschnitt = v.abschnitte.find(x => x.datum === p2.datum);
       zeile.append(
-        el('span', { class: 'auf-punkt' }),
-        el('span', { class: 'auf-name auf-name-fest' }, 'Sprit'),
-        el('span', { class: 'auf-quelle' }, 'Schnitt aus dem Tanken-Tab'),
-        el('strong', { class: 'auf-monat' }, money(l.sprit)),
+        el('span', { class: 'kmlog-datum' }, lang(p2.datum)),
+        el('strong', { class: 'kmlog-km' }, km(p2.km)),
+        el('span', { class: 'kmlog-delta' },
+          abschnitt ? `+${km(abschnitt.strecke)} in ${abschnitt.tage} Tagen` : 'erste Ablesung'),
+        el('span', { class: 'kmlog-quelle' },
+          p2.quelle === 'eigen' ? 'abgelesen' : 'getankt'),
       );
       liste.appendChild(zeile);
     }
-
     box.appendChild(liste);
 
-    const fuss = el('div', { class: 'auf-fuss' });
-    const neuKnopf = el('button', { class: 'btn btn-ghost btn-sm', type: 'button' }, '+ Posten');
-    neuKnopf.addEventListener('click', () => { auto().laufend.push(createLaufend()); aenderung(); });
-    const jahr = el('span', { class: 'auf-jahr' },
-      `${money(Math.round(l.gesamtProMonat * 12))} im Jahr`);
-    fuss.append(neuKnopf, jahr);
-    box.appendChild(fuss);
-
-    box.appendChild(el('p', { class: 'feld-hinweis' },
-      'Wird die Versicherung günstiger, trag den neuen Betrag einfach hier ein – '
-      + 'die Summe rechnet beim Tippen mit. Diese Posten zählen nicht in die '
-      + 'Gesamtkosten unten, sonst stünde die Versicherung doppelt drin.'));
-
+    if (v.liste.length > 14) {
+      box.appendChild(el('p', { class: 'feld-hinweis' },
+        `${v.liste.length - 14} ältere Ablesungen nicht gezeigt.`));
+    }
     return box;
   }
 
@@ -329,6 +466,7 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
 
   function renderKosten(a) {
     clear(kostenHost);
+    kostenHost.appendChild(renderKm(a));
     kostenHost.appendChild(el('div', { class: 'immo-chart-head' }, 'Einzelausgaben'));
 
     const k = a.kosten;
@@ -506,6 +644,31 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
     kauf.append(kaufHaken, el('span', {}, 'Anschaffung in den Kosten je km mitrechnen'));
     seiteHost.appendChild(kauf);
 
+    /* --- Kilometerstände --- */
+
+    const kmKopf = el('div', { class: 'editor-head editor-head-sep' });
+    kmKopf.appendChild(el('h2', {}, 'Kilometerstände'));
+    const kmNeu = el('button', { class: 'btn btn-primary btn-sm', type: 'button' }, '+ Ablesung');
+    kmNeu.addEventListener('click', () => {
+      // Mit dem letzten bekannten Stand vorbelegen - man tippt dann nur die
+      // Differenz, statt die ganze Zahl neu zu schreiben.
+      auto().kmStaende.push(createKmStand({ km: a.verlauf.hoechster ?? auto().aktuellKm ?? 0 }));
+      aenderung();
+    });
+    kmKopf.appendChild(kmNeu);
+    seiteHost.appendChild(kmKopf);
+
+    const kmListe = el('div', { class: 'rows' });
+    for (const st of [...auto().kmStaende].sort((x, y) => y.datum.localeCompare(x.datum))) {
+      kmListe.appendChild(kmZeile(st));
+    }
+    if (!auto().kmStaende.length) {
+      kmListe.appendChild(el('p', { class: 'feld-hinweis' },
+        'Tachostände aus dem Tanken-Tab zählen schon mit. Hier trägst du '
+        + 'Ablesungen ein, die nicht an einer Tankfüllung hängen.'));
+    }
+    seiteHost.appendChild(kmListe);
+
     /* --- Wartung pflegen --- */
 
     const kopf = el('div', { class: 'editor-head editor-head-sep' });
@@ -518,6 +681,27 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
     const liste = el('div', { class: 'rows' });
     for (const w of auto().wartung) liste.appendChild(wartungZeile(w));
     seiteHost.appendChild(liste);
+  }
+
+  function kmZeile(st) {
+    const box = el('div', { class: 'row row-km' });
+
+    const datum = el('input', { type: 'date', value: st.datum, 'aria-label': 'Datum' });
+    datum.addEventListener('change', () => { st.datum = datum.value || st.datum; aenderung(); });
+
+    const stand = el('input', {
+      type: 'number', min: '0', step: '1', value: st.km || '', 'aria-label': 'Kilometerstand',
+    });
+    stand.addEventListener('change', () => { st.km = Math.max(0, Math.round(zahl(stand.value))); aenderung(); });
+
+    const weg = el('button', { class: 'link-btn', type: 'button', title: 'Löschen' }, '✕');
+    weg.addEventListener('click', () => {
+      auto().kmStaende = auto().kmStaende.filter(x => x.id !== st.id);
+      aenderung();
+    });
+
+    box.append(datum, stand, el('span', { class: 'auf-einheit' }, 'km'), weg);
+    return box;
   }
 
   function wartungZeile(w) {

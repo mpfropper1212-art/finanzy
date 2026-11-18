@@ -7,7 +7,7 @@ import { MUSKELGRUPPEN, geraeteVorlage, uebungenVorlage } from './gym-daten.js';
 import { PLAN_IDS } from './gym-plaene.js';
 import { createProjekt } from './projekte-logik.js';
 import { SEED_AUTO, SEED_KOSTEN, SEED_WARTUNG, SEED_LAUFEND,
-  KATEGORIE_IDS, RHYTHMUS_IDS } from './auto-daten.js';
+  KATEGORIE_IDS, RHYTHMUS_IDS, VOLLKOSTEN_VORGABE } from './auto-daten.js';
 import { BEREICH_IDS, WIDGET_IDS, START_VORGABE } from './bereiche.js';
 
 export const DATA_VERSION = 2;
@@ -225,6 +225,8 @@ function autoVorlage() {
     kosten: SEED_KOSTEN.map(k => ({ ...k, id: uid('ak') })),
     wartung: SEED_WARTUNG.map(w => ({ ...w, id: uid('aw') })),
     laufend: SEED_LAUFEND.map(l => ({ ...l, id: uid('al') })),
+    kmStaende: [],
+    vollkosten: { ...VOLLKOSTEN_VORGABE },
   };
 }
 
@@ -257,6 +259,23 @@ function migrateAuto(roh) {
     // Fehlender Schlüssel und leere Liste sind zweierlei: wer alles gelöscht
     // hat, soll die Vorlage nicht zurückbekommen - wer das Feld aber noch nie
     // hatte, weil es damals nicht existierte, schon.
+    kmStaende: Array.isArray(roh.kmStaende)
+      ? roh.kmStaende.filter(x => x && x.id && istDatum(x.datum)).map(x => ({
+        id: String(x.id),
+        datum: x.datum,
+        km: Math.max(0, Math.round(Number(x.km) || 0)),
+        notiz: String(x.notiz ?? ''),
+      }))
+      : [],
+    vollkosten: {
+      werkstattQuelle: roh.vollkosten?.werkstattQuelle === 'manuell' ? 'manuell' : 'historie',
+      werkstattProMonat: Math.max(0, Math.round((Number(roh.vollkosten?.werkstattProMonat) || 0) * 100) / 100),
+      restwert: Number.isFinite(Number(roh.vollkosten?.restwert)) && roh.vollkosten?.restwert !== null
+        ? Math.max(0, Math.round(Number(roh.vollkosten.restwert) * 100) / 100)
+        : null,
+      pauschalenAn: roh.vollkosten?.pauschalenAn !== false,
+      zinssatz: Math.min(20, Math.max(0, Number(roh.vollkosten?.zinssatz) || 0)),
+    },
     laufend: roh.laufend === undefined
       ? SEED_LAUFEND.map(l => ({ ...l, id: uid('al') }))
       : (Array.isArray(roh.laufend)

@@ -143,3 +143,37 @@ export const SEED_LAUFEND = [
   { art: 'Versicherung', betrag: 1600.33, rhythmus: 'jaehrlich', kategorie: 'fix' },
   { art: 'KFZ-Steuer', betrag: 304, rhythmus: 'jaehrlich', kategorie: 'fix' },
 ];
+
+/* ------------------------- Vollkostenrechnung ------------------------- */
+
+// Pauschalen aus den Grundlagen der ADAC-Autokostenberechnung (Stand 10/2026,
+// "Berechnungsgrundlagen für die standardisierte Autokostenberechnung").
+// Sie decken Posten ab, die man selbst selten aufschreibt.
+export const ADAC_PAUSCHALEN = {
+  allgemein: {
+    proJahr: 200,
+    label: 'Allgemeine Kosten',
+    text: 'Parkgebühren, Kleinzubehör, HU/AU und Ähnliches',
+  },
+  pflege: {
+    proJahr: 250,
+    label: 'Wagenwäsche und Pflege',
+    text: 'Waschanlage, Pflegemittel',
+  },
+};
+
+export const ADAC_QUELLE = 'ADAC-Autokostenberechnung, Grundlagen Stand 10/2026';
+
+// Der ADAC setzt ab über drei Jahren Haltedauer oder ab 80.000 km
+// Gesamtlaufleistung zusätzlich eine Reparaturkostenpauschale an. Welche
+// Höhe, steht nicht im Grundlagenpapier - deshalb wird sie hier nicht
+// geraten, sondern aus der eigenen Kostenhistorie abgeleitet.
+export const REPARATUR_SCHWELLE_KM = 80000;
+
+export const VOLLKOSTEN_VORGABE = {
+  werkstattQuelle: 'historie',
+  werkstattProMonat: 0,
+  restwert: null,
+  pauschalenAn: true,
+  zinssatz: 0,
+};

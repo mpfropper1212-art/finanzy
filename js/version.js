@@ -1,3 +1,3 @@
 // Eine Stelle für die Versionsnummer. Steht klein in der Kopfzeile, damit man
 // bei einem Fehlerbericht sagen kann, welcher Stand gemeint ist.
-export const VERSION = '1.9.2';
+export const VERSION = '2.0.0';
