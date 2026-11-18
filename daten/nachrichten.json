@@ -1,53 +1,53 @@
 {
-  "stand": "2026-11-17T14:29:37+00:00",
+  "stand": "2026-11-18T14:05:09+00:00",
   "meldungen": [
     {
-      "titel": "Deutsche Bank: Aufsichtsratschef stellt sich nach Datenleak hinter Vorstandschef Christian Sewing",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/deutsche-bank-aufsichtsratschef-stellt-sich-nach-datenleak-hinter-vorstandschef-christian-sewing-a-ad3b2d2d-db1f-43ac-84a1-655f6ebdea19#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-17T13:29:00+00:00"
-    },
-    {
-      "titel": "EU wirft Temu mangelnden Einsatz gegen illegale Produkte vor",
-      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/eu-temu-illegale-produkte-100.html",
+      "titel": "Nach Datenleak: Deutsche-Bank-Papiere weiter unter Druck",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktbericht-146.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-17T13:24:48+00:00"
+      "zeit": "2026-11-18T13:48:13+00:00"
     },
     {
-      "titel": "Marktbericht: Deutsche-Bank-Aktien nach neuen Vorwürfen unter Druck",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/deutschebank-226.html",
+      "titel": "Regierung erleichtert Befristungen von Jobs",
+      "link": "https://www.tagesschau.de/wirtschaft/jobbefristungen-kabinett-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-17T13:08:30+00:00"
+      "zeit": "2026-11-18T13:44:31+00:00"
     },
     {
-      "titel": "EU-Kommission verdoppelt Prognose für Deutschland",
-      "link": "https://www.tagesschau.de/wirtschaft/konjunktur/eu-kommission-wachstumsprognose-deutschland-100.html",
+      "titel": "VW-Chef Blume: \"Komplett verändertes Umfeld\" zwingt zum Sparkurs",
+      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/vw-volkswagen-blume-zukunftsstrategie-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-17T12:42:17+00:00"
+      "zeit": "2026-11-18T13:43:17+00:00"
     },
     {
-      "titel": "Kinderarzt: Ambulante Kinderärzte in Deutschland versorgen im Schnitt weniger Kinder",
-      "link": "https://www.spiegel.de/wirtschaft/kinderarzt-ambulante-kinderaerzte-in-deutschland-versorgen-im-schnitt-weniger-kinder-a-3ba93353-aed9-4d21-91e1-c118974019be#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-17T12:01:00+00:00"
-    },
-    {
-      "titel": "Konjunktur: EU-Kommission verdoppelt Wachstumsprognose für Deutschland",
-      "link": "https://www.spiegel.de/wirtschaft/konjunktur-eu-kommission-verdoppelt-wachstumsprognose-fuer-deutschland-a-d32ff774-16e0-40fe-b4ea-727065af583a#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-17T10:46:00+00:00"
-    },
-    {
-      "titel": "Gesundheit: Früherer Arzttermin gegen Bezahlung – ist das überhaupt legal?",
-      "link": "https://www.spiegel.de/wirtschaft/soziales/gesundheit-frueherer-arzttermin-gegen-bezahlung-ist-das-ueberhaupt-legal-a-2258c04f-51c0-43ea-9a20-07331e9175a7#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-17T10:36:00+00:00"
-    },
-    {
-      "titel": "Marktbericht: DAX-Rückschlag vor Nvidia-Zahlen",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-ki-dow-nvidia-100.html",
+      "titel": "Stromsteuersenkung und Spritpreisdeckel: Was die Entlastungen im Alltag bringen könnten",
+      "link": "https://www.tagesschau.de/inland/innenpolitik/was-bringt-stromsteuer-senkung-koalitionsausschuss-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-17T09:57:57+00:00"
+      "zeit": "2026-11-18T13:36:45+00:00"
+    },
+    {
+      "titel": "Hendrik Wüst gegen Evonik-Übernahme durch BASF: »Das ist keine Pommesbude«",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/hendrik-wuest-gegen-evonik-uebernahme-durch-basf-das-ist-keine-pommesbude-a-efeed8d1-b9a9-46a9-95e2-e8b48adb1b30#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-18T12:44:00+00:00"
+    },
+    {
+      "titel": "Ukraine-Krieg: Warum die EU über weitere 45 Milliarden Euro für Kyjiw streitet",
+      "link": "https://www.spiegel.de/wirtschaft/ukraine-krieg-warum-die-eu-ueber-weitere-45-milliarden-euro-fuer-kyjiw-streitet-a-b8ec6864-59d7-4bb8-9cbf-1f31d61632cb#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-18T12:29:00+00:00"
+    },
+    {
+      "titel": "Deutsche Bank: So stimmt die Bank Mitarbeitende auf die Berichterstattung ein",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/deutsche-bank-so-stimmt-die-bank-mitarbeitende-auf-die-berichterstattung-ein-a-eb701341-d665-4e23-9db1-335d39547474#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-18T11:57:00+00:00"
+    },
+    {
+      "titel": "Jensen-Huang-Affäre: Nvidia verkauft keine KI-Chips mehr nach China",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/nvidia-jensen-huang-konzern-verkauft-keine-ki-chips-mehr-nach-china-a-e59ab63e-68d8-48c0-9f9b-5621595d27a2#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-18T11:52:00+00:00"
     }
   ]
 }
