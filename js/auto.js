@@ -3,7 +3,8 @@
 import { el, clear, money } from './util.js';
 import { KATEGORIEN, KATEGORIE_IDS, RHYTHMEN, RHYTHMUS_IDS } from './auto-daten.js';
 import {
-  auswerten, createKosten, createWartung, createLaufend, WARTUNG_STATUS, runde,
+  auswerten, laufendAuswerten, createKosten, createWartung, createLaufend,
+  WARTUNG_STATUS, runde,
 } from './auto-logik.js';
 import { auswerten as tankAuswerten } from './tanken.js';
 
@@ -27,6 +28,10 @@ function kachel(label, wert, hint) {
 export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, store }) {
   const auto = () => store.data.auto;
   const tank = () => store.data.tanken?.eintraege ?? [];
+
+  // Ob die Monatskosten aufgeklappt sind. Reine Anzeige, gehört nicht in
+  // die gespeicherten Daten.
+  let offen = false;
 
   function aenderung() {
     store.commit({ silent: true });
@@ -61,17 +66,31 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
         auto().kaufpreisMitrechnen === false ? 'ohne Kaufpreis' : 'mit Kaufpreis'),
       kachel('Bisher je Monat', k.proMonat === null ? '–' : money(Math.round(k.proMonat)),
         k.monate ? `Schnitt über ${Math.round(k.monate)} Monate` : 'noch zu kurz'),
-      kachel('Läuft je Monat', money(Math.round(a.laufend.gesamtProMonat)),
-        a.laufend.sprit === null
-          ? `${money(Math.round(a.laufend.proMonat))} fix, Sprit fehlt noch`
-          : `${money(Math.round(a.laufend.proMonat))} fix + ${money(Math.round(a.laufend.sprit))} Sprit`),
     );
+
+    // Die Monatskosten sind die eine Zahl, bei der man wissen will, woraus
+    // sie besteht - deshalb aufklappbar statt nur angezeigt.
+    const laufendKachel = el('button', {
+      type: 'button',
+      class: 'kpi kpi-klappe' + (offen ? ' ist-offen' : ''),
+      'aria-expanded': String(offen),
+    });
+    laufendKachel.append(
+      el('span', { class: 'kpi-label' }, 'Läuft je Monat'),
+      el('strong', { class: 'kpi-value' }, money(Math.round(a.laufend.gesamtProMonat))),
+      el('span', { class: 'kpi-hint' },
+        offen ? 'Zum Zuklappen tippen' : 'Antippen: woraus sich das zusammensetzt'),
+      el('span', { class: 'kpi-pfeil' }, offen ? '▴' : '▾'),
+    );
+    laufendKachel.addEventListener('click', () => { offen = !offen; renderAll(); });
+    box.appendChild(laufendKachel);
 
     if (a.wartung.faellig.length) {
       box.appendChild(kachel('Wartung fällig', String(a.wartung.faellig.length),
         a.wartung.faellig.map(x => x.teil).join(', ')));
     }
     kpiHost.appendChild(box);
+    if (offen) kpiHost.appendChild(aufschluesselung(a));
   }
 
   /* ----------------------------- Wartung ----------------------------- */
@@ -160,99 +179,148 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
     wartungHost.appendChild(liste);
   }
 
-  /* -------------------------- Laufende Kosten -------------------------- */
+  /* ----------------------- Monatskosten aufklappen ----------------------- */
 
-  function renderLaufend(a) {
+  const SPRIT_FARBE = '#d97706';
+
+  function aufschluesselung(a) {
     const l = a.laufend;
-    const box = el('section', { class: 'laufend' });
-    box.appendChild(el('div', { class: 'immo-chart-head' }, 'Laufende Kosten'));
-    box.appendChild(el('p', { class: 'feld-hinweis' },
-      'Was unabhängig von einzelnen Rechnungen weiterläuft. Alles wird auf '
-      + 'einen Monatswert umgerechnet. Diese Liste zählt nicht in die '
-      + 'Gesamtkosten unten – sonst stünde die Versicherung doppelt drin.'));
+    const box = el('section', { class: 'auf' });
 
-    const tabelle = el('table', { class: 'tank-tabelle' });
-    const kopf = el('tr');
-    for (const [t, c] of [['Was', ''], ['Betrag', 'num'], ['Rhythmus', ''], ['je Monat', 'num'], ['', '']]) {
-      kopf.appendChild(el('th', { class: c }, t));
+    const kopf = el('div', { class: 'auf-kopf' });
+    kopf.append(
+      el('h3', {}, 'Woraus sich das zusammensetzt'),
+      el('strong', { class: 'auf-summe' }, `${money(l.gesamtProMonat)} / Monat`),
+    );
+    box.appendChild(kopf);
+
+    // Anteilsbalken: zeigt vor dem Lesen schon, was am schwersten wiegt.
+    const anteile = [
+      ...l.posten.map(x => ({
+        id: x.id, label: x.art, wert: x.proMonat,
+        farbe: KATEGORIEN[x.kategorie]?.farbe ?? KATEGORIEN.fix.farbe,
+      })),
+      ...(l.sprit !== null && l.sprit > 0
+        ? [{ id: 'sprit', label: 'Sprit', wert: l.sprit, farbe: SPRIT_FARBE }]
+        : []),
+    ].filter(x => x.wert > 0);
+
+    if (anteile.length) {
+      const balken = el('div', { class: 'auf-balken' });
+      for (const x of anteile) {
+        balken.appendChild(el('span', {
+          class: 'auf-anteil',
+          style: `width: ${(x.wert / l.gesamtProMonat) * 100}%; background: ${x.farbe}`,
+          title: `${x.label}: ${money(x.wert)} je Monat`,
+        }));
+      }
+      box.appendChild(balken);
     }
-    const thead = el('thead');
-    thead.appendChild(kopf);
-    tabelle.appendChild(thead);
 
-    const body = el('tbody');
+    const liste = el('div', { class: 'auf-liste' });
+
+    // Alle Beträge, die sich live mitändern sollen, hier merken - so lässt
+    // sich beim Tippen rechnen, ohne die Liste neu zu bauen und damit den
+    // Fokus aus dem Feld zu werfen.
+    const anzeigen = [];
+    const neuRechnen = () => {
+      const frisch = laufendAuswerten(auto(), l.sprit);
+      for (const { id, knoten } of anzeigen) {
+        const posten = frisch.posten.find(x => x.id === id);
+        if (posten) knoten.textContent = money(posten.proMonat);
+      }
+      kopf.querySelector('.auf-summe').textContent = `${money(frisch.gesamtProMonat)} / Monat`;
+      jahr.textContent = `${money(Math.round(frisch.gesamtProMonat * 12))} im Jahr`;
+      // Die Kachel darüber zeigt dieselbe Zahl - sie muss mitlaufen, sonst
+      // stehen zwei verschiedene Summen übereinander.
+      const kachelWert = kpiHost.querySelector('.kpi-klappe .kpi-value');
+      if (kachelWert) kachelWert.textContent = money(Math.round(frisch.gesamtProMonat));
+    };
+
     for (const p2 of l.posten) {
       const original = auto().laufend.find(x => x.id === p2.id);
-      const tr = el('tr');
+      const farbe = KATEGORIEN[p2.kategorie]?.farbe ?? KATEGORIEN.fix.farbe;
+      const zeile = el('div', { class: 'auf-zeile', style: `--farbe: ${farbe}` });
 
-      const feld = (attrs, wert, uebernehmen) => {
-        const td = el('td', { class: attrs.class ?? '' });
-        const input = el('input', { ...attrs, class: 'tabellen-feld', value: wert });
-        input.addEventListener('input', () => { uebernehmen(input.value); store.commit({ silent: true }); });
-        input.addEventListener('change', () => { uebernehmen(input.value); aenderung(); });
-        td.appendChild(input);
-        return td;
-      };
+      zeile.appendChild(el('span', { class: 'auf-punkt' }));
 
-      tr.appendChild(feld({ type: 'text', 'aria-label': 'Bezeichnung' }, p2.art ?? '',
-        v => { original.art = v; }));
-      tr.appendChild(feld({ type: 'number', min: '0', step: '0.01', class: 'num', 'aria-label': 'Betrag' },
-        p2.betrag || '', v => { original.betrag = runde(v); }));
+      const name = el('input', {
+        type: 'text', value: p2.art, class: 'auf-name', 'aria-label': 'Bezeichnung',
+      });
+      name.addEventListener('input', () => { original.art = name.value; store.commit({ silent: true }); });
+      name.addEventListener('change', aenderung);
+      zeile.appendChild(name);
 
-      const rZelle = el('td');
-      const wahl = el('select', { class: 'tabellen-feld', 'aria-label': 'Rhythmus' });
+      const betrag = el('input', {
+        type: 'number', min: '0', step: '0.01', value: p2.betrag || '',
+        class: 'auf-betrag', 'aria-label': 'Betrag',
+      });
+      betrag.addEventListener('input', () => {
+        original.betrag = runde(betrag.value);
+        store.commit({ silent: true });
+        neuRechnen();
+      });
+      betrag.addEventListener('change', aenderung);
+      zeile.append(betrag, el('span', { class: 'auf-einheit' }, '€'));
+
+      const rhythmus = el('select', { class: 'auf-rhythmus', 'aria-label': 'Rhythmus' });
       for (const id of RHYTHMUS_IDS) {
         const opt = el('option', { value: id }, RHYTHMEN[id].label);
         if (p2.rhythmus === id) opt.selected = true;
-        wahl.appendChild(opt);
+        rhythmus.appendChild(opt);
       }
-      wahl.addEventListener('change', () => { original.rhythmus = wahl.value; aenderung(); });
-      rZelle.appendChild(wahl);
-      tr.appendChild(rZelle);
+      rhythmus.addEventListener('change', () => { original.rhythmus = rhythmus.value; aenderung(); });
+      zeile.appendChild(rhythmus);
 
-      tr.appendChild(el('td', { class: 'num stark' }, money(p2.proMonat)));
+      const kategorie = el('select', { class: 'auf-kategorie', 'aria-label': 'Kategorie' });
+      for (const id of KATEGORIE_IDS) {
+        const opt = el('option', { value: id }, KATEGORIEN[id].label);
+        if (p2.kategorie === id) opt.selected = true;
+        kategorie.appendChild(opt);
+      }
+      kategorie.addEventListener('change', () => { original.kategorie = kategorie.value; aenderung(); });
+      zeile.appendChild(kategorie);
 
-      const weg = el('td');
-      const x = el('button', { class: 'icon-btn', type: 'button', title: 'Eintrag löschen' }, '×');
-      x.addEventListener('click', () => {
-        auto().laufend = auto().laufend.filter(q => q.id !== p2.id);
+      const proMonat = el('strong', { class: 'auf-monat' }, money(p2.proMonat));
+      anzeigen.push({ id: p2.id, knoten: proMonat });
+      zeile.appendChild(proMonat);
+
+      const weg = el('button', { class: 'icon-btn', type: 'button', title: 'Posten entfernen' }, '×');
+      weg.addEventListener('click', () => {
+        auto().laufend = auto().laufend.filter(x => x.id !== p2.id);
         aenderung();
       });
-      weg.appendChild(x);
-      tr.appendChild(weg);
-      body.appendChild(tr);
+      zeile.appendChild(weg);
+
+      liste.appendChild(zeile);
     }
 
-    // Sprit kommt aus dem Tanken-Tab und wird deshalb nur angezeigt.
+    // Sprit kommt aus dem Tanken-Tab und wird hier nur ausgewiesen.
     if (l.sprit !== null) {
-      const tr = el('tr', { class: 'laufend-geerbt' });
-      tr.append(
-        el('td', {}, 'Sprit'),
-        el('td', { class: 'num' }, '–'),
-        el('td', {}, 'aus Tanken'),
-        el('td', { class: 'num stark' }, money(l.sprit)),
-        el('td', {}, ''),
+      const zeile = el('div', { class: 'auf-zeile ist-geerbt', style: `--farbe: ${SPRIT_FARBE}` });
+      zeile.append(
+        el('span', { class: 'auf-punkt' }),
+        el('span', { class: 'auf-name auf-name-fest' }, 'Sprit'),
+        el('span', { class: 'auf-quelle' }, 'Schnitt aus dem Tanken-Tab'),
+        el('strong', { class: 'auf-monat' }, money(l.sprit)),
       );
-      body.appendChild(tr);
+      liste.appendChild(zeile);
     }
-    tabelle.appendChild(body);
 
-    const fuss = el('tfoot');
-    const summe = el('tr');
-    summe.append(
-      el('th', {}, 'Je Monat'),
-      el('th', {}, ''),
-      el('th', {}, `${money(Math.round(l.gesamtProMonat * 12))} im Jahr`),
-      el('th', { class: 'num' }, money(l.gesamtProMonat)),
-      el('th', {}, ''),
-    );
-    fuss.appendChild(summe);
-    tabelle.appendChild(fuss);
-    box.appendChild(tabelle);
+    box.appendChild(liste);
 
-    const neuKnopf = el('button', { class: 'btn btn-ghost btn-sm', type: 'button' }, '+ Laufende Kosten');
+    const fuss = el('div', { class: 'auf-fuss' });
+    const neuKnopf = el('button', { class: 'btn btn-ghost btn-sm', type: 'button' }, '+ Posten');
     neuKnopf.addEventListener('click', () => { auto().laufend.push(createLaufend()); aenderung(); });
-    box.appendChild(neuKnopf);
+    const jahr = el('span', { class: 'auf-jahr' },
+      `${money(Math.round(l.gesamtProMonat * 12))} im Jahr`);
+    fuss.append(neuKnopf, jahr);
+    box.appendChild(fuss);
+
+    box.appendChild(el('p', { class: 'feld-hinweis' },
+      'Wird die Versicherung günstiger, trag den neuen Betrag einfach hier ein – '
+      + 'die Summe rechnet beim Tippen mit. Diese Posten zählen nicht in die '
+      + 'Gesamtkosten unten, sonst stünde die Versicherung doppelt drin.'));
 
     return box;
   }
@@ -261,7 +329,6 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
 
   function renderKosten(a) {
     clear(kostenHost);
-    kostenHost.appendChild(renderLaufend(a));
     kostenHost.appendChild(el('div', { class: 'immo-chart-head' }, 'Einzelausgaben'));
 
     const k = a.kosten;

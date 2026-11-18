@@ -2021,13 +2021,82 @@ button.kal-tag:disabled { cursor: default; }
 
 @media (max-width: 760px) {
   .wartung-zeile { flex-direction: column; align-items: flex-start; gap: 6px; }
+  /* Drei Reihen je Posten statt acht Spalten. */
+  .auf-zeile {
+    grid-template-columns: 10px minmax(0, 1fr) 86px 26px;
+    gap: 6px 7px;
+  }
+  .auf-name { grid-column: 2 / 4; }
+  .auf-betrag { grid-column: 2 / 3; grid-row: 2; }
+  .auf-einheit { display: none; }
+  .auf-rhythmus { grid-column: 3 / 5; grid-row: 2; }
+  .auf-kategorie { grid-column: 2 / 4; grid-row: 3; }
+  .auf-monat { grid-column: 4 / 5; grid-row: 3; }
+  .auf-quelle { grid-column: 2 / 4; grid-row: 2; }
 }
 
-/* Laufende Kosten und Intervall-Vorschläge */
-.laufend { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-.laufend .feld-hinweis { margin: 0; }
-/* Aus dem Tanken-Tab geerbt, hier nicht änderbar. */
-.laufend-geerbt td { opacity: .72; font-style: italic; }
+/* Monatskosten: Kachel zum Aufklappen und die Aufschlüsselung darunter */
+
+.kpi-klappe {
+  position: relative; text-align: left; cursor: pointer;
+  font: inherit; color: inherit; width: 100%;
+}
+.kpi-klappe:hover { border-color: var(--accent); }
+.kpi-klappe.ist-offen {
+  border-color: var(--accent); border-width: 1.5px;
+  background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+}
+.kpi-pfeil {
+  position: absolute; top: 11px; right: 12px;
+  font-size: 11px; color: var(--muted); line-height: 1;
+}
+
+.auf {
+  margin-top: 12px;
+  border: 1px solid var(--accent); border-radius: 14px;
+  background: var(--surface); padding: 15px;
+  display: flex; flex-direction: column; gap: 11px;
+}
+.auf-kopf {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+.auf-kopf h3 { margin: 0; font-size: 15px; }
+.auf-summe { font-size: 19px; font-variant-numeric: tabular-nums; }
+
+.auf-balken {
+  display: flex; height: 11px; border-radius: 999px; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.auf-anteil { height: 100%; }
+
+.auf-liste { display: flex; flex-direction: column; gap: 5px; }
+/* Ein Raster, keine Tabelle: so bleiben die Spalten bündig und brechen auf
+   dem Handy trotzdem sauber um. */
+.auf-zeile {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) 92px 14px 118px 128px 86px 26px;
+  gap: 7px; align-items: center;
+  padding: 6px 8px; border-radius: 9px;
+}
+.auf-zeile:hover { background: var(--surface-2); }
+.auf-punkt { width: 9px; height: 9px; border-radius: 50%; background: var(--farbe); }
+.auf-name { font-size: 13.5px; }
+.auf-name-fest { font-size: 13.5px; font-weight: 600; }
+.auf-betrag { text-align: right; font-variant-numeric: tabular-nums; }
+.auf-einheit { font-size: 12px; color: var(--muted); }
+.auf-monat {
+  text-align: right; font-size: 14px; font-variant-numeric: tabular-nums;
+}
+.auf-quelle { grid-column: 3 / 7; font-size: 12px; color: var(--muted); font-style: italic; }
+.auf-zeile.ist-geerbt { opacity: .8; }
+
+.auf-fuss {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; padding-top: 2px;
+}
+.auf-jahr { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.auf .feld-hinweis { margin: 0; }
 
 .wartung-hinweis {
   flex-basis: 100%; margin: 4px 0 0;
