@@ -6,6 +6,7 @@ import { uid, isoDatum } from './util.js';
 import { MUSKELGRUPPEN, geraeteVorlage, uebungenVorlage } from './gym-daten.js';
 import { PLAN_IDS } from './gym-plaene.js';
 import { createProjekt } from './projekte-logik.js';
+import { SEED_AUTO, SEED_KOSTEN, SEED_WARTUNG, KATEGORIE_IDS } from './auto-daten.js';
 import { BEREICH_IDS, WIDGET_IDS, START_VORGABE } from './bereiche.js';
 
 export const DATA_VERSION = 2;
@@ -74,6 +75,7 @@ export function createDefaultData() {
       aktivId: null,
       plan: { id: null, position: 0 },
     },
+    auto: autoVorlage(),
     pdf: { stufe: 'mittel' },
     projekte: (() => { const p = createProjekt('Beispielprojekt'); return { items: [p], activeId: p.id }; })(),
     strom: { staende: [], tarif: { arbeitspreis: 0.35, grundpreis: 12, abschlag: 0 } },
@@ -187,6 +189,7 @@ export function migrate(raw) {
         ? raw.wochenplan.abgehakt.filter(x => typeof x === 'string')
         : [],
     },
+    auto: migrateAuto(raw.auto),
     pdf: { stufe: ['stark', 'mittel', 'schonend'].includes(raw.pdf?.stufe) ? raw.pdf.stufe : 'mittel' },
     projekte: migrateProjekte(raw.projekte),
     start: migrateStart(raw.start),
@@ -211,6 +214,52 @@ export function migrate(raw) {
         sonstiges: Number(raw.tanken?.fixkosten?.sonstiges) || 0,
       },
     },
+  };
+}
+
+// Die gesammelten Fahrzeugdaten als Startbestand.
+function autoVorlage() {
+  return {
+    ...SEED_AUTO,
+    kosten: SEED_KOSTEN.map(k => ({ ...k, id: uid('ak') })),
+    wartung: SEED_WARTUNG.map(w => ({ ...w, id: uid('aw') })),
+  };
+}
+
+function migrateAuto(roh) {
+  if (!roh || typeof roh !== 'object') return autoVorlage();
+  const istDatum = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+  // Leer heißt hier wirklich leer - wer alles löscht, soll die Vorlage
+  // nicht beim nächsten Laden zurückbekommen.
+  const zahlOderNull = v => (Number.isFinite(Number(v)) && Number(v) > 0 ? Math.round(Number(v)) : null);
+
+  return {
+    name: String(roh.name ?? SEED_AUTO.name),
+    hsn: String(roh.hsn ?? ''),
+    tsn: String(roh.tsn ?? ''),
+    startKm: Math.max(0, Math.round(Number(roh.startKm) || 0)),
+    kmQuelle: roh.kmQuelle === 'tanken' ? 'tanken' : 'manuell',
+    aktuellKm: Math.max(0, Math.round(Number(roh.aktuellKm) || 0)),
+    kaufpreisMitrechnen: roh.kaufpreisMitrechnen !== false,
+    kosten: Array.isArray(roh.kosten)
+      ? roh.kosten.filter(x => x && x.id).map(x => ({
+        id: String(x.id),
+        datum: istDatum(x.datum) ? x.datum : isoDatum(),
+        art: String(x.art ?? ''),
+        betrag: Math.round((Number(x.betrag) || 0) * 100) / 100,
+        kategorie: KATEGORIE_IDS.includes(x.kategorie) ? x.kategorie : 'sonstiges',
+      }))
+      : [],
+    wartung: Array.isArray(roh.wartung)
+      ? roh.wartung.filter(x => x && x.id).map(x => ({
+        id: String(x.id),
+        teil: String(x.teil ?? 'Position'),
+        km: zahlOderNull(x.km),
+        datum: istDatum(x.datum) ? x.datum : null,
+        intervallKm: zahlOderNull(x.intervallKm),
+        intervallJahre: x.intervallJahre ? Math.min(20, Math.max(1, Math.round(Number(x.intervallJahre)))) : null,
+      }))
+      : [],
   };
 }
 

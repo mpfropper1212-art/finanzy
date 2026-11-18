@@ -60,6 +60,8 @@ const PFADE = {
   // die Sonne des Hell-Modus und wäre damit zweideutig.
   regler: ['M4,7 h16', 'M4,12 h16', 'M4,17 h16',
     'M9,5 a2,2 0 1 0 0.01,0', 'M15,10 a2,2 0 1 0 0.01,0', 'M7,15 a2,2 0 1 0 0.01,0'],
+  auto: ['M3,13 l2,-5 a2,2 0 0 1 1.9,-1.4 h10.2 a2,2 0 0 1 1.9,1.4 l2,5 v4 h-18 Z',
+    'M3,13 h18', 'M7,17 v2', 'M17,17 v2'],
   pdf: ['M13,3 H7 a2,2 0 0 0 -2,2 v14 a2,2 0 0 0 2,2 h10 a2,2 0 0 0 2,-2 V9 Z',
     'M13,3 v6 h6', 'M9,17 l3,-3 l3,3'],
   projekte: ['M3,5 h8 v4 h-8 Z', 'M9,11 h10 v4 h-10 Z', 'M6,17 h13 v4 h-13 Z'],

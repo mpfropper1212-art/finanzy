@@ -15,6 +15,7 @@ import { BEREICHE, GRUPPEN, bereichZu } from './bereiche.js';
 import { createHabitsView } from './habits.js';
 import { createProjekteView } from './projekte.js';
 import { createPdfView } from './pdf-werkzeug.js';
+import { createAutoView } from './auto.js';
 import { VERSION } from './version.js';
 import { createSchuldenView } from './schulden.js';
 import { createWochenplanView } from './wochenplan.js';
@@ -39,6 +40,7 @@ let gymView = null;
 let habitsView = null;
 let projekteView = null;
 let pdfView = null;
+let autoView = null;
 let schuldenView = null;
 let wochenView = null;
 let gruppenView = null;
@@ -242,6 +244,14 @@ function enterApp(data) {
 
   pdfView = createPdfView({ host: $('#pdf-host'), store });
 
+  autoView = createAutoView({
+    kpiHost: $('#auto-kpis'),
+    wartungHost: $('#auto-wartung'),
+    kostenHost: $('#auto-kosten'),
+    seiteHost: $('#auto-seite'),
+    store,
+  });
+
   wochenView = createWochenplanView({
     planHost: $('#woche-plan'),
     listeHost: $('#woche-liste'),
@@ -284,7 +294,7 @@ function enterApp(data) {
 function leaveApp() {
   store.detach();
   cloud.signOut();
-  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = stromView = gymView = habitsView = projekteView = pdfView = schuldenView = wochenView = gruppenView = dashboard = null;
+  flowEditor = accountsEditor = accountsView = immoView = gerichteView = tankenView = stromView = gymView = habitsView = projekteView = pdfView = autoView = schuldenView = wochenView = gruppenView = dashboard = null;
   $('#app-view').hidden = true;
   $('#login-view').hidden = false;
   $('#accounts-host').replaceChildren();
@@ -372,6 +382,7 @@ function rebuildAll() {
   habitsView.renderAll();
   projekteView.renderAll();
   pdfView.renderAll();
+  autoView.renderAll();
   schuldenView.renderAll();
   wochenView.renderAll();
   gruppenView.renderAll();
@@ -395,6 +406,7 @@ function setTab(tab) {
   else if (tab === 'habits') habitsView?.renderAll();
   else if (tab === 'projekte') projekteView?.renderAll();
   else if (tab === 'pdf') pdfView?.renderAll();
+  else if (tab === 'auto') autoView?.renderAll();
   else if (tab === 'schulden') schuldenView?.renderAll();
   else if (tab === 'woche') wochenView?.renderAll();
   else if (tab === 'gruppen') gruppenView?.renderAll();

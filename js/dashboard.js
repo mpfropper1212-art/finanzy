@@ -17,6 +17,7 @@ import { createMuenze } from './muenze.js';
 import { createHabitWidget, serie } from './habits.js';
 import { BEREICHE, WIDGETS, bereichZu } from './bereiche.js';
 import { planen } from './projekte-logik.js';
+import { auswerten as autoAuswerten } from './auto-logik.js';
 
 const dezimal = (v, stellen = 2) =>
   v === null || !Number.isFinite(v) ? '–' : v.toLocaleString('de-DE', {
@@ -83,6 +84,16 @@ function kennzahlen(data) {
         ? `${money(Math.round(sch.bekomme))} offen, ${money(Math.round(sch.schulde))} geschuldet`
         : 'nichts offen',
     },
+    auto: (() => {
+      const a = autoAuswerten(data.auto, data.tanken?.eintraege ?? []);
+      const offen = a.wartung.faellig.length;
+      return {
+        wert: offen ? `${offen} fällig` : money(a.kosten.gesamt),
+        zusatz: offen
+          ? a.wartung.faellig.map(x => x.teil).join(', ')
+          : `${a.kosten.proKm === null ? '–' : a.kosten.proKm.toFixed(2).replace('.', ',')} € je km`,
+      };
+    })(),
     pdf: { wert: 'Werkzeug', zusatz: 'läuft ganz in deinem Browser' },
     projekte: (() => {
       const liste = data.projekte.items;

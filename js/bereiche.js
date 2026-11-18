@@ -53,6 +53,12 @@ export const BEREICHE = [
   },
 
   {
+    tab: 'auto', panel: 'panel-auto', symbol: 'auto', kennzahl: 'auto', gruppe: 'Alltag',
+    titel: 'Auto',
+    text: 'Kosten, Kilometer und wann die nächste Wartung fällig ist.',
+  },
+
+  {
     tab: 'habits', panel: 'panel-habits', symbol: 'habits', kennzahl: 'habits', gruppe: 'Gesundheit',
     titel: 'Gewohnheiten',
     text: 'Kalender und Statistik zu deinen täglichen Haken.',

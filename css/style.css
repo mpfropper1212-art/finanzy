@@ -1964,3 +1964,61 @@ button.kal-tag:disabled { cursor: default; }
   .pdf-stufen-reihe { grid-template-columns: minmax(0, 1fr); }
   .pdf-host { padding: 12px; }
 }
+
+/* ------------------------------- Auto ------------------------------- */
+
+.dash-auto { background: color-mix(in srgb, #475569 14%, transparent); color: #475569; }
+
+.auto-kopf { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.auto-kopf h2 { margin: 0; font-size: 18px; }
+.auto-hsn { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Wartung: die Statusfarbe links ist das, was man beim Überfliegen sieht. */
+.wartung-liste { display: flex; flex-direction: column; gap: 5px; }
+.wartung-zeile {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+  border: 1px solid var(--border); border-left: 4px solid var(--status);
+  border-radius: 10px; background: var(--surface); padding: 9px 12px;
+}
+.wartung-zeile.ist-faellig { background: color-mix(in srgb, #dc2626 7%, var(--surface)); }
+.wartung-zeile.ist-offen { opacity: .72; }
+.wartung-links { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wartung-links strong { font-size: 13.5px; }
+.wartung-zuletzt { font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.wartung-rechts { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.wartung-marke {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  padding: 2px 8px; border-radius: 999px;
+  background: color-mix(in srgb, var(--status) 15%, transparent); color: var(--status);
+}
+.wartung-faellig { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Kostenverteilung als ein durchgehender Balken statt eigener Grafik. */
+.auto-verteilung {
+  display: flex; height: 13px; border-radius: 999px; overflow: hidden;
+  border: 1px solid var(--border); margin-bottom: 9px;
+}
+.auto-anteil { height: 100%; }
+.auto-legende { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; font-size: 12px; }
+.auto-legende-eintrag { display: flex; align-items: center; gap: 6px; }
+.auto-legende-eintrag strong { font-variant-numeric: tabular-nums; }
+.auto-punkt { width: 9px; height: 9px; border-radius: 50%; background: var(--farbe); }
+
+.auto-paar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* Vier Angaben je Wartungsposition - nebeneinander unlesbar, also drei Reihen. */
+.row-wartung {
+  display: grid; grid-template-columns: 1fr 1fr 24px;
+  gap: 6px; align-items: center;
+}
+.row-wartung > input.wartung-name { grid-area: 1 / 1 / 2 / 3; }
+.row-wartung > button.wartung-weg { grid-area: 1 / 3 / 2 / 4; justify-self: center; }
+.row-wartung > label:nth-of-type(1) { grid-area: 2 / 1 / 3 / 2; }
+.row-wartung > label:nth-of-type(2) { grid-area: 2 / 2 / 3 / 4; }
+.row-wartung > label:nth-of-type(3) { grid-area: 3 / 1 / 4 / 2; }
+.row-wartung > label:nth-of-type(4) { grid-area: 3 / 2 / 4 / 4; }
+
+@media (max-width: 760px) {
+  .wartung-zeile { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
