@@ -67,3 +67,79 @@ export const SEED_AUTO = {
   aktuellKm: 201495,
   kaufpreisMitrechnen: true,
 };
+
+/* ----------------------- Intervall-Vorschläge ----------------------- */
+
+// Übliche VW-Werte als Starthilfe für Positionen, bei denen in der Tabelle
+// kein Intervall stand. Das sind Richtwerte, keine Zusage: was für dieses
+// Fahrzeug gilt, steht im Serviceplan und hängt an Motor und Getriebe.
+//
+// Dass hier LongLife (QG1) angenommen wird, steht so in der übernommenen
+// Tabelle - "Intervallservice QG1" ist der VW-Code dafür.
+export const INTERVALL_VORSCHLAEGE = {
+  'Intervallservice QG1': {
+    km: 30000, jahre: 2,
+    hinweis: 'LongLife: bis 30.000 km oder 2 Jahre, je nachdem was zuerst kommt. '
+      + 'Das Auto meldet sich selbst, wenn es früher so weit ist.',
+  },
+  'Intervallservice QG0/1': {
+    km: 15000, jahre: 1,
+    hinweis: 'Fester Service (QG0): jährlich oder alle 15.000 km. Gilt nur, '
+      + 'wenn nicht auf LongLife gefahren wird.',
+  },
+  Inspektionsservice: {
+    km: 30000, jahre: 2,
+    hinweis: 'Bei LongLife alle 2 Jahre, bei festem Intervall jährlich.',
+  },
+  'DSG-Öl und Filter': {
+    km: 60000, jahre: null,
+    hinweis: 'Gilt für das DSG mit nasser Kupplung (DQ250, 6-Gang). Das '
+      + 'trockene 7-Gang-DSG (DQ200) hat eine Lebensdauerfüllung. Welches '
+      + 'verbaut ist, sagt dir die Werkstatt.',
+  },
+  Kraftstofffilter: {
+    km: 60000, jahre: null,
+    hinweis: 'Üblich beim Diesel. Benziner haben meist keinen Wechselfilter.',
+  },
+  Luftfiltereinsatz: {
+    km: 60000, jahre: null,
+    hinweis: 'Bei viel Staub oder Kurzstrecke eher früher.',
+  },
+  Reifenfüllflasche: {
+    km: null, jahre: 5,
+    hinweis: 'Das Dichtmittel läuft ab. Das Datum steht auf der Flasche selbst.',
+  },
+  Zahnriemen: {
+    km: 180000, jahre: null,
+    hinweis: 'Je nach Motor 180.000 bis 210.000 km. Deine eingetragenen '
+      + '150.000 km sind die vorsichtigere Variante – dabei zu bleiben '
+      + 'schadet nicht. Manche Motoren haben zusätzlich eine Altersgrenze.',
+  },
+  Bremsflüssigkeitswechsel: {
+    km: null, jahre: 2,
+    hinweis: 'Erstmals nach 3 Jahren, danach alle 2 Jahre.',
+  },
+  Innenraumfilter: {
+    km: 30000, jahre: 2,
+    hinweis: 'Bei Allergie oder Stadtverkehr gern jährlich.',
+  },
+};
+
+export const vorschlagFuer = teil => INTERVALL_VORSCHLAEGE[String(teil ?? '').trim()] ?? null;
+
+/* -------------------------- Laufende Kosten -------------------------- */
+
+export const RHYTHMEN = {
+  monatlich: { label: 'monatlich', proJahr: 12 },
+  vierteljaehrlich: { label: 'vierteljährlich', proJahr: 4 },
+  halbjaehrlich: { label: 'halbjährlich', proJahr: 2 },
+  jaehrlich: { label: 'jährlich', proJahr: 1 },
+};
+
+export const RHYTHMUS_IDS = Object.keys(RHYTHMEN);
+
+// Aus der Tabelle ableitbar: Versicherung und Steuer laufen weiter.
+export const SEED_LAUFEND = [
+  { art: 'Versicherung', betrag: 1600.33, rhythmus: 'jaehrlich', kategorie: 'fix' },
+  { art: 'KFZ-Steuer', betrag: 304, rhythmus: 'jaehrlich', kategorie: 'fix' },
+];

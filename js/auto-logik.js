@@ -2,7 +2,7 @@
 // fällig ist. Ohne DOM, damit es sich für sich prüfen lässt.
 
 import { isoDatum, uid } from './util.js';
-import { KATEGORIEN, KATEGORIE_IDS } from './auto-daten.js';
+import { KATEGORIEN, KATEGORIE_IDS, RHYTHMEN, vorschlagFuer } from './auto-daten.js';
 
 const zahl = v => (Number.isFinite(Number(v)) ? Number(v) : 0);
 const alsDatum = iso => new Date(`${iso}T12:00:00`);
@@ -13,6 +13,13 @@ export function createKosten(vorlage = {}) {
   return {
     id: uid('ak'), datum: isoDatum(), art: 'Neue Ausgabe',
     betrag: 0, kategorie: 'sonstiges', ...vorlage,
+  };
+}
+
+export function createLaufend(vorlage = {}) {
+  return {
+    id: uid('al'), art: 'Neue laufende Kosten', betrag: 0,
+    rhythmus: 'monatlich', kategorie: 'fix', ...vorlage,
   };
 }
 
@@ -73,6 +80,43 @@ export function kostenAuswerten(auto, aktuellKm) {
   };
 }
 
+/* -------------------------- Laufende Kosten -------------------------- */
+
+/**
+ * Was das Auto Monat für Monat kostet, unabhängig davon, wann die Rechnung
+ * kommt. Alles wird auf einen Monatswert umgerechnet.
+ *
+ * Bewusst getrennt von den Einzelausgaben: die eine Liste ist Vergangenheit
+ * (was tatsächlich bezahlt wurde), die andere eine Vorausschau. Würde man
+ * beides addieren, zählte man die Versicherung doppelt.
+ */
+export function laufendAuswerten(auto, spritProMonat = null) {
+  const liste = [...(auto?.laufend ?? [])];
+
+  const proMonat = runde(liste.reduce((s, x) => {
+    const r = RHYTHMEN[x.rhythmus] ?? RHYTHMEN.monatlich;
+    return s + (zahl(x.betrag) * r.proJahr) / 12;
+  }, 0));
+
+  const posten = liste.map(x => {
+    const r = RHYTHMEN[x.rhythmus] ?? RHYTHMEN.monatlich;
+    return { ...x, proMonat: runde((zahl(x.betrag) * r.proJahr) / 12), rhythmusLabel: r.label };
+  }).sort((a, b) => b.proMonat - a.proMonat);
+
+  // Ohne Klammer um Number(): Number(null) ist 0 und gilt als endlich -
+  // dann stünde "0 € Sprit" da, wo noch gar nichts erfasst ist.
+  const sprit = Number.isFinite(spritProMonat) ? runde(spritProMonat) : null;
+
+  return {
+    posten,
+    proMonat,
+    proJahr: runde(proMonat * 12),
+    sprit,
+    // Fixkosten plus Sprit: das ist die Zahl, die man im Kopf haben will.
+    gesamtProMonat: sprit === null ? proMonat : runde(proMonat + sprit),
+  };
+}
+
 /* ----------------------------- Wartung ----------------------------- */
 
 export const WARTUNG_STATUS = {
@@ -113,7 +157,10 @@ export function wartungAuswerten(auto, aktuellKm) {
       status = ueber ? 'faellig' : nah ? 'bald' : 'ok';
     }
 
-    return { ...w, faelligKm, restKm, faelligAm, restTage, status };
+    // Positionen ohne Intervall bekommen einen Vorschlag mit auf den Weg.
+    const vorschlag = status === 'offen' ? vorschlagFuer(w.teil) : null;
+
+    return { ...w, faelligKm, restKm, faelligAm, restTage, status, vorschlag };
   });
 
   // Was ansteht, zuerst; innerhalb der Gruppe das Dringendste oben.
@@ -145,11 +192,12 @@ export function aktuellerKm(auto, tankEintraege = []) {
   return Math.round(hoechster > 0 ? hoechster : zahl(auto?.aktuellKm));
 }
 
-export function auswerten(auto, tankEintraege = []) {
+export function auswerten(auto, tankEintraege = [], spritProMonat = null) {
   const km = aktuellerKm(auto, tankEintraege);
   return {
     km,
     kosten: kostenAuswerten(auto, km),
+    laufend: laufendAuswerten(auto, spritProMonat),
     wartung: wartungAuswerten(auto, km),
   };
 }

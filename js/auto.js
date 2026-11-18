@@ -1,10 +1,11 @@
 // Auto: Stammdaten, Kostenliste und Wartungsplan.
 
 import { el, clear, money } from './util.js';
-import { KATEGORIEN, KATEGORIE_IDS } from './auto-daten.js';
+import { KATEGORIEN, KATEGORIE_IDS, RHYTHMEN, RHYTHMUS_IDS } from './auto-daten.js';
 import {
-  auswerten, createKosten, createWartung, WARTUNG_STATUS, runde,
+  auswerten, createKosten, createWartung, createLaufend, WARTUNG_STATUS, runde,
 } from './auto-logik.js';
+import { auswerten as tankAuswerten } from './tanken.js';
 
 const zahl = v => (Number.isFinite(Number(v)) ? Number(v) : 0);
 
@@ -58,8 +59,12 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
           : `davon ${money(k.anschaffung)} Anschaffung`),
       kachel('Kosten je km', k.proKm === null ? '–' : `${runde(k.proKm).toLocaleString('de-DE', { minimumFractionDigits: 2 })} €`,
         auto().kaufpreisMitrechnen === false ? 'ohne Kaufpreis' : 'mit Kaufpreis'),
-      kachel('Kosten je Monat', k.proMonat === null ? '–' : money(Math.round(k.proMonat)),
-        k.monate ? `über ${Math.round(k.monate)} Monate` : 'noch zu kurz'),
+      kachel('Bisher je Monat', k.proMonat === null ? '–' : money(Math.round(k.proMonat)),
+        k.monate ? `Schnitt über ${Math.round(k.monate)} Monate` : 'noch zu kurz'),
+      kachel('Läuft je Monat', money(Math.round(a.laufend.gesamtProMonat)),
+        a.laufend.sprit === null
+          ? `${money(Math.round(a.laufend.proMonat))} fix, Sprit fehlt noch`
+          : `${money(Math.round(a.laufend.proMonat))} fix + ${money(Math.round(a.laufend.sprit))} Sprit`),
     );
 
     if (a.wartung.faellig.length) {
@@ -79,6 +84,14 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
       wartungHost.appendChild(el('p', { class: 'empty' },
         'Noch keine Wartungsposition. Rechts eintragen, was wann gemacht wurde.'));
       return;
+    }
+
+    const offene = a.wartung.liste.filter(w => w.vorschlag).length;
+    if (offene) {
+      wartungHost.appendChild(el('p', { class: 'feld-hinweis' },
+        `${offene === 1 ? 'Eine Position hat' : `${offene} Positionen haben`} noch kein Intervall. `
+        + 'Die Vorschläge sind übliche VW-Werte zum Übernehmen und danach frei änderbar – '
+        + 'verbindlich ist dein Serviceplan, nicht diese Liste.'));
     }
 
     const liste = el('div', { class: 'wartung-liste' });
@@ -115,21 +128,141 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
             : `seit ${lang(w.faelligAm)} überfällig`);
         }
         rechts.appendChild(el('span', { class: 'wartung-faellig' }, teile.join(' · ')));
+      } else if (w.vorschlag) {
+        const teile = [];
+        if (w.vorschlag.km) teile.push(`alle ${km(w.vorschlag.km)}`);
+        // "alle 1 Jahre" ist kein Deutsch.
+        if (w.vorschlag.jahre) {
+          teile.push(w.vorschlag.jahre === 1 ? 'jährlich' : `alle ${w.vorschlag.jahre} Jahre`);
+        }
+        const knopf = el('button', { class: 'btn btn-ghost btn-sm', type: 'button' },
+          `Vorschlag: ${teile.join(' oder ')}`);
+        knopf.title = w.vorschlag.hinweis;
+        knopf.addEventListener('click', () => {
+          const ziel = auto().wartung.find(x => x.id === w.id);
+          if (!ziel) return;
+          ziel.intervallKm = w.vorschlag.km;
+          ziel.intervallJahre = w.vorschlag.jahre;
+          aenderung();
+        });
+        rechts.appendChild(knopf);
       } else {
         rechts.appendChild(el('span', { class: 'wartung-faellig' }, 'kein Intervall hinterlegt'));
       }
       zeile.appendChild(rechts);
+
+      if (w.vorschlag) {
+        zeile.appendChild(el('p', { class: 'wartung-hinweis' }, w.vorschlag.hinweis));
+      }
 
       liste.appendChild(zeile);
     }
     wartungHost.appendChild(liste);
   }
 
+  /* -------------------------- Laufende Kosten -------------------------- */
+
+  function renderLaufend(a) {
+    const l = a.laufend;
+    const box = el('section', { class: 'laufend' });
+    box.appendChild(el('div', { class: 'immo-chart-head' }, 'Laufende Kosten'));
+    box.appendChild(el('p', { class: 'feld-hinweis' },
+      'Was unabhängig von einzelnen Rechnungen weiterläuft. Alles wird auf '
+      + 'einen Monatswert umgerechnet. Diese Liste zählt nicht in die '
+      + 'Gesamtkosten unten – sonst stünde die Versicherung doppelt drin.'));
+
+    const tabelle = el('table', { class: 'tank-tabelle' });
+    const kopf = el('tr');
+    for (const [t, c] of [['Was', ''], ['Betrag', 'num'], ['Rhythmus', ''], ['je Monat', 'num'], ['', '']]) {
+      kopf.appendChild(el('th', { class: c }, t));
+    }
+    const thead = el('thead');
+    thead.appendChild(kopf);
+    tabelle.appendChild(thead);
+
+    const body = el('tbody');
+    for (const p2 of l.posten) {
+      const original = auto().laufend.find(x => x.id === p2.id);
+      const tr = el('tr');
+
+      const feld = (attrs, wert, uebernehmen) => {
+        const td = el('td', { class: attrs.class ?? '' });
+        const input = el('input', { ...attrs, class: 'tabellen-feld', value: wert });
+        input.addEventListener('input', () => { uebernehmen(input.value); store.commit({ silent: true }); });
+        input.addEventListener('change', () => { uebernehmen(input.value); aenderung(); });
+        td.appendChild(input);
+        return td;
+      };
+
+      tr.appendChild(feld({ type: 'text', 'aria-label': 'Bezeichnung' }, p2.art ?? '',
+        v => { original.art = v; }));
+      tr.appendChild(feld({ type: 'number', min: '0', step: '0.01', class: 'num', 'aria-label': 'Betrag' },
+        p2.betrag || '', v => { original.betrag = runde(v); }));
+
+      const rZelle = el('td');
+      const wahl = el('select', { class: 'tabellen-feld', 'aria-label': 'Rhythmus' });
+      for (const id of RHYTHMUS_IDS) {
+        const opt = el('option', { value: id }, RHYTHMEN[id].label);
+        if (p2.rhythmus === id) opt.selected = true;
+        wahl.appendChild(opt);
+      }
+      wahl.addEventListener('change', () => { original.rhythmus = wahl.value; aenderung(); });
+      rZelle.appendChild(wahl);
+      tr.appendChild(rZelle);
+
+      tr.appendChild(el('td', { class: 'num stark' }, money(p2.proMonat)));
+
+      const weg = el('td');
+      const x = el('button', { class: 'icon-btn', type: 'button', title: 'Eintrag löschen' }, '×');
+      x.addEventListener('click', () => {
+        auto().laufend = auto().laufend.filter(q => q.id !== p2.id);
+        aenderung();
+      });
+      weg.appendChild(x);
+      tr.appendChild(weg);
+      body.appendChild(tr);
+    }
+
+    // Sprit kommt aus dem Tanken-Tab und wird deshalb nur angezeigt.
+    if (l.sprit !== null) {
+      const tr = el('tr', { class: 'laufend-geerbt' });
+      tr.append(
+        el('td', {}, 'Sprit'),
+        el('td', { class: 'num' }, '–'),
+        el('td', {}, 'aus Tanken'),
+        el('td', { class: 'num stark' }, money(l.sprit)),
+        el('td', {}, ''),
+      );
+      body.appendChild(tr);
+    }
+    tabelle.appendChild(body);
+
+    const fuss = el('tfoot');
+    const summe = el('tr');
+    summe.append(
+      el('th', {}, 'Je Monat'),
+      el('th', {}, ''),
+      el('th', {}, `${money(Math.round(l.gesamtProMonat * 12))} im Jahr`),
+      el('th', { class: 'num' }, money(l.gesamtProMonat)),
+      el('th', {}, ''),
+    );
+    fuss.appendChild(summe);
+    tabelle.appendChild(fuss);
+    box.appendChild(tabelle);
+
+    const neuKnopf = el('button', { class: 'btn btn-ghost btn-sm', type: 'button' }, '+ Laufende Kosten');
+    neuKnopf.addEventListener('click', () => { auto().laufend.push(createLaufend()); aenderung(); });
+    box.appendChild(neuKnopf);
+
+    return box;
+  }
+
   /* ------------------------------ Kosten ------------------------------ */
 
   function renderKosten(a) {
     clear(kostenHost);
-    kostenHost.appendChild(el('div', { class: 'immo-chart-head' }, 'Kosten'));
+    kostenHost.appendChild(renderLaufend(a));
+    kostenHost.appendChild(el('div', { class: 'immo-chart-head' }, 'Einzelausgaben'));
 
     const k = a.kosten;
     if (!k.liste.length) {
@@ -363,7 +496,10 @@ export function createAutoView({ kpiHost, wartungHost, kostenHost, seiteHost, st
   }
 
   function renderAll() {
-    const a = auswerten(auto(), tank());
+    // Die Spritkosten stehen schon im Tanken-Tab - von dort geholt, statt
+    // sie ein zweites Mal pflegen zu lassen.
+    const tankWerte = tankAuswerten(tank(), { fixkosten: {} });
+    const a = auswerten(auto(), tank(), tankWerte.spritProMonat);
     renderKpis(a);
     renderWartung(a);
     renderKosten(a);

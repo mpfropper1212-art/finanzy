@@ -2022,3 +2022,14 @@ button.kal-tag:disabled { cursor: default; }
 @media (max-width: 760px) {
   .wartung-zeile { flex-direction: column; align-items: flex-start; gap: 6px; }
 }
+
+/* Laufende Kosten und Intervall-Vorschläge */
+.laufend { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.laufend .feld-hinweis { margin: 0; }
+/* Aus dem Tanken-Tab geerbt, hier nicht änderbar. */
+.laufend-geerbt td { opacity: .72; font-style: italic; }
+
+.wartung-hinweis {
+  flex-basis: 100%; margin: 4px 0 0;
+  font-size: 11.5px; line-height: 1.5; color: var(--muted);
+}

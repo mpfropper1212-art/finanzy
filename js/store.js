@@ -6,7 +6,8 @@ import { uid, isoDatum } from './util.js';
 import { MUSKELGRUPPEN, geraeteVorlage, uebungenVorlage } from './gym-daten.js';
 import { PLAN_IDS } from './gym-plaene.js';
 import { createProjekt } from './projekte-logik.js';
-import { SEED_AUTO, SEED_KOSTEN, SEED_WARTUNG, KATEGORIE_IDS } from './auto-daten.js';
+import { SEED_AUTO, SEED_KOSTEN, SEED_WARTUNG, SEED_LAUFEND,
+  KATEGORIE_IDS, RHYTHMUS_IDS } from './auto-daten.js';
 import { BEREICH_IDS, WIDGET_IDS, START_VORGABE } from './bereiche.js';
 
 export const DATA_VERSION = 2;
@@ -223,6 +224,7 @@ function autoVorlage() {
     ...SEED_AUTO,
     kosten: SEED_KOSTEN.map(k => ({ ...k, id: uid('ak') })),
     wartung: SEED_WARTUNG.map(w => ({ ...w, id: uid('aw') })),
+    laufend: SEED_LAUFEND.map(l => ({ ...l, id: uid('al') })),
   };
 }
 
@@ -248,6 +250,15 @@ function migrateAuto(roh) {
         art: String(x.art ?? ''),
         betrag: Math.round((Number(x.betrag) || 0) * 100) / 100,
         kategorie: KATEGORIE_IDS.includes(x.kategorie) ? x.kategorie : 'sonstiges',
+      }))
+      : [],
+    laufend: Array.isArray(roh.laufend)
+      ? roh.laufend.filter(x => x && x.id).map(x => ({
+        id: String(x.id),
+        art: String(x.art ?? ''),
+        betrag: Math.round((Number(x.betrag) || 0) * 100) / 100,
+        rhythmus: RHYTHMUS_IDS.includes(x.rhythmus) ? x.rhythmus : 'monatlich',
+        kategorie: KATEGORIE_IDS.includes(x.kategorie) ? x.kategorie : 'fix',
       }))
       : [],
     wartung: Array.isArray(roh.wartung)
