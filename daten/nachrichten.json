@@ -1,53 +1,53 @@
 {
-  "stand": "2026-11-18T14:05:09+00:00",
+  "stand": "2026-11-19T14:28:10+00:00",
   "meldungen": [
     {
-      "titel": "Nach Datenleak: Deutsche-Bank-Papiere weiter unter Druck",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktbericht-146.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-18T13:48:13+00:00"
-    },
-    {
-      "titel": "Regierung erleichtert Befristungen von Jobs",
-      "link": "https://www.tagesschau.de/wirtschaft/jobbefristungen-kabinett-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-18T13:44:31+00:00"
-    },
-    {
-      "titel": "VW-Chef Blume: \"Komplett verändertes Umfeld\" zwingt zum Sparkurs",
-      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/vw-volkswagen-blume-zukunftsstrategie-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-18T13:43:17+00:00"
-    },
-    {
-      "titel": "Stromsteuersenkung und Spritpreisdeckel: Was die Entlastungen im Alltag bringen könnten",
-      "link": "https://www.tagesschau.de/inland/innenpolitik/was-bringt-stromsteuer-senkung-koalitionsausschuss-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-18T13:36:45+00:00"
-    },
-    {
-      "titel": "Hendrik Wüst gegen Evonik-Übernahme durch BASF: »Das ist keine Pommesbude«",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/hendrik-wuest-gegen-evonik-uebernahme-durch-basf-das-ist-keine-pommesbude-a-efeed8d1-b9a9-46a9-95e2-e8b48adb1b30#ref=rss",
+      "titel": "IEA: Weltweit geht erstmals mehr Energie fürs Kühlen als fürs Heizen drauf",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/iea-weltweit-geht-erstmals-mehr-energie-fuers-kuehlen-als-fuers-heizen-drauf-a-3c4f8dbc-6656-429d-98b8-23fb232111be#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-11-18T12:44:00+00:00"
+      "zeit": "2026-11-19T14:01:00+00:00"
     },
     {
-      "titel": "Ukraine-Krieg: Warum die EU über weitere 45 Milliarden Euro für Kyjiw streitet",
-      "link": "https://www.spiegel.de/wirtschaft/ukraine-krieg-warum-die-eu-ueber-weitere-45-milliarden-euro-fuer-kyjiw-streitet-a-b8ec6864-59d7-4bb8-9cbf-1f31d61632cb#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-18T12:29:00+00:00"
+      "titel": "KI-gestützter Cyberangriff auf EU-Kommission",
+      "link": "https://www.tagesschau.de/ausland/europa/cyberangriff-eu-kommission-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-19T13:56:39+00:00"
     },
     {
-      "titel": "Deutsche Bank: So stimmt die Bank Mitarbeitende auf die Berichterstattung ein",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/deutsche-bank-so-stimmt-die-bank-mitarbeitende-auf-die-berichterstattung-ein-a-eb701341-d665-4e23-9db1-335d39547474#ref=rss",
+      "titel": "Mercedes-Benz: Droht dem Autobauer ein Verkaufsverbot in den USA?",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/mercedes-benz-droht-dem-autobauer-ein-verkaufsverbot-in-den-usa-a-9c646c3d-96e2-4808-93e3-c3e8970d0e01#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-11-18T11:57:00+00:00"
+      "zeit": "2026-11-19T13:55:00+00:00"
     },
     {
-      "titel": "Jensen-Huang-Affäre: Nvidia verkauft keine KI-Chips mehr nach China",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/nvidia-jensen-huang-konzern-verkauft-keine-ki-chips-mehr-nach-china-a-e59ab63e-68d8-48c0-9f9b-5621595d27a2#ref=rss",
+      "titel": "Gebrauchte Spielekonsolen so teuer wie noch nie",
+      "link": "https://www.tagesschau.de/wirtschaft/digitales/gta-vi-konsolen-preise-gaming-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-19T13:33:49+00:00"
+    },
+    {
+      "titel": "Firmenporträt: Anthropics halsbrecherischer Aufstieg",
+      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/anthropic-firmenportrait-claude-boersengang-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-19T13:30:31+00:00"
+    },
+    {
+      "titel": "Warnstreiks der IG Metall",
+      "link": "https://www.tagesschau.de/wirtschaft/arbeitsmarkt/warnstreik-ig-metall-124.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-19T12:58:34+00:00"
+    },
+    {
+      "titel": "Marktbericht: Deutsche Telekom steigt bei KI-Start-up Mistral ein",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/mistral-telekom-ki-anthropic-marktbericht-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-19T12:57:07+00:00"
+    },
+    {
+      "titel": "Hamburg: Elbtower-Baufirma baut Kräne und Gerät ab",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/hamburg-elbtower-baufirma-baut-kraene-und-geraet-ab-a-e287501f-5a29-491a-bfcc-0255c3398ed2#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-11-18T11:52:00+00:00"
+      "zeit": "2026-11-19T12:51:00+00:00"
     }
   ]
 }
