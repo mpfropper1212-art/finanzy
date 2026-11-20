@@ -1,53 +1,53 @@
 {
-  "stand": "2026-11-19T14:28:10+00:00",
+  "stand": "2026-11-20T14:03:50+00:00",
   "meldungen": [
     {
-      "titel": "IEA: Weltweit geht erstmals mehr Energie fürs Kühlen als fürs Heizen drauf",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/iea-weltweit-geht-erstmals-mehr-energie-fuers-kuehlen-als-fuers-heizen-drauf-a-3c4f8dbc-6656-429d-98b8-23fb232111be#ref=rss",
+      "titel": "Galeria schließt drei Filialen - und noch viele mehr?",
+      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/galerie-schliessung-filialen-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-20T13:47:08+00:00"
+    },
+    {
+      "titel": "Marktbericht: KI-Kater nach dem Anthropic-Börsengang",
+      "link": "https://www.tagesschau.de/wirtschaft/boerse/ki-kater-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-20T13:19:33+00:00"
+    },
+    {
+      "titel": "Annalena Baerbock wird Beraterin",
+      "link": "https://www.spiegel.de/wirtschaft/annalena-baerbock-wird-beraterin-a-b0f7d531-e5ac-4a88-bf02-35894245c6f4#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-11-19T14:01:00+00:00"
+      "zeit": "2026-11-20T13:10:00+00:00"
     },
     {
-      "titel": "KI-gestützter Cyberangriff auf EU-Kommission",
-      "link": "https://www.tagesschau.de/ausland/europa/cyberangriff-eu-kommission-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-19T13:56:39+00:00"
-    },
-    {
-      "titel": "Mercedes-Benz: Droht dem Autobauer ein Verkaufsverbot in den USA?",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/mercedes-benz-droht-dem-autobauer-ein-verkaufsverbot-in-den-usa-a-9c646c3d-96e2-4808-93e3-c3e8970d0e01#ref=rss",
+      "titel": "Gender-Pay-Gap in der EU: Ab jetzt arbeiten Frauen umsonst",
+      "link": "https://www.spiegel.de/wirtschaft/gender-pay-gap-in-der-eu-ab-jetzt-arbeiten-frauen-umsonst-a-bebb8ac3-b170-437f-999e-7638b15a7e2e#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-11-19T13:55:00+00:00"
+      "zeit": "2026-11-20T11:17:00+00:00"
     },
     {
-      "titel": "Gebrauchte Spielekonsolen so teuer wie noch nie",
-      "link": "https://www.tagesschau.de/wirtschaft/digitales/gta-vi-konsolen-preise-gaming-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-19T13:33:49+00:00"
-    },
-    {
-      "titel": "Firmenporträt: Anthropics halsbrecherischer Aufstieg",
-      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/anthropic-firmenportrait-claude-boersengang-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-19T13:30:31+00:00"
-    },
-    {
-      "titel": "Warnstreiks der IG Metall",
-      "link": "https://www.tagesschau.de/wirtschaft/arbeitsmarkt/warnstreik-ig-metall-124.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-19T12:58:34+00:00"
-    },
-    {
-      "titel": "Marktbericht: Deutsche Telekom steigt bei KI-Start-up Mistral ein",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/mistral-telekom-ki-anthropic-marktbericht-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-19T12:57:07+00:00"
-    },
-    {
-      "titel": "Hamburg: Elbtower-Baufirma baut Kräne und Gerät ab",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/hamburg-elbtower-baufirma-baut-kraene-und-geraet-ab-a-e287501f-5a29-491a-bfcc-0255c3398ed2#ref=rss",
+      "titel": "Deutsche Bank: Wie Carsten Maschmeyer zum Risikokunden wurde",
+      "link": "https://www.spiegel.de/wirtschaft/deutsche-bank-wie-carsten-maschmeyer-zum-risikokunden-wurde-a-b7def544-3f6e-47e6-b740-1975f7c94243#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-11-19T12:51:00+00:00"
+      "zeit": "2026-11-20T11:16:00+00:00"
+    },
+    {
+      "titel": "Anthropic kann den Negativtrend an den Börsen nicht aufhalten",
+      "link": "https://www.spiegel.de/wirtschaft/anthropic-kann-den-negativtrend-an-den-boersen-nicht-aufhalten-a-2ebc6562-4f98-4fe9-9efe-f4a8a0b805fe#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-20T11:02:00+00:00"
+    },
+    {
+      "titel": "Gender Pay Gap: Frauen arbeiten den Rest des Jahres kostenlos",
+      "link": "https://www.tagesschau.de/wirtschaft/arbeitsmarkt/gender-pay-gap-140.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-20T10:09:15+00:00"
+    },
+    {
+      "titel": "Was die Volkswagen-Forderungen für Beschäftigte bedeuten könnten",
+      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/volkswagen-tarifstreit-ig-metall-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-20T09:55:01+00:00"
     }
   ]
 }
