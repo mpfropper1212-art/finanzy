@@ -1,53 +1,53 @@
 {
-  "stand": "2026-11-20T14:03:50+00:00",
+  "stand": "2026-11-21T13:30:02+00:00",
   "meldungen": [
     {
-      "titel": "Galeria schließt drei Filialen - und noch viele mehr?",
-      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/galerie-schliessung-filialen-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-20T13:47:08+00:00"
-    },
-    {
-      "titel": "Marktbericht: KI-Kater nach dem Anthropic-Börsengang",
-      "link": "https://www.tagesschau.de/wirtschaft/boerse/ki-kater-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-20T13:19:33+00:00"
-    },
-    {
-      "titel": "Annalena Baerbock wird Beraterin",
-      "link": "https://www.spiegel.de/wirtschaft/annalena-baerbock-wird-beraterin-a-b0f7d531-e5ac-4a88-bf02-35894245c6f4#ref=rss",
+      "titel": "Nvidia und Anthropic: Das steckt hinter dem Börsenbeben",
+      "link": "https://www.spiegel.de/wirtschaft/nvidia-und-anthropic-das-steckt-hinter-dem-boersenbeben-a-f2133f0d-0378-4c58-9875-7410412e0df1#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-11-20T13:10:00+00:00"
+      "zeit": "2026-11-21T13:13:00+00:00"
     },
     {
-      "titel": "Gender-Pay-Gap in der EU: Ab jetzt arbeiten Frauen umsonst",
-      "link": "https://www.spiegel.de/wirtschaft/gender-pay-gap-in-der-eu-ab-jetzt-arbeiten-frauen-umsonst-a-bebb8ac3-b170-437f-999e-7638b15a7e2e#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-20T11:17:00+00:00"
-    },
-    {
-      "titel": "Deutsche Bank: Wie Carsten Maschmeyer zum Risikokunden wurde",
-      "link": "https://www.spiegel.de/wirtschaft/deutsche-bank-wie-carsten-maschmeyer-zum-risikokunden-wurde-a-b7def544-3f6e-47e6-b740-1975f7c94243#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-20T11:16:00+00:00"
-    },
-    {
-      "titel": "Anthropic kann den Negativtrend an den Börsen nicht aufhalten",
-      "link": "https://www.spiegel.de/wirtschaft/anthropic-kann-den-negativtrend-an-den-boersen-nicht-aufhalten-a-2ebc6562-4f98-4fe9-9efe-f4a8a0b805fe#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-20T11:02:00+00:00"
-    },
-    {
-      "titel": "Gender Pay Gap: Frauen arbeiten den Rest des Jahres kostenlos",
-      "link": "https://www.tagesschau.de/wirtschaft/arbeitsmarkt/gender-pay-gap-140.html",
+      "titel": "Nach Kühnes Tod: Kontinuität und Aufarbeitung bei Kühne+Nagel",
+      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/klaus-michael-kuehne-unternehmer-vergangenheit-schindellegi-schweiz-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-20T10:09:15+00:00"
+      "zeit": "2026-11-21T12:36:54+00:00"
     },
     {
-      "titel": "Was die Volkswagen-Forderungen für Beschäftigte bedeuten könnten",
-      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/volkswagen-tarifstreit-ig-metall-100.html",
+      "titel": "Strom und Gas: Verivox rechnet mit steigenden Kosten",
+      "link": "https://www.spiegel.de/wirtschaft/service/strom-und-gas-verivox-rechnet-mit-steigenden-kosten-a-d6900d1e-e5cd-4399-a6ac-ca93f756be7b#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-21T10:50:00+00:00"
+    },
+    {
+      "titel": "\"Altersvorsorgedepot für nahezu alle Riester-Sparer interessant\"",
+      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/altersvorsorgedepot-tipps-riester-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-20T09:55:01+00:00"
+      "zeit": "2026-11-21T10:20:52+00:00"
+    },
+    {
+      "titel": "Altersvorsorgedepot: Staatlich organisierter Fonds nicht startklar",
+      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/altersvorsorgedepot-staatlicher-fonds-nicht-startklar-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-21T10:16:17+00:00"
+    },
+    {
+      "titel": "GTA VI spielt laut Konzern fast vier Milliarden Dollar am ersten Tag ein",
+      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/milliardengewinn-gta-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-21T09:39:17+00:00"
+    },
+    {
+      "titel": "Altersvorsorgedepot: Staatliches Depot für Zusatzrente verzögert sich wohl",
+      "link": "https://www.spiegel.de/wirtschaft/service/altersvorsorgedepot-staatliches-depot-fuer-zusatzrente-verzoegert-sich-wohl-a-705ab323-1c12-4e1e-b81f-4293c37475d6#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-21T08:43:00+00:00"
+    },
+    {
+      "titel": "Autobahnen: Vertrauliches Gutachten empfiehlt Pkw-Maut zur Finanzierung",
+      "link": "https://www.spiegel.de/wirtschaft/autobahnen-vertrauliches-gutachten-empfiehlt-pkw-maut-zur-finanzierung-a-e105dfef-32ed-4421-9a26-b935f697e8f9#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-21T06:16:00+00:00"
     }
   ]
 }
