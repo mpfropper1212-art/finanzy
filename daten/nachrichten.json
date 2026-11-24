@@ -1,53 +1,53 @@
 {
-  "stand": "2026-11-23T16:02:11+00:00",
+  "stand": "2026-11-24T15:55:39+00:00",
   "meldungen": [
     {
-      "titel": "Nvidia setzt Jensen Huang wieder als Chef ein",
-      "link": "https://www.tagesschau.de/wirtschaft/huang-wieder-nvidia-chef-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-23T15:18:29+00:00"
-    },
-    {
-      "titel": "OBI und Toom wollen fusionieren",
-      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/obi-toom-fusion-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-23T15:09:32+00:00"
-    },
-    {
-      "titel": "KI-Pioniere streiten über die Risiken",
-      "link": "https://www.tagesschau.de/wissen/ki-letzte-erfindung-der-menschheit-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-23T14:42:41+00:00"
-    },
-    {
-      "titel": "Nachfrage nach MINT-Fachkräften steigt wieder",
-      "link": "https://www.tagesschau.de/wirtschaft/arbeitsmarkt/mint-fachkraefte-steigende-nachfrage-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-23T14:41:00+00:00"
-    },
-    {
-      "titel": "Nvidia: Jensen Huang kehrt als Chef zurück",
-      "link": "https://www.spiegel.de/wirtschaft/nvidia-jensen-huang-kehrt-als-chef-zurueck-a-0b0c979f-9cf5-4e4d-be27-79ecbbb6945e#ref=rss",
+      "titel": "Öl: Brent-Peise stabilisiert sich nach Vortagsverlusten",
+      "link": "https://www.spiegel.de/wirtschaft/oel-brent-peise-stabilisiert-sich-nach-vortagsverlusten-a-bc31a2d2-29a0-493f-990a-53971fb94289#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-11-23T14:07:00+00:00"
+      "zeit": "2026-11-24T15:08:00+00:00"
     },
     {
-      "titel": "Obi und Toom: Fusion in der Baumarktbranche, Marke Toom verschwindet",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/baumarktketten-obi-und-toom-schliessen-sich-zusammen-a-3a984bb7-6185-415f-a62e-146a593dd5c7#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-23T13:23:00+00:00"
-    },
-    {
-      "titel": "Marktbericht: Dem DAX gelingt eine Erholung - vorerst",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/dax-erholung-wacklig-nach-kursrutsch-100.html",
+      "titel": "Wie Trump an Huangs Rückkehr zu Nvidia verdiente",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/trump-nvidia-aktien-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-23T11:49:55+00:00"
+      "zeit": "2026-11-24T14:51:13+00:00"
     },
     {
-      "titel": "Coca-Cola: EU-Kommission leitet Wettbewerbsverfahren gegen Abfüller ein",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/coca-cola-eu-kommission-leitet-wettbewerbsverfahren-gegen-abfueller-ein-a-299661c2-fc74-4333-bc61-2025aaea1f44#ref=rss",
+      "titel": "BYD: Autohersteller will ehemalige Smart-Fabrik in Lothringen kaufen",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/autohersteller-byd-will-ehemalige-smart-fabrik-in-lothringen-kaufen-a-44e5dc8a-e3da-4da7-a649-ee629bffa281#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-11-23T11:45:00+00:00"
+      "zeit": "2026-11-24T14:34:00+00:00"
+    },
+    {
+      "titel": "Nvidia hält die Märkte in Atem",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktbericht-nvidia-102.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-24T14:01:35+00:00"
+    },
+    {
+      "titel": "\"GTA VI\": Arbeitskampf hinter dem größten Videospiel der Welt",
+      "link": "https://www.tagesschau.de/wirtschaft/unternehmen/gta-6-104.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-24T13:42:43+00:00"
+    },
+    {
+      "titel": "Donald Trump: Nvidia-Aktien könnten Millionen an Wert gewonnen haben",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/nvidia-trumps-aktienbeteiligung-profitiert-von-huangs-schneller-rueckkehr-a-bb0f98ee-d9fa-4bf0-a71d-fa68aca801fd#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-24T13:27:00+00:00"
+    },
+    {
+      "titel": "Schädlingsbekämpfung mithilfe von KI: Die Rattenfängerin von Hannover",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/schaedlingsbekaempfung-mithilfe-von-ki-die-rattenfaengerin-von-hannover-a-c6f0bbb9-a507-4b55-983e-093b2ede6b66#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-24T13:06:00+00:00"
+    },
+    {
+      "titel": "EU: E-Autos boomen – besonders aus China",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/e-auto-elektrofahrzeuge-boomen-in-der-eu-rekordanteil-von-chinesischen-modellen-a-5a77379f-8945-4230-94a7-3e7a5acd5b01#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-24T12:29:00+00:00"
     }
   ]
 }
