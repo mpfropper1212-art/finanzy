@@ -1,53 +1,53 @@
 {
-  "stand": "2026-11-25T15:40:27+00:00",
+  "stand": "2026-11-26T15:21:38+00:00",
   "meldungen": [
     {
-      "titel": "USA kündigen neue Zölle an - auch gegen EU und China",
-      "link": "https://www.tagesschau.de/ausland/amerika/usa-zoelle-124.html",
+      "titel": "Spanier Hernández de Cos soll laut Medien Nachfolger von EZB-Chefin Lagarde werden",
+      "link": "https://www.tagesschau.de/eilmeldung/ezb-chef-de-cos-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-25T15:18:25+00:00"
+      "zeit": "2026-11-26T15:00:32+00:00"
     },
     {
-      "titel": "Hamburg: Alte Sternbrücke mit Asbest und Blei belastet",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/hamburg-alte-sternbruecke-mit-asbest-und-blei-belastet-a-4868dddd-47e4-4654-861e-e69e6d2f47ff#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-25T14:42:00+00:00"
-    },
-    {
-      "titel": "Discounter senken Butterpreis unter einen Euro",
-      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/butter-preis-preiskampf-discounter-bauern-100.html",
+      "titel": "Chinesischer Online-Händler Temu sagt mehr Verbraucherschutz zu",
+      "link": "https://www.tagesschau.de/wirtschaft/weltwirtschaft/temu-eu-verfahren-verbraucherschutz-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-25T14:01:31+00:00"
+      "zeit": "2026-11-26T14:38:50+00:00"
     },
     {
-      "titel": "Befristete Arbeitsverträge: Arbeitsrechtler halten Ausweitung für womöglich verfassungswidrig",
-      "link": "https://www.spiegel.de/wirtschaft/unternehmen/befristete-arbeitsvertraege-arbeitsrechtler-halten-ausweitung-fuer-womoeglich-verfassungswidrig-a-d87a6154-8998-411b-a439-5706f5097b88#ref=rss",
+      "titel": "EZB: Spanier ​Pablo Hernández de Cos soll Nachfolger von Christine Lagarde werden",
+      "link": "https://www.spiegel.de/wirtschaft/ezb-spanier-pablo-hernandez-de-cos-soll-nachfolger-von-christine-lagarde-werden-a-9cbee37b-5d10-4e23-8cd8-6bb207ea6809#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-11-25T13:37:00+00:00"
+      "zeit": "2026-11-26T13:57:00+00:00"
     },
     {
-      "titel": "USA planen neue Zölle gegen EU, China und 13 weitere Handelspartner",
-      "link": "https://www.spiegel.de/wirtschaft/usa-planen-neue-zoelle-gegen-eu-china-und-13-weitere-handelspartner-a-7ef83cdc-c400-43be-afd1-e5ab1a246e7d#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-25T13:35:00+00:00"
-    },
-    {
-      "titel": "Kartenzahlung überholt erstmals Bargeld in Geschäften",
-      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/ezb-zahlungsverhalten-bargeld-kartenzahlung-100.html",
+      "titel": "BGH stärkt Rechte von Mietern bei Balkonkraftwerken",
+      "link": "https://www.tagesschau.de/wirtschaft/verbraucher/mietrecht-balkonkraftwerke-bgh-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-25T13:32:13+00:00"
+      "zeit": "2026-11-26T13:29:47+00:00"
     },
     {
-      "titel": "Nach Apple-Absprung: Samsung steigt bei AMS-Osram ein",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/samsung-einstieg-osram-100.html",
+      "titel": "Marktbericht: Aktieninvestoren blicken vorsichtig nach vorn",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/dax-erholung-chancen-risiken-100.html",
       "quelle": "tagesschau",
-      "zeit": "2026-11-25T12:45:06+00:00"
+      "zeit": "2026-11-26T12:04:38+00:00"
     },
     {
-      "titel": "BMW: Gesamtbetriebsratschef Martin Kimmich attackiert Konzernchefs in Tarifkonflikt",
-      "link": "https://www.spiegel.de/wirtschaft/bmw-gesamtbetriebsratschef-martin-kimmich-attackiert-konzernchefs-in-tarifkonflikt-a-2241c461-f01e-4162-b33c-1dd68cb2544f#ref=rss",
+      "titel": "Lululemon-Gründer Chip Wilson soll sich auf Frauenkonferenz sexistisch geäußert haben",
+      "link": "https://www.spiegel.de/wirtschaft/unternehmen/lululemon-gruender-chip-wilson-soll-sich-auf-frauenkonferenz-sexistisch-geaeussert-haben-a-7c6a208b-8462-43df-afb8-c82338e36a3b#ref=rss",
       "quelle": "Spiegel",
-      "zeit": "2026-11-25T12:29:00+00:00"
+      "zeit": "2026-11-26T11:26:00+00:00"
+    },
+    {
+      "titel": "Streit um EU-Haushalt: Warum die Slowakei blockieren will",
+      "link": "https://www.tagesschau.de/ausland/europa/slowakei-blockiert-eu-haushalt-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-26T11:04:32+00:00"
+    },
+    {
+      "titel": "Reallöhne sind im Sommer langsamer gewachsen",
+      "link": "https://www.tagesschau.de/wirtschaft/arbeitsmarkt/loehne-wachstum-inflation-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-26T10:59:34+00:00"
     }
   ]
 }
