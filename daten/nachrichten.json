@@ -1,53 +1,53 @@
 {
-  "stand": "2026-11-27T15:09:27+00:00",
+  "stand": "2026-11-28T14:15:27+00:00",
   "meldungen": [
     {
-      "titel": "Sauter: Klavierbauer stellt Insolvenzantrag",
+      "titel": "So einfach kann man schlüssellose Autos mit Keyless Go knacken",
+      "link": "https://www.tagesschau.de/wirtschaft/digitales/keyless-cars-sicherheitsluecke-100.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-28T07:21:53+00:00"
+    },
+    {
+      "titel": "Rente: Riskanter Alleingang von Arbeitsminister Alexander Schweitzer",
+      "link": "https://www.spiegel.de/wirtschaft/soziales/rente-riskanter-alleingang-von-arbeitsminister-alexander-schweitzer-a-778dd4a2-450d-4c05-8c27-9a8603ce449b#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-27T22:40:00+00:00"
+    },
+    {
+      "titel": "KI: Ex-US-Arbeitsminister Robert Reich will die Macht der Techmilliardäre brechen",
+      "link": "https://www.spiegel.de/wirtschaft/ki-ex-us-arbeitsminister-robert-reich-will-die-macht-der-techmilliardaere-brechen-a-36aa8aa5-d8a0-4cd8-91a2-88d3fa5ed2e0#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-27T19:28:00+00:00"
+    },
+    {
+      "titel": "Marktbericht: Schnäppchenjagd an der Börse",
+      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-dow-geldanlage-176.html",
+      "quelle": "tagesschau",
+      "zeit": "2026-11-27T17:30:38+00:00"
+    },
+    {
+      "titel": "René Benko: Gericht korrigiert Strafe nach oben – nun drei Jahre Haft",
+      "link": "https://www.spiegel.de/wirtschaft/rene-benko-gericht-korrigiert-strafe-nach-oben-nun-drei-jahre-haft-a-59000352-3bb1-4756-8b55-40e0282cf651#ref=rss",
+      "quelle": "Spiegel",
+      "zeit": "2026-11-27T15:29:00+00:00"
+    },
+    {
+      "titel": "Sauter: Weltweit ältester Klavierbauer stellt Insolvenzantrag",
       "link": "https://www.spiegel.de/wirtschaft/unternehmen/sauter-klavierbauer-stellt-insolvenzantrag-a-a3df64ca-76e0-4225-8baf-a40c22fb35f0#ref=rss",
       "quelle": "Spiegel",
       "zeit": "2026-11-27T14:58:00+00:00"
     },
     {
-      "titel": "Handgepäck: Oberlandesgericht Frankfurt am Main erlaubt nur eine Tasche",
-      "link": "https://www.spiegel.de/wirtschaft/service/handgepaeck-oberlandesgericht-frankfurt-am-main-erlaubt-nur-eine-tasche-a-1642d5d5-9ff0-4170-a85d-f224a9b9e54d#ref=rss",
+      "titel": "Handgepäck: Oberlandesgericht Frankfurt am Main erlaubt nur eine Tasche pro Passagier",
+      "link": "https://www.spiegel.de/wirtschaft/service/handgepaeck-oberlandesgericht-frankfurt-am-main-erlaubt-nur-eine-tasche-pro-passagier-a-1642d5d5-9ff0-4170-a85d-f224a9b9e54d#ref=rss",
       "quelle": "Spiegel",
       "zeit": "2026-11-27T14:34:00+00:00"
     },
     {
-      "titel": "Bundeshaushalt 2027: Diese vier Grafiken zeigen, wohin Ihr Steuergeld fließt",
+      "titel": "Bundeshaushalt 2027: Diese Grafiken zeigen, wohin Ihr Steuergeld fließt",
       "link": "https://www.spiegel.de/wirtschaft/service/bundeshaushalt-2027-diese-vier-grafiken-zeigen-wohin-ihr-steuergeld-fliesst-a-a443d60d-a93e-4300-bae9-f4bcd3d9c995#ref=rss",
       "quelle": "Spiegel",
       "zeit": "2026-11-27T14:07:00+00:00"
-    },
-    {
-      "titel": "Black Friday: Wie das Shopping zum Kontaktsport wurde",
-      "link": "https://www.spiegel.de/wirtschaft/service/black-friday-wie-das-shopping-zum-kontaktsport-wurde-a-f7053732-7607-4b87-9200-83a2582bac3b#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-27T14:00:00+00:00"
-    },
-    {
-      "titel": "Anthropics wilde erste Börsenwoche",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/marktbericht-anthropic-ipo-ki-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-27T13:44:03+00:00"
-    },
-    {
-      "titel": "Was die Neubesetzung der EZB-Spitze bedeutet",
-      "link": "https://www.tagesschau.de/wirtschaft/finanzen/neuer-ezb-chef-de-cos-geldpolitik-100.html",
-      "quelle": "tagesschau",
-      "zeit": "2026-11-27T13:20:03+00:00"
-    },
-    {
-      "titel": "Uber sichert sich fast 90 Prozent der Anteile von Delivery Hero",
-      "link": "https://www.spiegel.de/wirtschaft/uber-sichert-sich-fast-90-prozent-der-anteile-von-delivery-hero-a-e3ce4aeb-2c38-4e99-9069-dc1159a62ca3#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-27T13:08:00+00:00"
-    },
-    {
-      "titel": "IG Metall und Arbeitgeber einigen sich: Das Herz der Wirtschaft schlägt noch – Meinung",
-      "link": "https://www.spiegel.de/wirtschaft/tarifabschluss-in-der-metall-und-elektroindustrie-das-herz-der-deutschen-wirtschaft-schlaegt-noch-a-866a0dba-a8ab-471b-bdc7-ace99989afb2#ref=rss",
-      "quelle": "Spiegel",
-      "zeit": "2026-11-27T12:54:00+00:00"
     }
   ]
 }
